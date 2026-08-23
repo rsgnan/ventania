@@ -22,6 +22,15 @@ class AuthService
         session_regenerate_id();
     }
 
+    public function getUserId(): ?int
+    {
+        $this->ensureSession();
+
+        return isset($_SESSION['user_id'])
+            ? (int) $_SESSION['user_id']
+            : null;
+    }
+
     public function handleLogin(string $username, string $password): bool
     {
         if (empty($username)) return false;

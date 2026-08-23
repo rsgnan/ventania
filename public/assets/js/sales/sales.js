@@ -11,7 +11,7 @@ const saleItems = typeof existingSaleItems !== 'undefined'
             id: Number(item.product_id),
             name: item.product_name,
             price: Number(item.unit_price),
-            stock: Number(product ? product.stock : 0),
+            stock: Number(product ? product.stock : 0) + Number(item.quantity),
             quantity: Number(item.quantity)
         };
     })

@@ -43,8 +43,8 @@ class SaleController extends ViewController
             $items = json_decode($_POST['items'] ?? '', true);
 
             $customerName = ($_POST['customer_name'] ?? '');
-            $status = ($_POST['status'] ?? '');
-            $userId = ($_POST['userId'] ?? null);
+            $status = 'pending'; // Por enquanto, até arrumar
+            $userId = $this->authService->getUserId();
 
             $subtotal = 0;
             $validateFields = [];
