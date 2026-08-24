@@ -40,7 +40,7 @@
                         <td><strong>R$ <?php echo e(number_format((float) $sale->total_amount, 2, ',', '.')); ?></strong></td>
                         <td>
                             <?php if ($sale->status === 'pending'): ?>
-                                <span class="badge yellow">Pendente</span>
+                                <span class="badge orange">Pendente</span>
                             <?php elseif ($sale->status === 'completed'): ?>
                                 <span class="badge green">Concluída</span>
                             <?php else: ?>
@@ -51,14 +51,7 @@
                         <td>
                             <div class="actions">
                                 <a href="?route=sales/edit&id=<?php echo e($sale->id); ?>" class="btn btn-ghost btn-sm">Editar</a>
-                                <?php if ($sale->status === 'pending'): ?>
-                                    <form method="POST" action="index.php?route=sales/cancel&id=<?php echo e($sale->id); ?>">
-                                        <?php echo csrf_field(); ?>
-                                        <button type="submit" class="btn btn-danger">
-                                            Cancelar
-                                        </button>
-                                    </form>
-                                <?php endif; ?>
+                            </div>
                         </td>
                     </tr>
                 <?php endforeach; ?>

@@ -33,7 +33,7 @@
             <div class="card-header">
                 <div>
                     <div class="card-title">Informações Gerais</div>
-                    <div class="card-subtitle">Nome, marca e categoria do produto</div>
+                    <div class="card-subtitle">Dados principais e descrição do produto</div>
                 </div>
             </div>
             <div class="card-body">
