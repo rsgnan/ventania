@@ -1,49 +1,49 @@
-    <?php
+<?php
 
-    namespace App\Controller;
+namespace App\Controller;
 
-    use App\Core\ViewController;
+use App\Core\ViewController;
 
-    class LoginController extends ViewController
+class LoginController extends ViewController
+{
+    public function logout(): void
     {
-        public function logout(): void
-        {
-            $this->authService->logout();
-            header('Location: index.php?' . http_build_query([
-                'route' => 'admin/login'
-            ]));
+        $this->authService->logout();
+        header('Location: index.php?' . http_build_query([
+            'route' => 'admin/login'
+        ]));
+        return;
+    }
+
+    public function login(): void
+    {
+        if ($this->authService->isLoggedIn()) {
+            header('Location: index.php?' . http_build_query(['route' => 'products/index']));
             return;
         }
 
-        public function login(): void
-        {
-            if ($this->authService->isLoggedIn()) {
-                header('Location: index.php?' . http_build_query(['route' => 'products/index']));
-                return;
-            }
+        $loginError = false;
+        $username = '';
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $username = trim((string) ($_POST['username'] ?? ''));
+            $password = (string) ($_POST['password'] ?? '');
 
-            $loginError = false;
-            $username = '';
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $username = trim((string) ($_POST['username'] ?? ''));
-                $password = (string) ($_POST['password'] ?? '');
-
-                if (!empty($username) && !empty($password)) {
-                    $loginOk = $this->authService->handleLogin($username, $password);
-                    if ($loginOk) {
-                        header('Location: index.php?' . http_build_query(['route' => 'products/index']));
-                        return;
-                    }
-
-                    $loginError = true;
-                } else {
-                    $loginError = true;
+            if (!empty($username) && !empty($password)) {
+                $loginOk = $this->authService->handleLogin($username, $password);
+                if ($loginOk) {
+                    header('Location: index.php?' . http_build_query(['route' => 'products/index']));
+                    return;
                 }
-            }
 
-            $this->renderStandalone('admin/login', [
-                'loginError' => $loginError,
-                'oldUsername' => $username
-            ]);
+                $loginError = true;
+            } else {
+                $loginError = true;
+            }
         }
+
+        $this->renderStandalone('admin/login', [
+            'loginError' => $loginError,
+            'oldUsername' => $username
+        ]);
     }
+}

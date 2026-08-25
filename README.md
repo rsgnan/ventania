@@ -1,4 +1,4 @@
-# Lumia
+# Ventania
 
 Sistema de gerenciamento desenvolvido em PHP e MySQL.
 
