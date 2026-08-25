@@ -2,7 +2,8 @@
 
 namespace App\Model;
 
-class CategoryModel {
+class CategoryModel 
+{
     public int $id;
     public string $name;
 }

@@ -6,15 +6,17 @@ use App\Core\ViewController;
 use App\Repository\ProductRepository;
 use App\Controller\ErrorController;
 use App\Support\AuthService;
+use App\Support\ActivityLogService;
 
 class ProductController extends ViewController
 {
     public function __construct(
         AuthService $authService,
-        private ProductRepository $productRepository
-        ) {
-            parent::__construct($authService);
-        }
+        private ProductRepository $productRepository,
+        private ActivityLogService $activityLogService
+    ) {
+        parent::__construct($authService);
+    }
 
     public function index(): void
     {
@@ -62,7 +64,22 @@ class ProductController extends ViewController
 
             // Salva o produto somente após validar todos os dados
             if (empty($errors)) {
-                $this->productRepository->create($name, $category_id, $tag, $price, $stock, $description, $photo);
+                $productId = $this->productRepository->create(
+                    $name,
+                    $category_id,
+                    $tag,
+                    $price,
+                    $stock,
+                    $description,
+                    $photo
+                );
+
+                $this->activityLogService->log(
+                    'product',
+                    $productId,
+                    $name,
+                    'create'
+                );
                 header("Location: index.php?route=products/index");
                 return;
             }
@@ -111,12 +128,13 @@ class ProductController extends ViewController
             // Atualiza os dados do produto antes de remover a foto antiga
             if (empty($errors)) {
                 $this->productRepository->update(
-                    $id, 
-                    $name, 
-                    $category_id, 
-                    $tag, $price, 
-                    $stock, 
-                    $description, 
+                    $id,
+                    $name,
+                    $category_id,
+                    $tag,
+                    $price,
+                    $stock,
+                    $description,
                     $photo
                 );
 
@@ -127,6 +145,13 @@ class ProductController extends ViewController
                         @unlink($oldPhotoPath);
                     }
                 }
+
+                $this->activityLogService->log(
+                    'product',
+                    $id,
+                    $name,
+                    'update'
+                );
 
                 header("Location: index.php?route=products/index");
                 return;
@@ -142,25 +167,25 @@ class ProductController extends ViewController
     }
 
     private function validateFields(
-        string $name, 
-        int $category_id, 
-        int $stock, 
-        float $price, 
+        string $name,
+        int $category_id,
+        int $stock,
+        float $price,
         array &$errors
-        ): void {
+    ): void {
         if (trim($name) === '') {
-            $errors[] = "Preencha o Nome do Produto corretamente!";
+            $errors[] = 'Preencha o nome do produto corretamente.';
         }
         if ($category_id === 0) {
-            $errors[] = "Selecione uma Categoria!";
+            $errors[] = 'Selecione uma categoria.';
         } elseif (!$this->productRepository->categoryExists($category_id)) {
-            $errors[] = "A Categoria selecionada não existe!";
+            $errors[] = 'A categoria selecionada não existe.';
         }
         if ($stock < 0) {
-            $errors[] = "Valor de Estoque não pode ser negativo!";
+            $errors[] = 'Valor de estoque não pode ser negativo.';
         }
         if ($price <= 0) {
-            $errors[] = "Estabeleça o valor do Produto!";
+            $errors[] = 'Estabeleça o valor do produto.';
         }
     }
 
@@ -215,8 +240,8 @@ class ProductController extends ViewController
 
         // Garante que a foto temporária pertence à sessão atual
         $belongToUser = in_array(
-            $tempPhotoName, 
-            $_SESSION['temp_photos'] ?? [], 
+            $tempPhotoName,
+            $_SESSION['temp_photos'] ?? [],
             true
         );
 

@@ -2,7 +2,8 @@
 
 namespace App\Model;
 
-class ProductModel {
+class ProductModel 
+{
     public int $id;
     public string $name;
     public int $category_id;

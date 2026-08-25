@@ -2,7 +2,8 @@
 
 namespace App\Model;
 
-class SaleModel {
+class SaleModel 
+{
     public int $id;
     public string $customer_name;
     public float $discount_amount;

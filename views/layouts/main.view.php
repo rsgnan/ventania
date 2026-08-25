@@ -32,7 +32,7 @@
     <!-- MENU PRINCIPAL -->
     <nav class="main-nav">
         <div class="main-nav-container">
-            <a class="main-nav-item<?php if(($_GET['route'] ?? '') === 'dashboard/index') echo e(' active'); ?>" href="?route=dashboard/index">
+            <a class="main-nav-item<?php if(str_starts_with($_GET['route'] ?? '', 'dashboard/')) echo e(' active'); ?>" href="?route=dashboard/index">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="7" height="7" rx="1" />
                     <rect x="14" y="3" width="7" height="7" rx="1" />
@@ -41,7 +41,7 @@
                 </svg>
                 Dashboard
             </a>
-            <a class="main-nav-item<?php if(($_GET['route'] ?? '') === 'products/index') echo e(' active'); ?>" href="?route=products/index">
+            <a class="main-nav-item<?php if(str_starts_with($_GET['route'] ?? '', 'products/')) echo e(' active'); ?>" href="?route=products/index">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 8v13H3V8" />
                     <path d="M1 3h22v5H1z" />
@@ -49,20 +49,22 @@
                 </svg>
                 Produtos
             </a>
-            <a class="main-nav-item<?php if(($_GET['route'] ?? '') === 'sales/index') echo e(' active'); ?>" href="?route=sales/index">
+            <a class="main-nav-item<?php if(str_starts_with($_GET['route'] ?? '', 'sales/')) echo e(' active'); ?>" href="?route=sales/index">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="1" x2="12" y2="23" />
                     <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
                 </svg>
                 Vendas
             </a>
-            <a class="main-nav-item<?php if(($_GET['route'] ?? '') === 'users/index') echo e(' active'); ?>" href="?route=users/index">
+            <?php if ($this->authService->isAdmin()): ?>
+            <a class="main-nav-item<?php if(str_starts_with($_GET['route'] ?? '', 'users/')) echo e(' active'); ?>" href="?route=users/index">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                     <circle cx="12" cy="7" r="4" />
                 </svg>
                 Usuários
             </a>
+            <?php endif; ?>
         </div>
     </nav>
 

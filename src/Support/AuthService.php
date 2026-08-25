@@ -18,7 +18,14 @@ class AuthService
     public function logout()
     {
         $this->ensureSession();
-        unset($_SESSION['user_email']);
+        
+        // Remove os dados do usuário da sessão
+        unset(
+            $_SESSION['user_id'],
+            $_SESSION['user_name'],
+            $_SESSION['user_role']
+        );
+
         session_regenerate_id();
     }
 
@@ -36,12 +43,20 @@ class AuthService
         if (empty($username)) return false;
         if (empty($password)) return false;
 
-        $stmt = $this->pdo->prepare('SELECT `id`, `password` FROM `users` WHERE `username` = :username');
+        // Busca o usuário pelo nome de usuário
+        $stmt = $this->pdo->prepare('SELECT `id`, `name`, `password`, `role`, `is_active`
+        FROM `users` 
+        WHERE `username` = :username');
         $stmt->bindValue(':username', $username);
         $stmt->execute();
         $entry = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (empty($entry)) {
+            return false;
+        }
+
+        // Impede o acesso de usuários inativos
+        if (!$entry['is_active']) {
             return false;
         }
 
@@ -53,16 +68,42 @@ class AuthService
         }
 
         $this->ensureSession();
+
+        // Armazena os dados necessários do usuário na sessão
         $_SESSION['user_id'] = $entry['id'];
+        $_SESSION['user_name'] = $entry['name'];
+        $_SESSION['user_role'] = $entry['role'];
+
         session_regenerate_id();
 
         return true;
     }
 
-    public function isLoggedIn(): bool 
+    public function isAdmin(): bool
+    {
+        $this->ensureSession();
+
+        return ($_SESSION['user_role'] ?? null) === 'admin';
+    }
+
+    public function isLoggedIn(): bool
     {
         $this->ensureSession();
         return !empty($_SESSION['user_id']);
+    }
+
+    public function ensureAdmin()
+    {
+        $this->ensureLoggedIn();
+
+        // Restringe o acesso aos administradores
+        if (!$this->isAdmin()) {
+            header('Location: index.php?' . http_build_query([
+                'route' => 'dashboard/index'
+            ]));
+
+            die();
+        }
     }
 
     public function ensureLoggedIn()

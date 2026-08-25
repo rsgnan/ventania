@@ -19,6 +19,22 @@ $container->bind('authService', function () use ($container) {
     return new \App\Support\AuthService($pdo);
 });
 
+// Logs de atividade
+$container->bind('activityLogRepository', function () use ($container) {
+    $pdo = $container->get('pdo');
+    return new \App\Repository\ActivityLogRepository($pdo);
+});
+
+$container->bind('activityLogService', function () use ($container) {
+    $activityLogRepository = $container->get('activityLogRepository');
+    $authService = $container->get('authService');
+
+    return new \App\Support\ActivityLogService(
+        $activityLogRepository,
+        $authService
+    );
+});
+
 // Login
 $container->bind('loginController', function () use ($container) {
     $authService = $container->get('authService');
@@ -34,9 +50,30 @@ $container->bind('productRepository', function () use ($container) {
 $container->bind('productController', function () use ($container) {
     $authService = $container->get('authService');
     $productRepository = $container->get('productRepository');
+    $activityLogService = $container->get('activityLogService');
+
     return new \App\Controller\ProductController(
         $authService,
-        $productRepository
+        $productRepository,
+        $activityLogService
+    );
+});
+
+// Usuários
+$container->bind('userRepository', function () use ($container) {
+    $pdo = $container->get('pdo');
+    return new \App\Repository\UserRepository($pdo);
+});
+
+$container->bind('userController', function () use ($container) {
+    $authService = $container->get('authService');
+    $userRepository = $container->get('userRepository');
+    $activityLogService = $container->get('activityLogService');
+
+    return new \App\Controller\UserController(
+        $authService,
+        $userRepository,
+        $activityLogService
     );
 });
 
@@ -52,17 +89,21 @@ $container->bind('saleItemRepository', function () use ($container) {
 });
 
 $container->bind('saleController', function () use ($container) {
+
     $authService = $container->get('authService');
     $pdo = $container->get('pdo');
     $productRepository = $container->get('productRepository');
     $saleRepository = $container->get('saleRepository');
     $saleItemRepository = $container->get('saleItemRepository');
+    $activityLogService = $container->get('activityLogService');
+    
     return new \App\Controller\SaleController(
         $authService,
         $pdo,
         $productRepository,
         $saleRepository,
-        $saleItemRepository
+        $saleItemRepository,
+        $activityLogService
     );
 });
 
@@ -148,6 +189,24 @@ if ($route == 'pages') {
 
     $salesController = $container->get('saleController');
     $salesController->cancel();
+} else if ($route === 'users/index') {
+    $authService = $container->get('authService');
+    $authService->ensureAdmin();
+
+    $userController = $container->get('userController');
+    $userController->index();
+} else if ($route === 'users/create') {
+    $authService = $container->get('authService');
+    $authService->ensureAdmin();
+
+    $userController = $container->get('userController');
+    $userController->create();
+} else if ($route === 'users/edit') {
+    $authService = $container->get('authService');
+    $authService->ensureAdmin();
+
+    $userController = $container->get('userController');
+    $userController->edit();
 } else {
     // Nenhuma rota bateu então devolve o error 404
     $errorController = $container->get('errorController');

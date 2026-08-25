@@ -3,8 +3,8 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Tempo de geração: 18/08/2026 às 15:14
--- Versão do servidor: 11.8.8-MariaDB
+-- Tempo de geração: 25/08/2026 às 03:29
+-- Versão do servidor: 12.3.2-MariaDB
 -- Versão do PHP: 8.5.9
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -31,9 +31,10 @@ CREATE TABLE `activity_logs` (
   `id` int(10) UNSIGNED NOT NULL,
   `record_type` varchar(50) NOT NULL,
   `record_id` int(10) UNSIGNED NOT NULL,
+  `record_label` varchar(255) NOT NULL,
   `action` varchar(50) NOT NULL,
   `user_id` int(10) UNSIGNED NOT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- --------------------------------------------------------
@@ -100,7 +101,7 @@ INSERT INTO `products` (`id`, `name`, `category_id`, `tag`, `price`, `stock`, `d
 (16, 'Quartzo Branco Lapidado', 2, 'Limpeza', 22.90, 38, 'Quartzo branco lapidado, indicado para limpeza e equilíbrio energético do ambiente.', 'pedra-quartzo-branco-lapidado.jpg', '2026-08-17 15:53:00', '2026-08-17 15:53:00'),
 (17, 'Turmalina Negra Bruta', 2, 'Aterramento', 29.90, 28, 'Pedra bruta de turmalina negra, usada para aterramento e proteção contra energias densas.', 'pedra-turmalina-negra-bruta.jpg', '2026-08-17 15:53:00', '2026-08-17 15:53:00'),
 (18, 'Citrino Ponta Natural', 2, 'Abundância', 32.90, 25, 'Ponta natural de citrino, associada à abundância e à alegria.', 'pedra-citrino-ponta-natural.jpg', '2026-08-17 15:53:00', '2026-08-17 15:53:00'),
-(19, 'Ágata Azul Rolada', 2, 'Calma', 21.90, 32, 'Pedra rolada de ágata azul, indicada para trazer calma e clareza mental.', 'pedra-agata-azul-rolada.jpg', '2026-08-17 15:53:00', '2026-08-17 15:53:00'),
+(19, 'Ágata Azul Rolada', 2, 'Calma', 21.90, 27, 'Pedra rolada de ágata azul, indicada para trazer calma e clareza mental.', 'pedra-agata-azul-rolada.jpg', '2026-08-17 15:53:00', '2026-08-25 00:27:54'),
 (20, 'Obsidiana Negra Polida', 2, 'Blindagem', 26.90, 30, 'Pedra polida de obsidiana negra, usada como blindagem energética.', 'pedra-obsidiana-negra-polida.jpg', '2026-08-17 15:53:00', '2026-08-17 15:53:00'),
 (21, 'Guia de Oxalá', 3, 'Paz', 119.90, 12, 'Guia de contas brancas dedicada a Oxalá, símbolo de paz e criação.', 'guia-guia-de-oxala.jpg', '2026-08-17 15:53:00', '2026-08-17 15:53:00'),
 (22, 'Guia de Iemanjá', 3, 'Mar', 129.90, 12, 'Guia de contas em tons de azul e cristal, dedicada a Iemanjá, rainha do mar.', 'guia-guia-de-iemanja.jpg', '2026-08-17 15:53:00', '2026-08-17 15:53:00'),
@@ -173,8 +174,9 @@ INSERT INTO `sales` (`id`, `customer_name`, `discount_amount`, `total_amount`, `
 (14, 'Eduardo Martins', 0.00, 99.90, 'completed', NULL, '2026-07-16 15:53:00', '2026-07-16 15:53:00'),
 (15, 'Neide Ramos', 5.00, 30.70, 'completed', NULL, '2026-07-14 15:53:00', '2026-07-14 15:53:00'),
 (16, 'Paulo Henrique Cardoso', 10.00, 476.00, 'completed', NULL, '2026-07-10 15:53:00', '2026-07-10 15:53:00'),
-(17, 'Sandra Regina Melo', 0.00, 301.33, 'completed', NULL, '2026-07-06 15:53:00', '2026-07-06 15:53:00'),
-(18, 'Wagner Teixeira', 15.00, 60.60, 'cancelled', NULL, '2026-07-02 15:53:00', '2026-07-02 15:53:00');
+(17, 'Sandra Regina Melo', 0.00, 301.33, 'pending', NULL, '2026-07-06 15:53:00', '2026-08-23 14:32:29'),
+(18, 'Wagner Teixeira', 15.00, 60.60, 'cancelled', NULL, '2026-07-02 15:53:00', '2026-07-02 15:53:00'),
+(19, 'Venda teste', 5.00, 60.70, 'pending', 1, '2026-08-23 16:22:58', '2026-08-25 00:27:54');
 
 -- --------------------------------------------------------
 
@@ -243,7 +245,8 @@ INSERT INTO `sale_items` (`id`, `sale_id`, `product_id`, `product_name`, `origin
 (41, 17, 19, 'Ágata Azul Rolada', 21.90, 20.49, 1, 20.49, '2026-07-06 15:53:00', '2026-07-06 15:53:00'),
 (42, 17, 9, 'Anágua de Balão', 54.90, 45.88, 2, 91.76, '2026-07-06 15:53:00', '2026-07-06 15:53:00'),
 (43, 18, 39, 'Banho de Rosas Brancas', 16.90, 16.90, 3, 50.70, '2026-07-02 15:53:00', '2026-07-02 15:53:00'),
-(44, 18, 13, 'Quartzo Rosa Bruto', 24.90, 24.90, 1, 24.90, '2026-07-02 15:53:00', '2026-07-02 15:53:00');
+(44, 18, 13, 'Quartzo Rosa Bruto', 24.90, 24.90, 1, 24.90, '2026-07-02 15:53:00', '2026-07-02 15:53:00'),
+(46, 19, 19, 'Ágata Azul Rolada', 21.90, 21.90, 3, 65.70, '2026-08-25 00:27:54', '2026-08-25 00:27:54');
 
 -- --------------------------------------------------------
 
@@ -257,6 +260,8 @@ CREATE TABLE `users` (
   `username` varchar(150) NOT NULL,
   `email` varchar(150) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `role` varchar(20) NOT NULL DEFAULT 'operator',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `last_ip` varchar(45) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -266,8 +271,9 @@ CREATE TABLE `users` (
 -- Despejando dados para a tabela `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `username`, `email`, `password`, `last_ip`, `created_at`, `updated_at`) VALUES
-(1, 'Administrador', 'admin', 'admin@email.com', '$2y$10$5SADRdU961B7gcUhhFAHTu3SVyeBy8t4gjjGTZk.xHfGVtGk1NqNa', NULL, '2026-08-16 15:59:40', '2026-08-16 15:59:40');
+INSERT INTO `users` (`id`, `name`, `username`, `email`, `password`, `role`, `is_active`, `last_ip`, `created_at`, `updated_at`) VALUES
+(1, 'Renan Gonçalves', 'rsgnan', 'rsgnan@proton.me', '$2y$10$5SADRdU961B7gcUhhFAHTu3SVyeBy8t4gjjGTZk.xHfGVtGk1NqNa', 'admin', 1, NULL, '2026-08-16 15:59:40', '2026-08-24 22:07:41'),
+(2, 'Usuario de teste', 'teste', 'teste@gmail.com', '$2y$12$6CCYAq3Jaji0DsmplvskVO.O3hzh0dTE3S2AoDp2IZxLGRsV0.r6W', 'admin', 1, NULL, '2026-08-25 00:17:45', '2026-08-25 03:14:59');
 
 --
 -- Índices para tabelas despejadas
@@ -278,9 +284,9 @@ INSERT INTO `users` (`id`, `name`, `username`, `email`, `password`, `last_ip`, `
 --
 ALTER TABLE `activity_logs`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_record` (`record_type`,`record_id`),
-  ADD KEY `idx_user` (`user_id`),
-  ADD KEY `idx_action` (`action`);
+  ADD KEY `idx_activity_logs_user_id` (`user_id`),
+  ADD KEY `idx_activity_logs_record` (`record_type`,`record_id`),
+  ADD KEY `idx_activity_logs_created_at` (`created_at`);
 
 --
 -- Índices de tabela `categories`
@@ -347,19 +353,19 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT de tabela `sales`
 --
 ALTER TABLE `sales`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT de tabela `sale_items`
 --
 ALTER TABLE `sale_items`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT de tabela `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Restrições para tabelas despejadas

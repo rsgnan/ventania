@@ -3,11 +3,12 @@
 namespace App\Controller;
 
 use App\Core\ViewController;
-use App\Support\AuthService;
 use App\Controller\ErrorController;
 use App\Repository\ProductRepository;
 use App\Repository\SaleRepository;
 use App\Repository\SaleItemRepository;
+use App\Support\AuthService;
+use App\Support\ActivityLogService;
 
 use PDO;
 
@@ -19,6 +20,7 @@ class SaleController extends ViewController
         private ProductRepository $productRepository,
         private SaleRepository $saleRepository,
         private SaleItemRepository $saleItemRepository,
+        private ActivityLogService $activityLogService  
     ) {
         parent::__construct($authService);
     }
@@ -101,6 +103,13 @@ class SaleController extends ViewController
                             throw new \Exception('Estoque insuficiente.');
                         }
                     }
+
+                    $this->activityLogService->log(
+                        'sale',
+                        $saleId,
+                        'Venda #' . $saleId,
+                        'create'
+                    );
 
                     $this->pdo->commit();
 
@@ -227,6 +236,13 @@ class SaleController extends ViewController
                             throw new \Exception('Estoque insuficiente.');
                         }
                     }
+
+                    $this->activityLogService->log(
+                        'sale',
+                        $saleId,
+                        'Venda #' . $saleId,
+                        'update'
+                    );
 
                     $this->pdo->commit();
                     header('Location: index.php?route=sales/index');
