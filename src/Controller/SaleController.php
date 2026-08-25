@@ -20,7 +20,7 @@ class SaleController extends ViewController
         private ProductRepository $productRepository,
         private SaleRepository $saleRepository,
         private SaleItemRepository $saleItemRepository,
-        private ActivityLogService $activityLogService  
+        private ActivityLogService $activityLogService
     ) {
         parent::__construct($authService);
     }
@@ -29,30 +29,33 @@ class SaleController extends ViewController
     {
         $sales = $this->saleRepository->getList();
 
-        // Renderiza a lista de vendas
         $this->render('sales/index', [
             'sales' => $sales
         ]);
     }
+
     public function create(): void
     {
         $errors = [];
         $products = $this->productRepository->getAll();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
             // Recebe os produtos enviados pelo JavaScript em JSON
             $items = json_decode($_POST['items'] ?? '', true);
 
-            $customerName = ($_POST['customer_name'] ?? '');
-            $status = 'pending'; // Por enquanto, até arrumar
+            $customerName = trim((string) ($_POST['customer_name'] ?? ''));
+            $status = 'pending';
             $userId = $this->authService->getUserId();
 
             $subtotal = 0;
-            $validateFields = [];
+            $validatedItems = [];
 
-            // Valida os produtos e calcula o subtotal da venda
-            $this->validateFields($items, $validateFields, $subtotal, $errors);
+            $this->validateFields(
+                $items, 
+                $validatedItems, 
+                $subtotal, 
+                $errors
+            );
 
             $discount = (float) ($_POST['discount_amount'] ?? 0);
 
@@ -64,7 +67,6 @@ class SaleController extends ViewController
 
             if (empty($errors)) {
                 try {
-
                     // Garante que venda, itens e estoque sejam alterados juntos
                     $this->pdo->beginTransaction();
 
@@ -76,13 +78,12 @@ class SaleController extends ViewController
                         $userId
                     );
 
-                    foreach ($validateFields as $item) {
+                    foreach ($validatedItems as $item) {
                         $product = $item['product'];
                         $quantity = (int) $item['quantity'];
 
                         $itemSubtotal = $product->price * $quantity;
 
-                        // Salva cada produto pertencente à venda
                         $this->saleItemRepository->create(
                             $saleId,
                             $product->id,
@@ -116,7 +117,6 @@ class SaleController extends ViewController
                     header('Location: index.php?route=sales/index');
                     return;
                 } catch (\Throwable $e) {
-
                     // Desfaz todas as alterações se qualquer etapa falhar
                     if ($this->pdo->inTransaction()) {
                         $this->pdo->rollBack();
@@ -125,7 +125,7 @@ class SaleController extends ViewController
                 }
             }
         }
-        // Renderiza a página de criar venda
+        
         $this->render('sales/create', [
             'errors' => $errors,
             'products' => $products
@@ -143,13 +143,12 @@ class SaleController extends ViewController
             return;
         }
 
-        // Somenta vendas pendentes podem ser alteradas
+        // Somente vendas pendentes podem ser alteradas
         if ($sale->status !== 'pending') {
             header('Location: index.php?route=sales/index');
             return;
         }
 
-        // Itens que pertencem atualmente à venda
         $items = $this->saleItemRepository->getBySaleId($saleId);
 
         // Todos os produtos são enviados para o JavaScript
@@ -158,7 +157,6 @@ class SaleController extends ViewController
         $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
             $customerName = trim((string) ($_POST['customer_name'] ?? ''));
             $discount = (float) ($_POST['discount_amount'] ?? 0);
             $status = $_POST['status'] ?? '';
@@ -167,12 +165,12 @@ class SaleController extends ViewController
             $newItems = json_decode($_POST['items'] ?? '', true);
 
             $subtotal = 0;
-            $validateFields = [];
+            $validatedItems = [];
 
             // Valida os novos itens e considera o estoque da venda antiga
             $this->validateFields(
                 $newItems,
-                $validateFields,
+                $validatedItems,
                 $subtotal,
                 $errors,
                 $items
@@ -197,7 +195,6 @@ class SaleController extends ViewController
                         );
                     }
 
-                    // Atualiza os dados principais da venda
                     $this->saleRepository->update(
                         $saleId,
                         $customerName,
@@ -209,12 +206,11 @@ class SaleController extends ViewController
                     // Remove os itens antigos antes de inserir os novos
                     $this->saleItemRepository->deleteBySaleId($saleId);
 
-                    // Insere os itens resultantes da edição
-                    foreach ($validateFields as $item) {
+                    foreach ($validatedItems as $item) {
                         $product = $item['product'];
                         $quantity = (int) $item['quantity'];
 
-                        $itemSubTotal = $product->price * $quantity;
+                        $itemSubtotal = $product->price * $quantity;
 
                         $this->saleItemRepository->create(
                             $saleId,
@@ -223,7 +219,7 @@ class SaleController extends ViewController
                             $product->price,
                             $product->price,
                             $quantity,
-                            $itemSubTotal
+                            $itemSubtotal
                         );
 
                         // Retira do estoque a quantidade da nova venda
@@ -245,7 +241,9 @@ class SaleController extends ViewController
                     );
 
                     $this->pdo->commit();
+
                     header('Location: index.php?route=sales/index');
+                    return;
                 } catch (\Throwable $e) {
 
                     // Se alguma etapa falhar, desfaz toda a edição
@@ -266,7 +264,7 @@ class SaleController extends ViewController
 
     public function cancel(): void
     {
-        $saleId = (int) ($_GET['id']);
+        $saleId = (int) ($_GET['id'] ?? 0);
         $sale = $this->saleRepository->getById($saleId);
 
         if ($sale === null) {
@@ -308,7 +306,6 @@ class SaleController extends ViewController
                 $this->pdo->rollBack();
             }
 
-            // Por enquanto, volta para a lista
             header('Location: index.php?route=sales/index');
             return;
         }
@@ -316,7 +313,7 @@ class SaleController extends ViewController
 
     private function validateFields(
         ?array $items,
-        array &$validateFields,
+        array &$validatedItems,
         float &$subtotal,
         array &$errors,
         ?array $currentItems = null
@@ -327,9 +324,10 @@ class SaleController extends ViewController
         }
 
         foreach ($items as $item) {
-
             // Busca no banco os dados reais do produto
-            $product = $this->productRepository->getById((int) $item['id']);
+            $productId = (int) ($item['id'] ?? 0);
+
+            $product = $this->productRepository->getById($productId);
 
             if ($product === null) {
                 $errors[] = 'Produto não encontrado.';
@@ -351,11 +349,11 @@ class SaleController extends ViewController
             $quantity = (int) ($item['quantity'] ?? 0);
 
             if ($quantity < 1) {
-                $errors[] = 'Quantidade inválida';
+                $errors[] = 'Quantidade inválida.';
                 continue;
             }
 
-            // Estoque atual + estoque devolvido
+            // Considera também a quantidade da venda antes da edição
             if ($quantity > ($product->stock + $currentQuantity)) {
                 $errors[] = 'Quantidade maior que o estoque disponível.';
                 continue;
@@ -363,8 +361,7 @@ class SaleController extends ViewController
 
             $subtotal += $product->price * $quantity;
 
-            // Guarda os produtos validados para salvar a venda
-            $validateFields[] = [
+            $validatedItems[] = [
                 'product' => $product,
                 'quantity' => $quantity
             ];

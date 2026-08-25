@@ -2,27 +2,28 @@
 
 namespace App\Core;
 
-// Simples container de injeção de dependências
 class Container
 {
     private array $instances = [];
     private array $recipes = [];
 
-    // Guarda a receita
-    public function bind(string $what, \Closure $recipe)
+    public function bind(string $id, \Closure $recipe): void
     {
-        $this->recipes[$what] = $recipe;
+        $this->recipes[$id] = $recipe;
     }
-    // Container simples para registro das receitas
-    public function get($what)
+
+    public function get(string $id)
     {
-        if (empty($this->instances[$what])) {
-            if (empty($this->recipes[$what])) {
-                echo "Could not build: {$what}. \n";
-                die();
+        if (!isset($this->instances[$id])) {
+            if (!isset($this->recipes[$id])) {
+                throw new \RuntimeException(
+                    "Could not build: {$id}."
+                );
             }
-            $this->instances[$what] = $this->recipes[$what]();
+
+            $this->instances[$id] = $this->recipes[$id]();
         }
-        return $this->instances[$what];
+
+        return $this->instances[$id];
     }
 }

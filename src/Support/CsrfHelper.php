@@ -4,38 +4,48 @@ namespace App\Support;
 
 class CsrfHelper
 {
-    public function handle()
+    public function handle(): void
     {
         $this->ensureSession();
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (
-                !empty($_POST['_csrf']) &&
-                !empty($_SESSION['csrfToken']) &&
-                $_POST['_csrf'] === $_SESSION['csrfToken']
+                isset($_POST['_csrf']) &&
+                isset($_SESSION['csrfToken']) &&
+                hash_equals(
+                    $_SESSION['csrfToken'],
+                    (string) $_POST['_csrf']
+                )
             ) {
                 unset($_SESSION['csrfToken']);
                 return;
             }
 
             http_response_code(419);
-            echo "Error: CSRF token mismatch";
-            die();
-        }
-    }
 
-    private function ensureSession()
-    {
-        if (session_id() === '') {
-            session_start();
+            echo "Error: CSRF token mismatch";
+
+            exit();
         }
     }
 
     public function generateToken(): string
     {
-        if (empty($_SESSION['csrfToken'])) {
-            $token = bin2hex(random_bytes(32));
-            $_SESSION['csrfToken'] = $token;
+        $this->ensureSession();
+
+        if (!isset($_SESSION['csrfToken'])) {
+            $_SESSION['csrfToken'] = bin2hex(
+                random_bytes(32)
+            );
         }
+        
         return $_SESSION['csrfToken'];
+    }
+
+    private function ensureSession(): void
+    {
+        if (session_id() === '') {
+            session_start();
+        }
     }
 }

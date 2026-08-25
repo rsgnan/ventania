@@ -8,14 +8,14 @@ class AuthService
 {
     public function __construct(private PDO $pdo) {}
 
-    public function ensureSession()
+    public function ensureSession(): void
     {
         if (session_id() === '') {
             session_start();
         }
     }
 
-    public function logout()
+    public function logout(): void
     {
         $this->ensureSession();
         
@@ -26,7 +26,7 @@ class AuthService
             $_SESSION['user_role']
         );
 
-        session_regenerate_id();
+        session_regenerate_id(true);
     }
 
     public function getUserId(): ?int
@@ -40,41 +40,47 @@ class AuthService
 
     public function handleLogin(string $username, string $password): bool
     {
-        if (empty($username)) return false;
-        if (empty($password)) return false;
+        if ($username === '' || $password === '') {
+            return false;
+        }
 
-        // Busca o usuário pelo nome de usuário
-        $stmt = $this->pdo->prepare('SELECT `id`, `name`, `password`, `role`, `is_active`
-        FROM `users` 
-        WHERE `username` = :username');
+        $stmt = $this->pdo->prepare(
+            'SELECT 
+                `id`, 
+                `name`, 
+                `password`, 
+                `role`, 
+                `is_active`
+            FROM `users` 
+            WHERE `username` = :username'
+        );
+
         $stmt->bindValue(':username', $username);
         $stmt->execute();
+        
         $entry = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (empty($entry)) {
+        if ($entry === false) {
             return false;
         }
 
         // Impede o acesso de usuários inativos
-        if (!$entry['is_active']) {
+        if ((int) $entry['is_active'] !== 1) {
             return false;
         }
 
-        $hash = $entry['password'];
-        $passwordOk = password_verify($password, $hash);
-
-        if (empty($passwordOk)) {
+        if (!password_verify($password, $entry['password'])) {
             return false;
         }
 
         $this->ensureSession();
 
         // Armazena os dados necessários do usuário na sessão
-        $_SESSION['user_id'] = $entry['id'];
+        $_SESSION['user_id'] = (int) $entry['id'];
         $_SESSION['user_name'] = $entry['name'];
         $_SESSION['user_role'] = $entry['role'];
 
-        session_regenerate_id();
+        session_regenerate_id(true);
 
         return true;
     }
@@ -89,10 +95,11 @@ class AuthService
     public function isLoggedIn(): bool
     {
         $this->ensureSession();
+
         return !empty($_SESSION['user_id']);
     }
 
-    public function ensureAdmin()
+    public function ensureAdmin(): void
     {
         $this->ensureLoggedIn();
 
@@ -102,16 +109,18 @@ class AuthService
                 'route' => 'dashboard/index'
             ]));
 
-            die();
+            exit;
         }
     }
 
-    public function ensureLoggedIn()
+    public function ensureLoggedIn(): void
     {
-        $isLoggedIn = $this->isLoggedIn();
-        if (empty($isLoggedIn)) {
-            header('Location: index.php?' . http_build_query(['route' => 'admin/login']));
-            die();
+        if (!$this->isLoggedIn()) {
+            header('Location: index.php?' . http_build_query([
+                'route' => 'admin/login'
+            ]));
+
+            exit;
         }
     }
 }

@@ -24,18 +24,16 @@ class ProductController extends ViewController
         $categories = $this->productRepository->getAllCategories();
         $productCategoryRows = $this->productRepository->getWithCategoryName();
 
-        // Monta um mapa do produto para o nome da categoria
         $categoryMap = [];
+
         foreach ($productCategoryRows as $row) {
             $categoryMap[$row['id']] = $row['category_name'];
         }
 
-        // Anexa o nome da categoria em cada produto
         foreach ($products as $product) {
             $product->category_name = $categoryMap[$product->id] ?? '';
         }
 
-        // Renderiza a página de produtos
         $this->render('products/index', [
             'products' => $products,
             'categories' => $categories
@@ -48,25 +46,28 @@ class ProductController extends ViewController
         $errors = [];
         $tempPhoto = $_POST['temp_photo'] ?? null;
 
-        if (!empty($_POST)) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = trim((string) ($_POST['name'] ?? ''));
-            $category_id = (int) ($_POST['category_id'] ?? '');
+            $categoryId = (int) ($_POST['category_id'] ?? 0);
             $tag = trim((string) ($_POST['tag'] ?? ''));
-            $price = (float) ($_POST['price'] ?? '');
-            $stock = (int) ($_POST['stock'] ?? '');
+            $price = (float) ($_POST['price'] ?? 0);
+            $stock = (int) ($_POST['stock'] ?? 0);
             $description = trim((string) ($_POST['description'] ?? ''));
 
-            // Valida os dados antes de salvar o produto
-            $this->validateFields($name, $category_id, $stock, $price, $errors);
+            $this->validateFields(
+                $name,
+                $categoryId,
+                $stock,
+                $price,
+                $errors
+            );
 
-            // Trata a foto antes de salvar o produto
             $photo = $this->handlePhoto($errors, $tempPhoto, null);
 
-            // Salva o produto somente após validar todos os dados
             if (empty($errors)) {
                 $productId = $this->productRepository->create(
                     $name,
-                    $category_id,
+                    $categoryId,
                     $tag,
                     $price,
                     $stock,
@@ -80,12 +81,11 @@ class ProductController extends ViewController
                     $name,
                     'create'
                 );
-                header("Location: index.php?route=products/index");
+                header('Location: index.php?route=products/index');
                 return;
             }
         }
 
-        // Renderiza a página de adicionar produto
         $this->render('products/create', [
             'errors' => $errors,
             'categories' => $categories,
@@ -95,11 +95,9 @@ class ProductController extends ViewController
 
     public function update(): void
     {
-
         $id = (int) ($_GET['id'] ?? 0);
         $product = $this->productRepository->getById($id);
 
-        // Verifica se o produto existe antes de continuar
         if ($product === null) {
             (new ErrorController())->notFound();
             return;
@@ -109,28 +107,35 @@ class ProductController extends ViewController
         $errors = [];
         $tempPhoto = $_POST['temp_photo'] ?? null;
 
-        if (!empty($_POST)) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = trim((string) ($_POST['name'] ?? ''));
-            $category_id = (int) ($_POST['category_id'] ?? '');
+            $categoryId = (int) ($_POST['category_id'] ?? 0);
             $tag = trim((string) ($_POST['tag'] ?? ''));
-            $price = (float) ($_POST['price'] ?? '');
-            $stock = (int) ($_POST['stock'] ?? '');
+            $price = (float) ($_POST['price'] ?? 0);
+            $stock = (int) ($_POST['stock'] ?? 0);
             $description = trim((string) ($_POST['description'] ?? ''));
 
-            // Valida os dados antes de atualizar o produto
-            $this->validateFields($name, $category_id, $stock, $price, $errors);
+            $this->validateFields(
+                $name,
+                $categoryId,
+                $stock,
+                $price,
+                $errors
+            );
 
-            // Guarda a foto original antiga para removê-la depois
             $oldPhoto = $product->photo ?? '';
 
-            $photo = $this->handlePhoto($errors, $tempPhoto, $oldPhoto);
+            $photo = $this->handlePhoto(
+                $errors,
+                $tempPhoto,
+                $oldPhoto
+            );
 
-            // Atualiza os dados do produto antes de remover a foto antiga
             if (empty($errors)) {
                 $this->productRepository->update(
                     $id,
                     $name,
-                    $category_id,
+                    $categoryId,
                     $tag,
                     $price,
                     $stock,
@@ -138,7 +143,7 @@ class ProductController extends ViewController
                     $photo
                 );
 
-                // Remove a foto antiga somente após atualizar o banco
+                // Remove a foto antiga somente após atualizar o produto
                 if (!empty($oldPhoto) && $oldPhoto !== $photo) {
                     $oldPhotoPath = __DIR__ . '/../../public/uploads/products/' . $oldPhoto;
                     if (is_file($oldPhotoPath)) {
@@ -153,11 +158,11 @@ class ProductController extends ViewController
                     'update'
                 );
 
-                header("Location: index.php?route=products/index");
+                header('Location: index.php?route=products/index');
                 return;
             }
         }
-        // Renderiza a página de editar produto
+
         $this->render('products/edit', [
             'product' => $product,
             'errors' => $errors,
@@ -168,7 +173,7 @@ class ProductController extends ViewController
 
     private function validateFields(
         string $name,
-        int $category_id,
+        int $categoryId,
         int $stock,
         float $price,
         array &$errors
@@ -176,38 +181,41 @@ class ProductController extends ViewController
         if (trim($name) === '') {
             $errors[] = 'Preencha o nome do produto corretamente.';
         }
-        if ($category_id === 0) {
+
+        if ($categoryId === 0) {
             $errors[] = 'Selecione uma categoria.';
-        } elseif (!$this->productRepository->categoryExists($category_id)) {
+        } elseif (!$this->productRepository->categoryExists($categoryId)) {
             $errors[] = 'A categoria selecionada não existe.';
         }
+
         if ($stock < 0) {
             $errors[] = 'Valor de estoque não pode ser negativo.';
         }
+
         if ($price <= 0) {
             $errors[] = 'Estabeleça o valor do produto.';
         }
     }
 
-    private function handlePhoto(array &$errors, ?string &$tempPhoto, ?string $currentPhoto): string
-    {
-        // Mantém a foto atual até trocar
+    private function handlePhoto(
+        array &$errors,
+        ?string &$tempPhoto,
+        ?string $currentPhoto
+    ): string {
         $photo = $currentPhoto ?? '';
 
         $hasNewPhoto = !empty($_FILES['photo']['name']);
 
         if ($hasNewPhoto) {
-
-            // Valida a foto enviada
             $validation = validatePhoto($_FILES['photo']);
+
             if (!$validation['success']) {
                 $errors[] = $validation['error'];
                 return $photo;
             }
 
-            // Se houver erros, mantém a foto na pasta temporária
+            // Usa a pasta temporária quando outros campos possuem erros
             $isTemporary = !empty($errors);
-
             $folder = $isTemporary ? 'tmp' : 'products';
 
             $upload = uploadPhoto($_FILES['photo'], __DIR__ . '/../../public/uploads/' . $folder);
@@ -220,7 +228,7 @@ class ProductController extends ViewController
             if ($isTemporary) {
                 $tempPhoto = $upload['filename'];
 
-                // Registra a foto temporária para validar o acesso depois
+                // Registra o arquivo para impedir o uso de fotos de outra sessão
                 $_SESSION['temp_photos'][] = $tempPhoto;
             } else {
                 $photo = $upload['filename'];
@@ -234,11 +242,10 @@ class ProductController extends ViewController
             return $photo;
         }
 
-        // Recupera a foto temporária enviada anteriormente
         $tempPhotoName = basename(trim((string) $_POST['temp_photo']));
         $tempPath = __DIR__ . '/../../public/uploads/tmp/' . $tempPhotoName;
 
-        // Garante que a foto temporária pertence à sessão atual
+        // Confirma que a foto temporária pertence à sessão atual
         $belongToUser = in_array(
             $tempPhotoName,
             $_SESSION['temp_photos'] ?? [],
@@ -257,29 +264,33 @@ class ProductController extends ViewController
             'size'      => filesize($tempPath)
         ];
 
-        // Valida novamente a foto temporária
+        // Valida novamente o arquivo antes de movê-lo
         $validation = validatePhoto($checkFile);
 
         if (!$validation['success']) {
             $errors[] = $validation['error'];
+
             @unlink($tempPath);
+
             $this->forgetTempPhoto($tempPhotoName);
+
             $tempPhoto = null;
+
             return $photo;
         }
 
         if (!empty($errors)) {
-            // Mantém a foto temporária para a próxima tentativa
             $tempPhoto = $tempPhotoName;
             return $photo;
         }
 
-        // Move a foto temporária para a pasta definitiva
         $finalPath = __DIR__ . '/../../public/uploads/products/' . $tempPhotoName;
 
         if (rename($tempPath, $finalPath)) {
             $this->forgetTempPhoto($tempPhotoName);
+
             $tempPhoto = null;
+
             return $tempPhotoName;
         }
 
@@ -294,7 +305,6 @@ class ProductController extends ViewController
             return;
         }
 
-        // Remove a foto da lista de arquivos temporários da sessão
         $_SESSION['temp_photos'] = array_values(
             array_diff($_SESSION['temp_photos'], [$filename])
         );

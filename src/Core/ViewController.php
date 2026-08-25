@@ -12,7 +12,7 @@ abstract class ViewController
     protected function render(string $view, array $params): void
     {
         extract($params);
-        
+
         ob_start();
         require __DIR__ . '/../../views/' . $view . '.view.php';
         $contents = ob_get_clean();
@@ -22,12 +22,11 @@ abstract class ViewController
         require __DIR__ . '/../../views/layouts/main.view.php';
     }
 
-    // Renderiza uma página sozinha
-    protected function renderStandalone(string $view, array $params): void 
+    // Renderiza uma página sem o layout principal
+    protected function renderStandalone(string $view, array $params): void
     {
         extract($params);
 
         require __DIR__ . '/../../views/' . $view . '.view.php';
     }
-
 }

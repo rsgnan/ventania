@@ -17,9 +17,21 @@ class ActivityLogRepository
     ): bool {
         $stmt = $this->pdo->prepare(
             'INSERT INTO `activity_logs`
-            (`record_type`, `record_id`, `record_label`, `action`, `user_id`)
+            (
+                `record_type`, 
+                `record_id`, 
+                `record_label`, 
+                `action`, 
+                `user_id`
+            )
             VALUES
-            (:record_type, :record_id, :record_label, :action, :user_id)'
+            (
+                :record_type, 
+                :record_id, 
+                :record_label, 
+                :action, 
+                :user_id
+            )'
         );
 
         $stmt->bindValue(':record_type', $recordType);
