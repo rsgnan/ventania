@@ -32,11 +32,11 @@ class UserController extends ViewController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = trim($_POST['name'] ?? '');
-            $username = trim($_POST['username'] ?? '');
-            $email = trim($_POST['email'] ?? '');
+            $username = strtolower(trim($_POST['username'] ?? ''));
+            $email = strtolower(trim($_POST['email'] ?? ''));
             $password = $_POST['password'] ?? '';
             $role = $_POST['role'] ?? 'operator';
-            $isActive = (int) ($_POST['is_active'] ?? 1);
+            $isActive = $_POST['is_active'] ?? '1';
 
             $this->validateFields(
                 $name,
@@ -47,6 +47,7 @@ class UserController extends ViewController
                 $errors
             );
 
+            // A senha é obrigatória no cadastro
             if ($password === '') {
                 $errors[] = 'Informe a senha.';
             } elseif (strlen($password) < 6) {
@@ -69,7 +70,11 @@ class UserController extends ViewController
             }
 
             if (empty($errors)) {
-                $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+                $isActive = (int) $isActive;
+                $passwordHash = password_hash(
+                    $password,
+                    PASSWORD_DEFAULT
+                );
 
                 $userId = $this->userRepository->create(
                     $name,
@@ -117,11 +122,11 @@ class UserController extends ViewController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = trim($_POST['name'] ?? '');
-            $username = trim($_POST['username'] ?? '');
-            $email = trim($_POST['email'] ?? '');
+            $username = strtolower(trim($_POST['username'] ?? ''));
+            $email = strtolower(trim($_POST['email'] ?? ''));
             $password = $_POST['password'] ?? '';
             $role = $_POST['role'] ?? 'operator';
-            $isActive = (int) ($_POST['is_active'] ?? 1);
+            $isActive = $_POST['is_active'] ?? '1';
 
             $this->validateFields(
                 $name,
@@ -158,6 +163,7 @@ class UserController extends ViewController
             }
 
             if (empty($errors)) {
+                $isActive = (int) $isActive;
 
                 $this->userRepository->update(
                     $id,
@@ -168,6 +174,7 @@ class UserController extends ViewController
                     $isActive
                 );
 
+                // A senha só é alterada quando um novo valor é infomado
                 if ($password !== '') {
                     $passwordHash = password_hash(
                         $password,
@@ -178,7 +185,6 @@ class UserController extends ViewController
                         $id,
                         $passwordHash
                     );
-                    
                 }
 
                 $this->activityLogService->log(
@@ -199,8 +205,7 @@ class UserController extends ViewController
             $user->username = $username;
             $user->email = $email;
             $user->role = $role;
-            $user->is_active = $isActive;
-            
+            $user->is_active = (int) $isActive;
         }
 
         $this->render('users/edit', [
@@ -214,7 +219,7 @@ class UserController extends ViewController
         string $username,
         string $email,
         string $role,
-        int $isActive,
+        string $isActive,
         array &$errors
     ): void {
         if ($name === '') {
@@ -223,6 +228,8 @@ class UserController extends ViewController
 
         if ($username === '') {
             $errors[] = 'Informe o nome de usuário.';
+        } elseif (!preg_match('/^[a-z0-9_]+$/', $username)) {
+            $errors[] = 'O nome de usuário deve conter apenas letras minúsculas, números e sublinhado.';
         }
 
         if ($email === '') {
@@ -235,7 +242,7 @@ class UserController extends ViewController
             $errors[] = 'Perfil de acesso inválido.';
         }
 
-        if (!in_array($isActive, [0, 1], true)) {
+        if (!in_array($isActive, ['0', '1'], true)) {
             $errors[] = 'Status da conta inválido.';
         }
     }

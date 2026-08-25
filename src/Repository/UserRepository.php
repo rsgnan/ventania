@@ -51,15 +51,15 @@ class UserRepository
         $stmt = $this->pdo->prepare(
             'INSERT INTO `users`
             (`name`, `username`, `email`, `password`, `role`, `is_active`)
-        VALUES
+            VALUES
             (:name, :username, :email, :password, :role, :is_active)'
         );
 
-        $stmt->bindValue(':name', $name);
-        $stmt->bindValue(':username', $username);
-        $stmt->bindValue(':email', $email);
-        $stmt->bindValue(':password', $password);
-        $stmt->bindValue(':role', $role);
+        $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+        $stmt->bindValue(':username', $username, PDO::PARAM_STR);
+        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
+        $stmt->bindValue(':password', $password, PDO::PARAM_STR);
+        $stmt->bindValue(':role', $role, PDO::PARAM_STR);
         $stmt->bindValue(':is_active', $isActive, PDO::PARAM_INT);
 
         $stmt->execute();
@@ -87,10 +87,10 @@ class UserRepository
         );
 
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-        $stmt->bindValue(':name', $name);
-        $stmt->bindValue(':username', $username);
-        $stmt->bindValue(':email', $email);
-        $stmt->bindValue(':role', $role);
+        $stmt->bindValue(':name', $name, PDO::PARAM_STR);
+        $stmt->bindValue(':username', $username, PDO::PARAM_STR);
+        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
+        $stmt->bindValue(':role', $role, PDO::PARAM_STR);
         $stmt->bindValue(':is_active', $isActive, PDO::PARAM_INT);
 
         return $stmt->execute();
@@ -107,7 +107,7 @@ class UserRepository
         );
 
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-        $stmt->bindValue(':password', $password);
+        $stmt->bindValue(':password', $password, PDO::PARAM_STR);
 
         return $stmt->execute();
     }
@@ -115,12 +115,13 @@ class UserRepository
     public function usernameExists(string $username): bool
     {
         $stmt = $this->pdo->prepare(
-            'SELECT `id`
+            'SELECT 1
             FROM `users`
-            WHERE `username` = :username'
+            WHERE `username` = :username
+            LIMIT 1'
         );
 
-        $stmt->bindValue(':username', $username);
+        $stmt->bindValue(':username', $username, PDO::PARAM_STR);
         $stmt->execute();
 
         return $stmt->fetchColumn() !== false;
@@ -131,13 +132,14 @@ class UserRepository
         int $userId
     ): bool {
         $stmt = $this->pdo->prepare(
-            'SELECT `id`
+            'SELECT 1
             FROM `users`
             WHERE `username` = :username
-            AND `id` != :id'
+            AND `id` != :id
+            LIMIT 1'
         );
 
-        $stmt->bindValue(':username', $username);
+        $stmt->bindValue(':username', $username, PDO::PARAM_STR);
         $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
         $stmt->execute();
 
@@ -147,12 +149,13 @@ class UserRepository
     public function emailExists(string $email): bool
     {
         $stmt = $this->pdo->prepare(
-            'SELECT `id`
+            'SELECT 1
             FROM `users`
-            WHERE `email` = :email'
+            WHERE `email` = :email
+            LIMIT 1'
         );
 
-        $stmt->bindValue(':email', $email);
+        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
         $stmt->execute();
 
         return $stmt->fetchColumn() !== false;
@@ -163,13 +166,14 @@ class UserRepository
         int $userId
     ): bool {
         $stmt = $this->pdo->prepare(
-            'SELECT `id`
+            'SELECT 1
             FROM `users`
             WHERE `email` = :email
-            AND `id` != :id'
+            AND `id` != :id
+            LIMIT 1'
         );
 
-        $stmt->bindValue(':email', $email);
+        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
         $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
         $stmt->execute();
 

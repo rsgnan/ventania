@@ -2,7 +2,8 @@
 
 namespace App\Model;
 
-class UserModel{
+class UserModel
+{
     public int $id;
     public string $name;
     public string $username;
