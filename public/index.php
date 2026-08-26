@@ -6,6 +6,7 @@ session_start();
 // Carrega dependênciase funções
 require __DIR__ . '/../src/Support/Autoloader.php';
 require __DIR__ . '/../src/Support/Functions.php';
+require __DIR__ . '/../src/Support/Icons.php';
 
 // Container básico do sistema
 $container = new \App\Core\Container();

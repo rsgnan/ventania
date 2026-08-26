@@ -12,37 +12,16 @@
 
 /* Marca */
 .login-brand {
-    padding: 24px;
-
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 10px;
+    margin-bottom: 14px;
 }
 
-.login-logo-symbol {
-    width: 64px;
-    height: auto;
-
+.login-logo {
     display: block;
-
-    flex-shrink: 0;
-}
-
-.login-brand-text strong {
-    color: var(--color-text);
-
-    font-size: 20px;
-    font-weight: 700;
-}
-
-.login-brand-text span {
-    margin-left: 4px;
-
-    color: var(--color-text-muted);
-
-    font-size: 11px;
-    font-weight: 400;
+    width: 220px;
+    max-width: 100%;
+    height: auto;
 }
 
 /* Card */
@@ -63,7 +42,7 @@
     color: var(--color-text);
 
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 600;
 
     text-align: center;
 }
@@ -73,7 +52,7 @@
 
     color: var(--color-text-muted);
 
-    font-size: 12.5px;
+    font-size: 13px;
     
     text-align: center;
 }
@@ -87,7 +66,8 @@
     align-items: center;
     gap: 10px;
     
-    background: rgba(214, 57, 57, 0.08);
+    background: var(--color-danger-soft);
+    border: 1px solid rgba(214, 57, 57, 0.18);
     border-radius: var(--radius-md);
 
     color: var(--color-danger);
@@ -104,9 +84,11 @@
     width: 16px;
     height: 16px;
 
+    display: block;
     flex-shrink: 0;
-}
 
+    overflow: visible;
+}
 
 /* Formulário */
 .login-form {
@@ -116,10 +98,18 @@
 }
 
 .login-field {
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
-.login-field .form-input {
+.login-password {
+    position: relative;
+    width: 100%;
+}
+
+.login-password .form-input {
+    width: 100%;
     padding-right: 40px;
 }
 
@@ -128,10 +118,11 @@
 
     display: flex;
     align-items: center;
+    justify-content: center;
 
     position: absolute;
-    top: 34px;
-    right: 12px;
+    top: 50%;
+    right: 10px;
 
     background: transparent;
 
@@ -140,6 +131,7 @@
     color: var(--color-text-muted);
 
     cursor: pointer;    
+    transform: translateY(-50%);
 }
 
 .login-toggle-pass:hover {
@@ -172,7 +164,7 @@
 }
 
 .login-remember input {
-    accent-color: var(--accent);
+    accent-color: var(--color-primary);
 
     cursor: pointer;
 }
@@ -195,7 +187,7 @@
     margin-top: 4px;
     padding: 11px 18px;
 
-    font-size: 13.5px;
+    font-size: 13px;
 
 }
 
@@ -210,7 +202,7 @@
     text-align: center;
 }
 
-/*  Responsivo */
+/* Responsivo */
 @media (max-width: 480px) {
     .login-wrap {
         padding: 20px;
@@ -220,12 +212,8 @@
         padding: 26px 20px;
     }
 
-    .login-logo-symbol {
-        width: 56px;
-    }
-
-    .login-brand-text strong {
-        font-size: 18px;
+    .login-logo {
+        width: 190px;
     }
 
     .login-options {
