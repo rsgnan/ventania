@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Tempo de geração: 25/08/2026 às 03:29
+-- Tempo de geração: 26/08/2026 às 17:12
 -- Versão do servidor: 12.3.2-MariaDB
 -- Versão do PHP: 8.5.9
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Banco de dados: `lumia`
+-- Banco de dados: `ventania`
 --
 
 -- --------------------------------------------------------
@@ -272,8 +272,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `username`, `email`, `password`, `role`, `is_active`, `last_ip`, `created_at`, `updated_at`) VALUES
-(1, 'Renan Gonçalves', 'rsgnan', 'rsgnan@proton.me', '$2y$10$5SADRdU961B7gcUhhFAHTu3SVyeBy8t4gjjGTZk.xHfGVtGk1NqNa', 'admin', 1, NULL, '2026-08-16 15:59:40', '2026-08-24 22:07:41'),
-(2, 'Usuario de teste', 'teste', 'teste@gmail.com', '$2y$12$6CCYAq3Jaji0DsmplvskVO.O3hzh0dTE3S2AoDp2IZxLGRsV0.r6W', 'admin', 1, NULL, '2026-08-25 00:17:45', '2026-08-25 03:14:59');
+(1, 'Renan Gonçalves', 'admin', 'rsgnan@proton.me', '$2y$10$5SADRdU961B7gcUhhFAHTu3SVyeBy8t4gjjGTZk.xHfGVtGk1NqNa', 'admin', 1, NULL, '2026-08-16 15:59:40', '2026-08-26 16:53:42');
 
 --
 -- Índices para tabelas despejadas
@@ -365,7 +364,7 @@ ALTER TABLE `sale_items`
 -- AUTO_INCREMENT de tabela `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Restrições para tabelas despejadas

@@ -49,7 +49,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 8v13H3V8" />
                     <path d="M1 3h22v5H1z" />
-                    <line x1="10" y1="12" x2="14" y2="112" />
+                    <line x1="10" y1="12" x2="14" y2="12" />
                 </svg>
                 Produtos
             </a>

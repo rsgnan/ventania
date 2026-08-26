@@ -23,6 +23,32 @@ class ProductRepository
         return $stmt->fetchAll(PDO::FETCH_CLASS, ProductModel::class);
     }
 
+    public function countAll(): int
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT COUNT(*)
+            FROM `products`'
+        );
+
+        $stmt->execute();
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    public function countLowStock(int $limit = 5): int
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT COUNT(*)
+            FROM `products`
+            WHERE `stock` <= :limit'
+        );
+
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return (int) $stmt->fetchColumn();
+    }
+
     public function getById(int $id): ?ProductModel
     {
         $stmt = $this->pdo->prepare(

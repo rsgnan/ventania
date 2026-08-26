@@ -78,6 +78,7 @@ $container->bind('userController', function () use ($container) {
     );
 });
 
+
 // Vendas
 $container->bind('saleRepository', function () use ($container) {
     $pdo = $container->get('pdo');
@@ -97,7 +98,7 @@ $container->bind('saleController', function () use ($container) {
     $saleRepository = $container->get('saleRepository');
     $saleItemRepository = $container->get('saleItemRepository');
     $activityLogService = $container->get('activityLogService');
-    
+
     return new \App\Controller\SaleController(
         $authService,
         $pdo,
@@ -106,6 +107,20 @@ $container->bind('saleController', function () use ($container) {
         $saleItemRepository,
         $activityLogService
     );
+});
+
+// Dashboard
+$container->bind('dashboardController', function () use ($container) {
+
+    $authService = $container->get('authService');
+    $saleRepository = $container->get('saleRepository');
+    $productRepository = $container->get('productRepository');
+
+    return new \App\Controller\DashboardController(
+        $authService,
+        $productRepository,
+        $saleRepository
+        );
 });
 
 // CSRF
@@ -208,6 +223,12 @@ if ($route == 'pages') {
 
     $userController = $container->get('userController');
     $userController->edit();
+} else if ($route === 'dashboard/index') {
+    $authService = $container->get('authService');
+    $authService->ensureLoggedIn();
+
+    $dashboardController = $container->get('dashboardController');
+    $dashboardController->index();
 } else {
     // Nenhuma rota bateu então devolve o error 404
     $errorController = $container->get('errorController');
