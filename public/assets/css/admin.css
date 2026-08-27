@@ -598,6 +598,15 @@ textarea {
     color: var(--color-danger);
 }
 
+.stat-meta {
+    margin-top: 10px;
+
+    color: var(--color-text-muted);
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
 /* Tabelas */
 .table-responsive {
     width: 100%;

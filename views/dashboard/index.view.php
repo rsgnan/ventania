@@ -18,7 +18,7 @@
 
             <?php echo $revenueChange >= 0 ? '↑' : '↓'; ?>
 
-            <?php echo number_format(abs($revenueChange), 1, ',', '.'); ?>%
+            <?php echo number_format($revenueChange, 1, ',', '.'); ?>%
 
             <span>vs. mês anterior</span>
         </div>
@@ -43,7 +43,7 @@
 
             <?php echo $salesChange >= 0 ? '↑' : '↓'; ?>
 
-            <?php echo number_format(abs($salesChange), 1, ',', '.'); ?>%
+            <?php echo number_format($salesChange, 1, ',', '.'); ?>%
 
             <span>vs. mês anterior</span>
         </div>
@@ -51,15 +51,19 @@
 
     <div class="stat-card stat-card-purple">
         <div class="stat-icon">
-            <?php echo icon('package'); ?>
+            <?php echo icon('clock'); ?>
         </div>
 
         <div class="stat-value">
-            <?php echo e($productsCount); ?>
+            <?php echo e($pendingSalesCount); ?>
         </div>
 
         <div class="stat-label">
-            Produtos cadastrados
+            Vendas pendentes
+        </div>
+
+        <div class="stat-meta">
+            Aguardando conclusão
         </div>
 
     </div>
@@ -75,6 +79,10 @@
 
         <div class="stat-label">
             Estoque baixo
+        </div>
+
+        <div class="stat-meta">
+            Produtos com até 5 unidades
         </div>
     </div>
 </div>
@@ -126,7 +134,35 @@
                         </td>
 
                         <td>
-                            <?php echo e($sale['status']); ?>
+                            <?php 
+                            $statusLabel = '';
+                            $statusClass = '';
+
+                            switch ($sale['status']) {
+                                case 'completed':
+                                    $statusLabel = 'Concluída';
+                                    $statusClass = 'green';
+                                    break;
+                                
+                                case 'pending':
+                                    $statusLabel = 'Pendente';
+                                    $statusClass = 'orange';
+                                    break;
+                                
+                                case 'cancelled':
+                                    $statusLabel = 'Cancelada';
+                                    $statusClass = 'red';
+                                    break;
+
+                                default:
+                                    $statusLabel = ucfirst($sale['status']);
+                                    $statusClass = '';
+                                    break;
+                            }
+                        ?>
+                        <span class="badge <?php echo e($statusClass); ?>">
+                            <?php echo e($statusLabel); ?>
+                        </span>
                         </td>
 
                         <td>

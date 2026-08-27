@@ -31,7 +31,7 @@ class LoginController extends ViewController
             if (!empty($username) && !empty($password)) {
                 $loginOk = $this->authService->handleLogin($username, $password);
                 if ($loginOk) {
-                    header('Location: index.php?' . http_build_query(['route' => 'products/index']));
+                    header('Location: index.php?' . http_build_query(['route' => 'dashboard/index']));
                     return;
                 }
 

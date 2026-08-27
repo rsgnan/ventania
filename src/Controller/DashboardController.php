@@ -3,48 +3,46 @@
 namespace App\Controller;
 
 use App\Core\ViewController;
-use App\Repository\ProductRepository;
-use App\Repository\SaleRepository;
+use App\Repository\DashboardRepository;
 use App\Support\AuthService;
 
 class DashboardController extends ViewController
 {
     public function __construct(
         AuthService $authService,
-        private ProductRepository $productRepository,
-        private SaleRepository $saleRepository
+        private DashboardRepository $dashboardRepository
     ) {
         parent::__construct($authService);
     }
 
     public function index()
     {
-        $salesCurrentMonth = $this->saleRepository->countCurrentMonth();
-        $revenueCurrentMonth = $this->saleRepository->getTotalCurrentMonth();
-        $salesPreviousMonth = $this->saleRepository->countPreviousMonth();
-        $revenuePreviousMonth = $this->saleRepository->getTotalPreviousMonth();
-        $productsCount = $this->productRepository->countAll();
-        $lowStockCount = $this->productRepository->countLowStock();
+        $salesCurrentMonth = $this->dashboardRepository->countSalesCurrentMonth();
+        $revenueCurrentMonth = $this->dashboardRepository->getRevenueCurrentMonth();
 
+        $salesPreviousMonth = $this->dashboardRepository->countSalesPreviousMonth();
+        $revenuePreviousMonth = $this->dashboardRepository->getRevenuePreviousMonth();
+        
         $salesChange = $this->calculatePercentageChange(
             $salesCurrentMonth,
             $salesPreviousMonth
         );
 
-         $revenueChange = $this->calculatePercentageChange(
+        $revenueChange = $this->calculatePercentageChange(
             $revenueCurrentMonth,
             $revenuePreviousMonth
         );
 
-        $latestSales = $this->saleRepository->getLastest();
-
+        $pendingSalesCount = $this->dashboardRepository->countPendingSales();
+        $lowStockCount = $this->dashboardRepository->countLowStockProducts();
+        $latestSales = $this->dashboardRepository->getLatestSales();
 
         $this->render('dashboard/index', [
             'salesCurrentMonth' => $salesCurrentMonth,
             'revenueCurrentMonth' => $revenueCurrentMonth,
             'salesChange' => $salesChange,
             'revenueChange' => $revenueChange,
-            'productsCount' => $productsCount,
+            'pendingSalesCount' => $pendingSalesCount,
             'lowStockCount' => $lowStockCount,
             'latestSales' => $latestSales
         ]);

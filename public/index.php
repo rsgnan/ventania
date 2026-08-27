@@ -110,17 +110,20 @@ $container->bind('saleController', function () use ($container) {
 });
 
 // Dashboard
-$container->bind('dashboardController', function () use ($container) {
+$container->bind('dashboardRepository', function () use ($container) {
+    $pdo = $container->get('pdo');
 
+    return new \App\Repository\DashboardRepository($pdo);
+});
+
+$container->bind('dashboardController', function () use ($container) {
     $authService = $container->get('authService');
-    $saleRepository = $container->get('saleRepository');
-    $productRepository = $container->get('productRepository');
+    $dashboardRepository = $container->get('dashboardRepository');
 
     return new \App\Controller\DashboardController(
         $authService,
-        $productRepository,
-        $saleRepository
-        );
+        $dashboardRepository
+    );
 });
 
 // CSRF
