@@ -4,120 +4,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Ventania - Painel Administrativo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    <!-- CSS -->
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <link href="assets/css/admin.css" rel="stylesheet">
-    <link href="assets/css/sale.css" rel="stylesheet">
-    <!-- Favicon -->
+
     <link rel="icon" href="assets/img/favicon.ico" sizes="any">
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
+    <link
+        rel="apple-touch-icon"
+        sizes="180x180"
+        href="assets/img/apple-touch-icon">
 </head>
 
 <body>
-    <!-- CABEÇALHO PRINCIPAL -->
-    <header class="navbar">
-        <div class="navbar-container">
-            <a href="?route=dashboard/index" class="navbar-brand">
-                <div class="logo-icon">VN</div>
-                <span>Ventania</span>
-            </a>
 
-            <div class="navbar-user">
-                <div class="avatar">RG</div>
-                <div class="user-info">
-                    <div class="user-name">Renan Gonçalves</div>
-                    <div class="user-role">Administrador</div>
-                </div>
-            </div>
-        </div>
-    </header>
+    <div class="app">
 
-    <!-- MENU PRINCIPAL -->
-    <nav class="main-nav">
-        <div class="main-nav-container">
-            <a class="main-nav-item<?php if (str_starts_with($_GET['route'] ?? '', 'dashboard/')) echo e(' active'); ?>" href="?route=dashboard/index">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="7" height="7" rx="1" />
-                    <rect x="14" y="3" width="7" height="7" rx="1" />
-                    <rect x="3" y="14" width="7" height="7" rx="1" />
-                    <rect x="14" y="14" width="7" height="7" rx="1" />
-                </svg>
-                Dashboard
-            </a>
-            <a class="main-nav-item<?php if (str_starts_with($_GET['route'] ?? '', 'products/')) echo e(' active'); ?>" href="?route=products/index">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 8v13H3V8" />
-                    <path d="M1 3h22v5H1z" />
-                    <line x1="10" y1="12" x2="14" y2="12" />
-                </svg>
-                Produtos
-            </a>
-            <a class="main-nav-item<?php if (str_starts_with($_GET['route'] ?? '', 'sales/')) echo e(' active'); ?>" href="?route=sales/index">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="1" x2="12" y2="23" />
-                    <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
-                </svg>
-                Vendas
-            </a>
-            <?php if ($this->authService->isAdmin()): ?>
-                <a class="main-nav-item<?php if (str_starts_with($_GET['route'] ?? '', 'users/')) echo e(' active'); ?>" href="?route=users/index">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                        <circle cx="12" cy="7" r="4" />
-                    </svg>
-                    Usuários
+        <!-- Sidebar -->
+        <aside class="app-sidebar" id="app-sidebar">
+
+            <div class="sidebar-header">
+                <a class="sidebar-brand" href="?route=dashboard/index">
+                    <div class="sidebar-logo">
+                        VN
+                    </div>
+
+                    <span class="sidebar-brand-name">
+                        Ventania
+                    </span>
                 </a>
-            <?php endif; ?>
-        </div>
-    </nav>
 
-    <!-- CONTEÚDO -->
-    <main class="main">
-        <div class="content">
-            <?php echo $contents; ?>
-        </div>
-    </main>
-</body>
-<script>
-    // PREVIEW IMAGE
-    const productImageInput = document.getElementById('product-image-input');
-    if (productImageInput) {
-        productImageInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const preview = document.getElementById('image-preview');
-            const icon = document.getElementById('image-upload-icon');
-            const text = document.getElementById('image-upload-text');
+                <button
+                    class="sidebar-close"
+                    id="sidebar-close"
+                    type="button"
+                    aria-label="Fechar menu">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
 
-            if (file) {
+            <nav class="sidebar-nav">
+
+                <a
+                    class="sidebar-nav-link
+                    <?php if (
+                        str_starts_with($_GET["route"] ?? "", "dashboard/")
+                    ) {
+                        echo " active";
+                    } ?>"
+                    href="?route=dashboard/index">
+
+                    <span>Dashboard</span>
+                </a>
+
+                <a
+                    class="sidebar-nav-link
+                    <?php if (
+                        str_starts_with($_GET["route"] ?? "", "products/")
+                    ) {
+                        echo " active";
+                    } ?>"
+                    href="?route=products/index">
+
+                    <span>Produtos</span>
+                </a>
+
+                <a
+                    class="sidebar-nav-link
+                    <?php if (str_starts_with($_GET["route"] ?? "", "sales/")) {
+                        echo " active";
+                    } ?>"
+                    href="?route=sales/index">
+
+                    <span>Vendas</span>
+                </a>
+
+                <?php if ($this->authService->isAdmin()): ?>
+                <a
+                    class="sidebar-nav-link
+                    <?php if (str_starts_with($_GET["route"] ?? "", "users/")) {
+                        echo " active";
+                    } ?>"
+                    href="?route=users/index">
+
+                    <span>Usuários</span>
+                </a>
+                <?php endif; ?>
+
+            </nav>
+
+            <div class="sidebar-footer">
+                    <div class="sidebar-version">
+                        Ventania
+                        <span>v1.0.0</span>
+                    </div>
+
+            </div>
+
+        </aside>
+
+        <!-- Overlay mobile -->
+        <div class="app-overlay" id="app-overlay"></div>
+
+        <!-- Área principal -->
+        <div class="app-body">
+
+            <!-- Header -->
+            <header class="app-header">
+
+                <button
+                    class="header-menu-button"
+                    id="sidebar-open"
+                    type="button"
+                    aria-label="Abrir menu">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round">
+                        <line x1="4" y1="6" x2="20" y2="6" />
+                        <line x1="4" y1="12" x2="20" y2="12" />
+                        <line x1="4" y1="18" x2="20" y2="18" />
+                    </svg>
+
+                </button>
+
+                <div class="header-spacer"></div>
+
+                <div class="header-user">
+
+                    <div class="header-avatar">
+                        RG
+                    </div>
+
+                    <div class="header-user-info">
+                        <span class="header-user-name">
+                            Renan Gonçalves
+                        </span>
+
+                        <span class="header-user-role">
+                            Administrador
+                        </span>
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- Conteúdo -->
+            <main class="app-main">
+                <div class="app-content">
+                    <?php echo $contents; ?>
+                </div>
+            </main>
+
+        </div>
+
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('app-sidebar');
+        const overlay = document.getElementById('app-overlay');
+        const sidebarOpen = document.getElementById('sidebar-open');
+        const sidebarClose = document.getElementById('sidebar-close');
+
+        function openSidebar() {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+
+        sidebarOpen.addEventListener('click', openSidebar);
+        sidebarClose.addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
+
+        // Preview da imagem do produto
+        const productImageInput = document.getElementById('product-image-input');
+
+        if (productImageInput) {
+            productImageInput.addEventListener('change', function (event) {
+                const file = event.target.files[0];
+                const preview = document.getElementById('image-preview');
+                const icon = document.getElementById('image-upload-icon');
+                const text = document.getElementById('image-upload-text');
+
+                if (!file) {
+                    preview.style.display = 'none';
+                    icon.style.display = '';
+                    text.style.display = '';
+                    return;
+                }
+
                 const reader = new FileReader();
-                reader.onload = function(ev) {
-                    preview.src = ev.target.result;
+
+                reader.onload = function (event) {
+                    preview.src = event.target.result;
                     preview.style.display = 'block';
                     icon.style.display = 'none';
                     text.style.display = 'none';
                 };
+
                 reader.readAsDataURL(file);
-            } else {
-                preview.style.display = 'none';
-                icon.style.display = '';
-                text.style.display = '';
-            }
-        });
-    }
-    // BAR CHART
-    const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-    const values = [62, 78, 55, 88, 72, 95, 84, 102, 91, 88, 75, 94];
-    const max = Math.max(...values);
-    const chart = document.getElementById('barChart');
-    const labels = document.getElementById('barLabels');
-    if (chart && labels) {
-        months.forEach((m, i) => {
-            const h = Math.round((values[i] / max) * 140);
-            chart.innerHTML += `<div class="bar-wrap"><div class="bar" style="height:${h}px" title="R$ ${values[i]}k"></div></div>`;
-            labels.innerHTML += `<div class="bar-wrap">${m}</div>`;
-        });
-    }
-</script>
+            });
+        }
+    </script>
+
+</body>
 
 </html>

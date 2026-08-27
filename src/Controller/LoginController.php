@@ -18,7 +18,7 @@ class LoginController extends ViewController
     public function login(): void
     {
         if ($this->authService->isLoggedIn()) {
-            header('Location: index.php?' . http_build_query(['route' => 'products/index']));
+            header('Location: index.php?' . http_build_query(['route' => 'dashboard/index']));
             return;
         }
 

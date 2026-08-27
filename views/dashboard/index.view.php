@@ -110,6 +110,7 @@
                 <tr>
                     <th>Venda</th>
                     <th>Data</th>
+                    <th>Itens</th>
                     <th>Total</th>
                     <th>Status</th>
                     <th>Ações</th>
@@ -127,6 +128,10 @@
 
                         <td>
                             <?php echo date('d/m/Y H:i', strtotime($sale['created_at'])); ?>
+                        </td>
+
+                        <td>
+                            <?php echo e($sale['items_quantity']); ?>
                         </td>
 
                         <td>
