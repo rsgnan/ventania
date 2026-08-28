@@ -118,4 +118,29 @@ class DashboardRepository
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getBestSellingProducts(): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT
+                products.id,
+                products.name,
+                SUM(sale_items.quantity) AS quantity_sold,
+                SUM(sale_items.subtotal) AS revenue
+            FROM sale_items
+            INNER JOIN products
+                ON products.id = sale_items.product_id
+            INNER JOIN sales
+                ON sales.id = sale_items.sale_id
+            WHERE sales.status = :status
+            GROUP BY products.id, products.name
+            ORDER BY quantity_sold DESC
+            LIMIT 5'
+        );
+
+        $stmt->bindValue(':status', 'completed');
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
 }

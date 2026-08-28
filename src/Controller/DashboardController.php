@@ -36,6 +36,7 @@ class DashboardController extends ViewController
         $pendingSalesCount = $this->dashboardRepository->countPendingSales();
         $lowStockCount = $this->dashboardRepository->countLowStockProducts();
         $latestSales = $this->dashboardRepository->getLatestSales();
+        $bestSellingProducts = $this->dashboardRepository->getBestSellingProducts();
 
         $this->render('dashboard/index', [
             'salesCurrentMonth' => $salesCurrentMonth,
@@ -44,7 +45,8 @@ class DashboardController extends ViewController
             'revenueChange' => $revenueChange,
             'pendingSalesCount' => $pendingSalesCount,
             'lowStockCount' => $lowStockCount,
-            'latestSales' => $latestSales
+            'latestSales' => $latestSales,
+            'bestSellingProducts' => $bestSellingProducts
         ]);
     }
 
