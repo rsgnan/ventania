@@ -41,6 +41,25 @@ class ProductRepository
         return $entry !== false ? $entry : null;
     }
 
+    public function getByCategory(int $categoryId): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT
+                products.*,
+                categories.name AS category_name
+            FROM products
+            LEFT JOIN categories
+                ON categories.id = products.category_id
+            WHERE products.category_id = :category_id
+            ORDER BY products.name ASC'
+        );
+
+        $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_CLASS, ProductModel::class);
+    }
+
     public function getAllCategories(): array
     {
         $stmt = $this->pdo->prepare(

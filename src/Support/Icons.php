@@ -18,6 +18,20 @@ function icon(string $name): string
             </svg>
         ',
 
+        'alert-triangle' => '
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M10.3 2.9 1.8 17a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 2.9a2 2 0 0 0-3.4 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+        ',
+
         'shopping-cart' => '
             <svg
                 viewBox="0 0 24 24"
@@ -56,20 +70,6 @@ function icon(string $name): string
                 <path d="M21 8v13H3V8" />
                 <path d="M1 3h22v5H1z" />
                 <path d="M10 12h4" />
-            </svg>
-        ',
-
-        'alert-triangle' => '
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M10.3 2.9 1.8 17a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 2.9a2 2 0 0 0-3.4 0z" />
-                <line x1="12" y1="9" x2="12" y2="13" />
-                <line x1="12" y1="17" x2="12.01" y2="17" />
             </svg>
         ',
 

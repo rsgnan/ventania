@@ -10,8 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="assets/css/admin.css" rel="stylesheet">
 
-    <link rel="icon" href="assets/img/favicon.ico" sizes="any">
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon">
 </head>
 
 <body>
@@ -23,13 +21,10 @@
 
             <div class="sidebar-header">
                 <a class="sidebar-brand" href="?route=dashboard/index">
-                    <div class="sidebar-logo">
-                        VN
-                    </div>
-
-                    <span class="sidebar-brand-name">
-                        Ventania
-                    </span>
+                    <img
+                        class="sidebar-brand-logo" 
+                        src="assets/img/logo-inside.png"
+                        alt="Ventania - Painel Administrativo">
                 </a>
 
                 <button

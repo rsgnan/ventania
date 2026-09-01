@@ -153,10 +153,10 @@ $container->bind('errorController', function () use ($container) {
 
 // Tratamento de route
 
-$route = @(string) ($_GET['route'] ?? 'pages');
+$route = (string) ($_GET['route'] ?? 'pages');
 
 if ($route == 'pages') {
-    $page = @(string) ($_GET['page'] ?? 'index');
+    $page = (string) ($_GET['page'] ?? 'index');
 
     $adminController = $container->get('productController');
     $adminController->index();

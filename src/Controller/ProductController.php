@@ -20,7 +20,17 @@ class ProductController extends ViewController
 
     public function index(): void
     {
-        $products = $this->productRepository->getAll();
+
+        $categoryId = isset($_GET['category'])
+            ? (int) $_GET['category']
+            : null;
+
+        if ($categoryId) {
+            $products = $this->productRepository->getByCategory($categoryId);
+        } else {
+            $products = $this->productRepository->getAll();
+        }
+        
         $categories = $this->productRepository->getAllCategories();
         $productCategoryRows = $this->productRepository->getWithCategoryName();
 
