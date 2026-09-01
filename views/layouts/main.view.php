@@ -32,10 +32,10 @@
                     </span>
                 </a>
 
-                <button 
-                    class="sidebar-close" 
-                    id="sidebar-close" 
-                    type="button" 
+                <button
+                    class="sidebar-close"
+                    id="sidebar-close"
+                    type="button"
                     aria-label="Fechar menu">
 
                     <svg
@@ -199,12 +199,13 @@
 
                         <svg
                             viewBox="0 0 24 24"
-                            fille="none"
+                            fill="none"
                             stroke="currentColor"
                             stroke-width="2"
-                            stroke-linehoin="round"
+                            stroke-linejoin="round"
                             stroke-linecap="round">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h" />
+
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                             <polyline points="16 17 21 12 16 7" />
                             <line x1="21" y1="12" x2="9" y2="12" />
                         </svg>
@@ -231,46 +232,48 @@
             <!-- Header mobile -->
             <header class="app-header">
 
-            <button 
-                class="header-menu-button" 
-                id="sidebar-open" 
-                type="button" 
-                aria-label="Arbrir menu">
+                <button
+                    class="header-menu-button"
+                    id="sidebar-open"
+                    type="button"
+                    aria-label="Abrir menu"
+                    aria-controls="app-sidebar"
+                    aria-expanded="false">
 
-                <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linejoin="round"
-                    stroke-linecap="round">
-                    <line x1="4" y1="6" x2="20" y2="6" />
-                    <line x1="4" y1="12" x2="20" y2="12" />
-                    <line x1="4" y1="18" x2="20" y2="18" />
-                </svg>
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linejoin="round"
+                        stroke-linecap="round">
+                        <line x1="4" y1="6" x2="20" y2="6" />
+                        <line x1="4" y1="12" x2="20" y2="12" />
+                        <line x1="4" y1="18" x2="20" y2="18" />
+                    </svg>
 
-            </button>
+                </button>
 
-            <div class="header-spacer"></div>
+                <div class="header-spacer"></div>
 
-            <div class="header-user">
-                <div class="header-avatar">
-                    RG
+                <div class="header-user">
+                    <div class="header-avatar">
+                        RG
+                    </div>
+
+                    <div class="header-user-info">
+                        <span class="header-user-name">
+                            Renan Gonçalves
+                        </span>
+
+                        <span class="header-user-role">
+                            Administrador
+                        </span>
+                    </div>
                 </div>
-
-                <div class="header-user-info">
-                    <span class="header-user-name">
-                        Renan Gonçalves
-                    </span>
-
-                    <span class="header-user-role">
-                        Administrador
-                    </span>
-                </div>
-            </div>
 
             </header>
-            
+
             <!-- Conteúdo -->
             <main class="app-main">
                 <div class="app-content">
@@ -289,18 +292,56 @@
         const sidebarClose = document.getElementById('sidebar-close');
 
         function openSidebar() {
+            if (!sidebar || !overlay) {
+                return;
+            }
+
             sidebar.classList.add('open');
             overlay.classList.add('active');
+
+            if (sidebarOpen) {
+                sidebarOpen.setAttribute('aria-expanded', 'true');
+
+            }
         }
 
         function closeSidebar() {
+            if (!sidebar || !overlay) {
+                return;
+            }
+
             sidebar.classList.remove('open');
             overlay.classList.remove('active');
+
+            if (sidebarOpen) {
+                sidebarOpen.setAttribute('aria-expanded', 'false');
+
+            }
         }
 
-        sidebarOpen.addEventListener('click', openSidebar);
-        sidebarClose.addEventListener('click', closeSidebar);
-        overlay.addEventListener('click', closeSidebar);
+        if (sidebarOpen) {
+            sidebarOpen.addEventListener('click', openSidebar);
+        }
+
+        if (sidebarClose) {
+            sidebarClose.addEventListener('click', closeSidebar);
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', closeSidebar);
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeSidebar();
+            }
+        });
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
 
         // Preview da imagem do produto
         const productImageInput = document.getElementById('product-image-input');

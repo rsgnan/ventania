@@ -11,6 +11,7 @@
 </div>
 
 <div class="stat-grid">
+
     <div class="stat-card stat-card-revenue">
         <div class="stat-icon">
             <?php echo icon('dollar-sign'); ?>
@@ -29,8 +30,7 @@
                                     : 'stat-change-negative'; ?>">
 
             <?php echo $revenueChange >= 0 ? '↑' : '↓'; ?>
-
-            <?php echo number_format($revenueChange, 1, ',', '.'); ?>%
+            <?php echo number_format(abs($revenueChange), 1, ',', '.'); ?>%
 
             <span>vs. mês anterior</span>
         </div>
@@ -55,7 +55,7 @@
 
             <?php echo $salesChange >= 0 ? '↑' : '↓'; ?>
 
-            <?php echo number_format($salesChange, 1, ',', '.'); ?>%
+            <?php echo number_format(abs($salesChange), 1, ',', '.'); ?>%
 
             <span>vs. mês anterior</span>
         </div>
@@ -120,86 +120,93 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Venda</th>
+                        <th class="table-hide-mobile">Venda</th>
                         <th>Data</th>
-                        <th>Itens</th>
+                        <th class="table-hide-mobile">Itens</th>
                         <th>Total</th>
                         <th>Status</th>
-                        <th>Ações</th>
+                        <th class="table-hide-mobile">Ações</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    <?php foreach ($latestSales as $sale): ?>
-                        <tr>
-                            <td>
-                                <strong>
-                                    #<?php echo e($sale['id']); ?>
-                                </strong>
-                            </td>
+                    <?php if (!empty($latestSales)) : ?>
+                        <?php foreach ($latestSales as $sale): ?>
+                            <?php
+                            $statusLabel = '';
+                            $statusClass = '';
 
-                            <td>
-                                <?php echo date(
-                                    'd/m/Y H:i',
-                                    strtotime($sale['created_at']),
-                                ); ?>
-                            </td>
+                            switch ($sale['status']) {
+                                case 'completed':
+                                    $statusLabel = 'Concluída';
+                                    $statusClass = 'badge-success';
+                                    break;
 
-                            <td>
-                                <?php echo e($sale['items_quantity']); ?>
-                            </td>
+                                case 'pending':
+                                    $statusLabel = 'Pendente';
+                                    $statusClass = 'badge-warning';
+                                    break;
 
-                            <td>
-                                R$ <?php echo number_format(
-                                        $sale['total_amount'],
-                                        2,
-                                        ',',
-                                        '.',
+                                case 'cancelled':
+                                    $statusLabel = 'Cancelada';
+                                    $statusClass = 'badge-danger';
+                                    break;
+
+                                default:
+                                    $statusLabel = ucfirst((string) $sale['status']);
+                                    $statusClass = 'badge-info';
+                                    break;
+                            }
+                            ?>
+                            <tr>
+                                <td class="table-hide-mobile"
+                                    <strong>
+                                        #<?php echo e($sale['id']); ?>
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    <?php echo date(
+                                        'd/m/Y H:i',
+                                        strtotime($sale['created_at'])
                                     ); ?>
-                            </td>
+                                </td>
 
-                            <td>
-                                <?php
-                                $statusLabel = '';
-                                $statusClass = '';
+                                <td class="table-hide-mobile">
+                                    <?php echo e($sale['items_quantity']); ?>
+                                </td>
 
-                                switch ($sale['status']) {
-                                    case 'completed':
-                                        $statusLabel = 'Concluída';
-                                        $statusClass = 'badge-success';
-                                        break;
+                                <td>
+                                    R$ <?php echo number_format(
+                                            $sale['total_amount'],
+                                            2,
+                                            ',',
+                                            '.'
+                                        ); ?>
+                                </td>
 
-                                    case 'pending':
-                                        $statusLabel = 'Pendente';
-                                        $statusClass = 'badge-warning';
-                                        break;
+                                <td>
+                                    <span class="badge <?php echo e($statusClass); ?>">
+                                        <?php echo e($statusLabel); ?>
+                                    </span>
+                                </td>
 
-                                    case 'cancelled':
-                                        $statusLabel = 'Cancelada';
-                                        $statusClass = 'badge-danger';
-                                        break;
-
-                                    default:
-                                        $statusLabel = ucfirst($sale['status']);
-                                        break;
-                                }
-                                ?>
-                                <span class="badge <?php echo e($statusClass); ?>">
-                                    <?php echo e($statusLabel); ?>
-                                </span>
-                            </td>
-
-                            <td>
-                                <div class="table-actions">
-                                    <a class="btn btn-ghost btn-sm" href="?route=sales/edit&id=<?php echo e(
-                                                                                                    $sale['id'],
-                                                                                                ); ?>">
-                                        Ver
-                                    </a>
-                                </div>
+                                <td class="table-hide-mobile">
+                                    <div class="table-actions">
+                                        <a class="btn btn-ghost btn-sm" href="?route=sales/edit&id=<?php echo e($sale['id']); ?>">
+                                            Ver
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">
+                                Nenhuma venda encontrada.
                             </td>
                         </tr>
-                    <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -228,30 +235,39 @@
                 </thead>
 
                 <tbody>
-                    <?php foreach ($bestSellingProducts as $product): ?>
+                    <?php if (!empty($bestSellingProducts)): ?>
+                        <?php foreach ($bestSellingProducts as $product): ?>
+                            <tr>
+                                <td>
+                                    <strong>
+                                        <?php echo e($product['name']); ?>
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    <?php echo e($product['quantity_sold']); ?>
+                                </td>
+
+                                <td>
+                                    R$ <?php echo number_format(
+                                            $product['revenue'],
+                                            2,
+                                            ',',
+                                            '.'
+                                        ); ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
                         <tr>
-                            <td>
-                                <strong>
-                                    <?php echo e($product['name']); ?>
-                                </strong>
-                            </td>
-
-                            <td>
-                                <?php echo e($product['quantity_sold']); ?>
-                            </td>
-
-                            <td>
-                                R$ <?php echo number_format(
-                                        $product['revenue'],
-                                        2,
-                                        ',',
-                                        '.',
-                                    ); ?>
+                            <td colspan="3" class="text-center text-muted">
+                                Nenhum produto vendido no período.
                             </td>
                         </tr>
-                    <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
     </div>
+
 </div>

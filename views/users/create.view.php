@@ -3,15 +3,24 @@
 
     <div class="page-header">
         <div class="page-header-left">
-            <a class="btn btn-ghost btn-icon" href="?route=users/index" title="Voltar para Usuários">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <line x1="19" y1="12" x2="5" y2="12" />
-                    <polyline points="12 19 5 12 12 5" />
-                </svg>
-            </a>
-            <div>
-                <h1>Novo Usuário</h1>
-                <p>Cadastre um novo usuário para acessar o sistema</p>
+            <div class="page-header-title">
+                <a
+                    class="btn btn-ghost btn-icon"
+                    href="?route=users/index"
+                    title="Voltar para Usuários">
+
+                    <?php echo icon('arrow-left'); ?>
+                    
+                </a>
+                <div>
+                    <h1 class="page-title">
+                        Novo Usuário
+                    </h1>
+
+                    <p class="page-description">
+                        Cadastre um novo usuário para acessar o sistema.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -19,10 +28,18 @@
     <div class="form-panel">
         <?php if (!empty($errors)): ?>
             <div class="alert alert-error">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round">
+
                     <circle cx="12" cy="12" r="10" />
                     <line x1="12" y1="8" x2="12" y2="12" />
                     <line x1="12" y1="16" x2="12.01" y2="16" />
+
                 </svg>
                 <ul class="alert-list">
                     <?php foreach ($errors as $error): ?>
@@ -31,59 +48,140 @@
                 </ul>
             </div>
         <?php endif; ?>
+
         <div class="card">
             <div class="card-header">
                 <div>
-                    <div class="card-title">Dados do Usuário</div>
-                    <div class="card-subtitle">Informações pessoais e credenciais de acesso</div>
+                    <div class="card-title">
+                        Dados do Usuário
+                    </div>
+
+                    <div class="card-subtitle">
+                        Informações pessoais e credenciais de acesso
+                    </div>
                 </div>
             </div>
+
             <div class="card-body">
                 <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Nome</label>
-                        <input class="form-input" type="text" id="name" name="name" value="<?php echo e($_POST['name'] ?? ''); ?>" required>
+                    <div class="form-field">
+                        <label class="form-label" for="name">
+                            Nome
+                        </label>
+
+                        <input
+                            class="form-input"
+                            type="text"
+                            id="name"
+                            name="name"
+                            value="<?php echo e($_POST['name'] ?? ''); ?>"
+                            required>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Usuário</label>
-                        <input class="form-input" type="text" id="username" name="username" required>
+                    <div class="form-field">
+                        <label class="form-label" for="username">
+                            Usuário
+                        </label>
+
+                        <input
+                            class="form-input"
+                            type="text"
+                            id="username"
+                            name="username"
+                            value="<?php echo e($_POST['username'] ?? ''); ?>"
+                            required>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">E-mail</label>
-                        <input class="form-input" type="email" id="email" name="email" required>
+                    <div class="form-field">
+                        <label class="form-label" for="email">
+                            E-mail
+                        </label>
+
+                        <input
+                            class="form-input"
+                            type="email"
+                            id="email"
+                            name="email"
+                            value="<?php echo e($_POST['email'] ?? ''); ?>"
+                            required>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Senha</label>
-                        <input class="form-input" type="password" id="password" name="password" required>
+                    <div class="form-field">
+                        <label class="form-label" for="password">
+                            Senha
+                        </label>
+
+                        <input
+                            class="form-input"
+                            type="password"
+                            id="password"
+                            name="password"
+                            required>
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="card">
             <div class="card-header">
                 <div>
-                    <div class="card-title">Acesso e Permissões</div>
-                    <div class="card-subtitle">Defina o perfil de acesso e o status da conta</div>
+                    <div class="card-title">
+                        Acesso e Permissões
+                    </div>
+
+                    <div class="card-subtitle">
+                        Defina o perfil de acesso e o status da conta
+                    </div>
                 </div>
             </div>
+
             <div class="card-body">
                 <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Perfil</label>
-                        <select class="form-input" id="role" name="role" required>
-                            <option value="operator" selected>Operador</option>
-                            <option value="admin">Administrador</option>
+                    <div class="form-field">
+                        <label class="form-label" for="role">
+                            Perfil
+                        </label>
+
+                        <select
+                            class="form-input"
+                            id="role"
+                            name="role"
+                            required>
+
+                            <option
+                                value="operator"
+                                <?php echo ($_POST['role'] ?? 'operator') === 'operator' ? 'selected' : ''; ?>>
+                                Operador
+                            </option>
+
+                            <option
+                                value="admin"
+                                <?php echo ($_POST['role'] ?? '') === 'admin' ? 'selected' : ''; ?>>
+                                Administrador
+                            </option>
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Status</label>
-                        <select class="form-input" id="is_active" name="is_active" required>
-                            <option value="1" selected>Ativo</option>
-                            <option value="0">Inativo</option>
+                    <div class="form-field">
+                        <label class="form-label" for="is_active">
+                            Status
+                        </label>
+
+                        <select 
+                            class="form-input" 
+                            id="is_active" 
+                            name="is_active" 
+                            required>
+
+                            <option value="1"
+                            <?php echo ($_POST['is_active'] ?? '1') === '1' ? 'selected' : ''; ?>>
+                            Ativo
+                            </option>
+
+                            <option value="0"
+                            <?php echo ($_POST['is_active'] ?? '') === '0' ? 'selected' : ''; ?>>
+                            Inativo
+                            </option>
                         </select>
                     </div>
                 </div>
@@ -94,7 +192,8 @@
             <button type="submit" class="btn btn-primary">
                 Salvar Usuário
             </button>
-            <a href="?route=users/index" class="btn btn-ghost">
+
+            <a class="btn btn-ghost" href="?route=users/index">
                 Cancelar
             </a>
         </div>

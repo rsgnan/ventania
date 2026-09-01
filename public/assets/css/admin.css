@@ -90,7 +90,7 @@ svg {
     /* Layout */
     --sidebar-width: 230px;
     --header-height: 64px;
-    --content-max-width: 1440px;
+    --content-max-width: 1600px;
 
     /* Espaçamento */
     --space-xs: 4px;
@@ -155,7 +155,7 @@ svg {
     width: 100%;
     max-width: var(--content-max-width);
 
-    margin: 0 auto;
+    margin: 0;
     padding: 28px 30px 40px;
 }
 
@@ -213,11 +213,9 @@ svg {
 
     flex-shrink: 0;
 
-    background: linear-gradient(
-        135deg,
-        var(--color-primary),
-        var(--color-secondary)
-    );
+    background: linear-gradient(135deg,
+            var(--color-primary),
+            var(--color-secondary));
 
     border-radius: var(--radius-md);
 
@@ -306,7 +304,7 @@ svg {
 
     transition:
         background-color var(--transition-normal),
-        border-color var(--transition-normal)
+        border-color var(--transition-normal),
         color var(--transition-normal);
 }
 
@@ -360,11 +358,9 @@ svg {
 
     flex-shrink: 0;
 
-    background: linear-gradient(
-        135deg,
-        var(--color-primary),
-        var(--color-secondary)
-    );
+    background: linear-gradient(135deg,
+            var(--color-primary),
+            var(--color-secondary));
 
     border-radius: 50%;
 
@@ -426,7 +422,7 @@ svg {
     font-size: 12px;
     font-weight: 500;
 
-    transition: 
+    transition:
         background-color var(--transition-fast),
         color var(--transition-fast);
 }
@@ -489,7 +485,7 @@ svg {
 
     cursor: pointer;
 
-    transition: 
+    transition:
         background-color var(--transition-fast),
         color var(--transition-fast);
 }
@@ -526,11 +522,9 @@ svg {
 
     flex-shrink: 0;
 
-    background: linear-gradient(
-        135deg,
-        var(--color-primary),
-        var(--color-secondary)
-    );
+    background: linear-gradient(135deg,
+            var(--color-primary),
+            var(--color-secondary));
 
     border-radius: 50%;
 
@@ -591,7 +585,6 @@ svg {
 /* Botões */
 .btn {
     min-height: 36px;
-
     padding: 0 14px;
 
     display: inline-flex;
@@ -694,14 +687,12 @@ svg {
 
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
-
-    box-shadow: var(--shadow-md);
 }
 
 .card-header {
     min-height: 58px;
 
-    padding: 14px 18px;
+    padding: 16px 18px;
 
     display: flex;
     align-items: center;
@@ -718,20 +709,21 @@ svg {
 .card-title {
     color: var(--color-text);
 
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
 }
 
 .card-subtitle {
-    margin-top: 3px;
+    margin-top: 4px;
 
     color: var(--color-text-muted);
 
-    font-size: 11px;
+    font-size: 12px;
+    line-height: 1.4    ;
 }
 
 .card-body {
-    padding: 18px;
+    padding: 22px 18px;
 }
 
 /* Estatísticas */
@@ -810,7 +802,6 @@ svg {
 .stat-icon {
     width: 38px;
     height: 38px;
-
     margin-bottom: 14px;
 
     display: flex;
@@ -885,15 +876,18 @@ svg {
     gap: var(--space-lg);
 }
 
-.dashboard-grid .table td {
-    height: 55px;
+.dashboard-grid .card {
+    min-width: 0;
 }
 
 /* Tabelas */
 .table-wrapper {
     width: 100%;
+    max-width: 100%;
 
     overflow-x: auto;
+
+    -webkit-overflow-scrolling: touch;
 }
 
 .table {
@@ -952,7 +946,6 @@ svg {
 /* Badges */
 .badge {
     min-height: 24px;
-
     padding: 0 9px;
 
     display: inline-flex;
@@ -1011,7 +1004,7 @@ svg {
 
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 8px;
 }
 
 .form-field-full {
@@ -1019,10 +1012,15 @@ svg {
 }
 
 .form-label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.form-help {
     color: var(--color-text-muted);
 
-    font-size: 11px;
-    font-weight: 600;
+    font-size: 12px;
+    line-height: 1.4;
 }
 
 .form-input,
@@ -1047,9 +1045,9 @@ svg {
 
 .form-input,
 .form-select {
-    height: 40px;
+    height: 44px;
 
-    padding: 0 12px;
+    padding: 0 14px;
 }
 
 .form-textarea {
@@ -1086,11 +1084,19 @@ svg {
 }
 
 .form-actions {
-    margin-top: 20px;
-
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.page-header-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-header-left {
+    min-width: 0;
 }
 
 /* Alertas */
@@ -1156,7 +1162,6 @@ svg {
 .product-image {
     width: 100%;
     aspect-ratio: 16 / 10;
-
     margin-bottom: 12px;
 
     background: var(--color-surface-secondary);
@@ -1284,6 +1289,10 @@ svg {
         backdrop-filter: blur(12px);
     }
 
+    .header-menu-button {
+        display: flex;
+    }
+
     .app-content {
         padding: 20px 16px 30px;
     }
@@ -1301,14 +1310,28 @@ svg {
 
     .form-grid {
         grid-template-columns: 1fr;
+        gap: 16px;
     }
 
     .form-field-full {
         grid-column: auto;
     }
 
+    .table-hide-mobile {
+        display: none;
+    }
+
     .table {
-        min-width: 680px;
+        min-width: 0;
+    }
+
+    .dashboard-grid .table-wrapper {
+        overflow-x: hidden;
+    }
+
+    .dashboard-grid .table td {
+        padding-top: 10px;
+        padding-bottom: 10px;
     }
 
     .product-grid {
@@ -1318,6 +1341,10 @@ svg {
 
 @media (max-width: 520px) {
     .header-user-info {
+        display: none;
+    }
+
+    .stat-grid {
         grid-template-columns: 1fr;
     }
 
