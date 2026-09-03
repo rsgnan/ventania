@@ -14,17 +14,9 @@
 
     <div class="page-header-actions">
         <a class="btn btn-primary" href="?route=users/create">
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linejoin="round"
-                stroke-linecap="round">
 
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
+            <?php echo icon('plus'); ?>
+            
             Novo Usuário
         </a>
     </div>

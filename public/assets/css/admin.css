@@ -65,7 +65,7 @@ svg {
 
     --color-primary: #c99718;
     --color-primary-hover: #b18414;
-    --color-primary-soft: rgba(201, 151, 24 , 0.12);
+    --color-primary-soft: rgba(201, 151, 24, 0.12);
 
     --color-secondary: #84cc16;
 
@@ -566,6 +566,16 @@ svg {
     gap: 8px;
 }
 
+.page-header-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-header-left {
+    min-width: 0;
+}
+
 /* Botões */
 .btn {
     min-height: 36px;
@@ -703,7 +713,7 @@ svg {
     color: var(--color-text-muted);
 
     font-size: 12px;
-    line-height: 1.4    ;
+    line-height: 1.4;
 }
 
 .card-body {
@@ -846,7 +856,7 @@ svg {
 }
 
 .stat-change-positive {
-    color: var(--color-success);card
+    color: var(--color-success);
 }
 
 .stat-change-negative {
@@ -858,6 +868,7 @@ svg {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-lg);
+    align-items: start;
 }
 
 .dashboard-grid .card {
@@ -927,6 +938,12 @@ svg {
     gap: 6px;
 }
 
+.table-empty {
+    color: var(--color-text-muted) !important;
+
+    text-align: center;
+}
+
 /* Abas */
 .tabs {
 
@@ -982,7 +999,7 @@ svg {
     background: var(--color-surface);
     color: var(--color-text);
 
-    box-shadow: var(--shadow-sm)    ;
+    box-shadow: var(--shadow-sm);
 
     font-weight: 600;
 }
@@ -1035,6 +1052,10 @@ svg {
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+
+.form-panel-wide {
+    max-width: none;
 }
 
 .form-grid {
@@ -1133,23 +1154,13 @@ svg {
     gap: 8px;
 }
 
-.page-header-title {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.page-header-left {
-    min-width: 0;
-}
-
 /* Alertas */
 .alert {
     padding: 13px 14px;
 
     display: flex;
     align-items: flex-start;
-    gap: 10px;
+    gap: 8px;
 
     border: 1px solid transparent;
     border-radius: var(--radius-md);
@@ -1158,19 +1169,23 @@ svg {
     line-height: 1.5;
 }
 
+.alert>svg {
+    width: 18px;
+    height: 18px;
+
+    flex-shrink: 0;
+}
+
+.alert-list {
+    list-style: none;
+}
+
 .alert-danger {
     background: var(--color-danger-soft);
 
     border-color: rgba(239, 68, 68, 0.22);
 
     color: var(--color-danger);
-}
-
-.alert-icon {
-    width: 18px;
-    height: 18px;
-
-    flex-shrink: 0;
 }
 
 /* Produtos */
@@ -1245,8 +1260,6 @@ svg {
     font-size: 14px;
     font-weight: 700;
 }
-
-/* Vendas */
 
 /* Utilitários */
 .hidden {

@@ -1,8 +1,10 @@
-/* SALES */
+/* Vendas */
+
+/* Layout */
 .sale-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 320px;
-    gap: 20px;
+    gap: var(--space-lg);
     align-items: start;
 }
 
@@ -10,167 +12,326 @@
     min-width: 0;
 }
 
-.summary {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    position: sticky;
-    top: 80px;
-}
-
-.summary h2 {
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 20px;
-}
-
-.summary .field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 16px;
-}
-
-.summary-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 20px 0;
-}
-
-.summary-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 10px;
-}
-
-.summary-row span:last-child {
-    color: var(--text);
-    font-weight: 500;
-}
-
-.summary-total {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 18px;
-    font-size: 18px;
-    font-weight: 700;
-}
-
-.summary-total span:last-child {
-    color: var(--accent);
-}
-
-.btn-finalize {
-    width: 100%;
-    margin-top: 20px;
-    padding: 11px 18px;
-    border: none;
-    border-radius: 8px;
-    background: var(--accent);
-    color: var(--text);
-    font-family: 'Roboto', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.btn-finalize:hover {
-    background: var(--accent);
-}
-
-/* SEARCH */
+/* Busca de produtos */
 .autocomplete {
-    position: relative;
+    margin-bottom: var(--space-lg);
+    padding: 10px 14px;
+
+    min-height: 44px;
+
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
-    margin-bottom: 20px;
+    gap: var(--space-md);
+
+    position: relative;
+
+    background: var(--color-surface-secondary);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
 }
 
 .autocomplete:focus-within {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(79, 100, 247, 0.12);
+    background: var(--color-surface-tertiary);
+
+    border-color: var(--color-primary);
+
+    box-shadow: 0 0 0 3px var(--color-primary-soft);
 }
 
-.autocomplete > svg {
+.autocomplete>svg {
     width: 18px;
     height: 18px;
-    color: var(--muted);
+
     flex-shrink: 0;
+
+    color: var(--color-text-muted);
 }
 
 .autocomplete input {
     width: 100%;
-    background: none;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-family: 'Roboto', sans-serif;
-    font-size: 13.5px;
+
+    padding: 0;
+
+    background: transparent;
+
+    border: 0;
+    outline: 0;
+
+    color: var(--color-text);
+
+    font-size: 13px;
 }
 
 .autocomplete input::placeholder {
-    color: var(--muted);
+    color: var(--color-placeholder);
 }
 
 .autocomplete-results {
     position: absolute;
     top: calc(100% + 5px);
-    left: 0;
     right: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
+    left: 0;
     z-index: 20;
+
+    overflow: hidden;
+
+    background: var(--color-surface);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    box-shadow: var(--shadow-md);
 }
 
-/* ITEMS */
+/* Itens da venda */
 .sale-main .card {
     margin-bottom: 0;
 }
 
-.sale-main table {
+.sale-main .table {
     min-width: 600px;
 }
 
-.sale-main .card {
-    overflow-x: auto;
+.sale-empty {
+    min-height: 320px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+
+    color: var(--color-text-muted);
+
+    text-align: center;
 }
 
-.sale-main .card-header {
-    min-width: 600px;
+.sale-empty-icon {
+    width: 64px;
+    height: 64px;
+
+    margin-bottom: var(--space-sm);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+
+    color: var(--color-text-muted);
 }
 
-/* RESPONSIVE */
+.sale-empty-icon svg {
+    width: 28px;
+    height: 28px;
+}
+
+.sale-empty strong {
+    color: var(--color-text);
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.sale-empty span {
+    color: var(--color-text-muted);
+
+    font-size: 12px;
+}
+
+.item-quantity {
+    width: 64px;
+    height: 34px;
+
+    padding: 0 var(--space-sm);
+
+    background: var(--color-surface-secondary);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+
+    color: var(--color-text);
+
+    font-size: 13px;
+    text-align: center;
+
+    outline: none;
+
+    transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.item-quantity:focus {
+    border-color: var(--color-primary);
+
+    box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.btn-remove {
+    padding: 6px 10px;
+
+    background: transparent;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+
+    color: var(--color-text-muted);
+
+    font-size: 12px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        color var(--transition-fast);
+}
+
+.btn-remove:hover {
+    background: var(--color-danger-soft);
+
+    border-color: var(--color-danger);
+
+    color: var(--color-danger);
+}
+
+/* Resumo da venda */
+.sale-summary {
+    padding: var(--space-xl);
+
+    position: sticky;
+    top: var(--space-xl);
+
+    background: var(--color-surface);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+}
+
+.sale-summary h2 {
+    margin-bottom: var(--space-xl);
+
+    color: var(--color-text);
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.sale-summary .field {
+    margin-bottom: var(--space-lg);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.sale-summary-divider {
+    height: 1px;
+
+    margin: var(--space-xl) 0;
+
+    background: var(--color-border);
+}
+
+/* Informações do resumo */
+.sale-summary-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.sale-summary-row {
+    min-height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+
+    border-bottom: 1px solid var(--color-border);
+
+    color: var(--color-text-muted);
+
+    font-size: 13px;
+}
+
+.sale-summary-row:last-child {
+    border-bottom: 0;
+}
+
+.sale-summary-row strong {
+    color: var(--color-text);
+
+    font-weight: 600;
+}
+
+/* Total da venda */
+.sale-summary-total {
+    margin-top: var(--space-lg);
+    padding: var(--space-lg);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+
+    background: var(--color-primary-soft);
+
+    border: 1px solid rgba(201, 151, 24, 0.35);
+    border-radius: var(--radius-md);
+
+    color: var(--color-primary);
+}
+
+.sale-summary-total span {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.sale-summary-total strong {
+    color: var(--color-primary);
+
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.sale-summary .btn {
+    width: 100%;
+
+    margin-top: var(--space-lg);
+}
+
+/* Responsividade */
+@media (max-width: 900px) {
+    .sale-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sale-summary {
+        position: static;
+    }
+}
+
 @media (max-width: 600px) {
-    .content {
-        padding: 20px 16px;
-    }
-
-    .page-header h1 {
-        font-size: 19px;
-    }
-
-    .page-header p {
-        font-size: 12px;
-    }
-
-    .sale-main .card {
-        overflow-x: auto;
-    }
-
-    .sale-main table {
+    .sale-main .table {
         min-width: 600px;
+    }
+
+    .sale-summary-total {
+        padding: var(--space-md);
+    }
+
+    .sale-summary-total strong {
+        font-size: 19px;
     }
 }

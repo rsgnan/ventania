@@ -9,6 +9,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="assets/css/admin.css" rel="stylesheet">
+    <link href="assets/css/sale.css" rel="stylesheet">
 
 </head>
 
@@ -22,7 +23,7 @@
             <div class="sidebar-header">
                 <a class="sidebar-brand" href="?route=dashboard/index">
                     <img
-                        class="sidebar-brand-logo" 
+                        class="sidebar-brand-logo"
                         src="assets/img/logo-inside.png"
                         alt="Ventania - Painel Administrativo">
                 </a>

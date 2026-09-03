@@ -180,6 +180,9 @@
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">
+
+                <?php echo icon('check'); ?>
+
                 Salvar Usuário
             </button>
 

@@ -244,14 +244,8 @@
         </div>
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">
-                <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2.5">
 
-                    <polyline points="20 6 9 17 4 12" />
-                </svg>
+                <?php echo icon('check'); ?>
 
                 Salvar Produto
             </button>

@@ -1,24 +1,30 @@
-<!-- VENDAS -->
-<div class="page active" id="page-vendas">
-    <div class="page-header">
-        <div>
-            <h1>Vendas</h1>
-            <p><?php echo e(count($sales)); ?> vendas registradas</p>
-        </div>
-        <a href="?route=sales/create" class="btn btn-primary">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            Novo Venda
-            </svg>
+<!-- Vendas -->
+
+<div class="page-header">
+    <div class="page-header-content">
+        <h1 class="page-title">
+            Vendas
+        </h1>
+
+        <p class="page-description">
+            <?php echo e(count($sales)); ?> vendas registradas
+        </p>
+    </div>
+
+    <div class="page-header-actions">
+        <a class="btn btn-primary" href="?route=sales/create">
+            <?php echo icon('plus'); ?>
+            Nova Venda
         </a>
     </div>
-    <div class="card">
-        <table>
+</div>
+
+<div class="card">
+    <div class="table-wrapper">
+        <table class="table">
             <thead>
                 <tr>
-                    <th>Clientee</th>
+                    <th>Cliente</th>
                     <th>Itens</th>
                     <th>Total</th>
                     <th>Status</th>
@@ -26,35 +32,66 @@
                     <th>Ações</th>
                 </tr>
             </thead>
+
             <tbody>
                 <?php if (empty($sales)): ?>
                     <tr>
-                        <td coldspan="7" style="text-align:center; color:var(--muted); padding:40px 18px; ">
-                            Nenhuma venda registrada ainda
+                        <td colspan="6" class="table-empty">
+                            Nenhuma venda registrada ainda.
+                        </td>
                     </tr>
+                <?php else: ?>
+                    <?php foreach ($sales as $sale): ?>
+                        <tr>
+                            <td>
+                                <strong>
+                                    <?php echo e($sale->customer_name); ?>
+                                </strong>
+                            </td>
+
+                            <td>
+                                <?php echo e($sale->items_quantity); ?>
+                                <?php echo $sale->items_quantity == 1 ? 'item' : 'itens'; ?>
+                            </td>
+
+                            <td>
+                                <strong>
+                                    R$ <?php echo e(number_format((float) $sale->total_amount, 2, ',', '.')); ?>
+                                </strong>
+                            </td>
+
+                            <td>
+                                <?php if ($sale->status === 'pending'): ?>
+                                    <span class="badge badge-warning">
+                                        Pendente
+                                    </span>
+                                <?php elseif ($sale->status === 'completed'): ?>
+                                    <span class="badge badge-success">
+                                        Concluída
+                                    </span>
+                                <?php else: ?>
+                                    <span class="badge badge-danger">
+                                        Cancelada
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+
+                            <td>
+                                <?php echo e(date('d/m/Y H:i', strtotime($sale->created_at))); ?>
+                            </td>
+
+                            <td>
+                                <div class="table-actions">
+                                    <a
+                                        class="btn btn-ghost btn-sm"
+                                        href="?route=sales/edit&id=<?php echo e($sale->id); ?>">
+                                        Editar
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
                 <?php endif; ?>
-                <?php foreach ($sales as $sale): ?>
-                    <tr>
-                        <td><strong><?php echo e($sale->customer_name); ?></strong></td>
-                        <td><?php echo e($sale->items_quantity); ?> <?php echo $sale->items_quantity == 1 ? 'item' : 'itens'; ?></td>
-                        <td><strong>R$ <?php echo e(number_format((float) $sale->total_amount, 2, ',', '.')); ?></strong></td>
-                        <td>
-                            <?php if ($sale->status === 'pending'): ?>
-                                <span class="badge orange">Pendente</span>
-                            <?php elseif ($sale->status === 'completed'): ?>
-                                <span class="badge green">Concluída</span>
-                            <?php else: ?>
-                                <span class="badge red">Cancelada</span>
-                            <?php endif; ?>
-                        </td>
-                        <td><?php echo e(date('d/m/Y H:i', strtotime($sale->created_at))); ?></td>
-                        <td>
-                            <div class="actions">
-                                <a href="?route=sales/edit&id=<?php echo e($sale->id); ?>" class="btn btn-ghost btn-sm">Editar</a>
-                            </div>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
             </tbody>
         </table>
     </div>

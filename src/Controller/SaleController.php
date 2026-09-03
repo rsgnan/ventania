@@ -44,16 +44,18 @@ class SaleController extends ViewController
             $items = json_decode($_POST['items'] ?? '', true);
 
             $customerName = trim((string) ($_POST['customer_name'] ?? ''));
-            $status = 'pending';
+            $status = $_POST['status'] ?? 'pending';
             $userId = $this->authService->getUserId();
 
             $subtotal = 0;
             $validatedItems = [];
 
             $this->validateFields(
-                $items, 
-                $validatedItems, 
-                $subtotal, 
+                $customerName,
+                $status,
+                $items,
+                $validatedItems,
+                $subtotal,
                 $errors
             );
 
@@ -125,7 +127,7 @@ class SaleController extends ViewController
                 }
             }
         }
-        
+
         $this->render('sales/create', [
             'errors' => $errors,
             'products' => $products
@@ -169,6 +171,8 @@ class SaleController extends ViewController
 
             // Valida os novos itens e considera o estoque da venda antiga
             $this->validateFields(
+                $customerName,
+                $status,
                 $newItems,
                 $validatedItems,
                 $subtotal,
@@ -312,12 +316,22 @@ class SaleController extends ViewController
     }
 
     private function validateFields(
+        string $customerName,
+        string $status,
         ?array $items,
         array &$validatedItems,
         float &$subtotal,
         array &$errors,
         ?array $currentItems = null
     ): void {
+        if ($customerName === '') {
+            $errors[] = 'Informe o nome do cliente.';
+        }
+
+        if (!in_array($status, ['pending', 'completed', 'cancelled'], true)) {
+            $errors[] = 'Status da venda inválida.';
+        }
+
         if (empty($items)) {
             $errors[] = 'Adicione pelo menos um produto à venda.';
             return;
