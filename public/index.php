@@ -202,12 +202,12 @@ if ($route == 'pages') {
 
     $salesController = $container->get('saleController');
     $salesController->edit();
-} else if ($route === 'sales/cancel') {
+} else if ($route === 'sales/show') {
     $authService = $container->get('authService');
     $authService->ensureLoggedIn();
 
     $salesController = $container->get('saleController');
-    $salesController->cancel();
+    $salesController->show();
 } else if ($route === 'users/index') {
     $authService = $container->get('authService');
     $authService->ensureAdmin();

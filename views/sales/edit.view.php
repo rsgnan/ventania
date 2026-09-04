@@ -24,7 +24,8 @@
         </div>
     </div>
 
-    <div class="form-panel">
+    <div class="form-panel form-panel-wide">
+
         <?php if (!empty($errors)): ?>
             <div class="alert alert-danger">
 
@@ -40,16 +41,19 @@
 
         <div class="sale-layout">
 
-            <!-- Área principal -->
+            <!-- Itens da venda -->
             <div class="sale-main">
+
                 <div class="autocomplete">
+
                     <?php echo icon('search'); ?>
 
                     <input
                         type="text"
                         id="searchInput"
                         placeholder="Buscar produto pelo nome..."
-                        autocomplete="off">
+                        autocomplete="off"
+                        aria-label="Buscar produto">
 
                     <div
                         class="autocomplete-results"
@@ -57,18 +61,22 @@
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card sale-items-card">
+
                     <div class="card-header">
-                        <div>
+                        <div class="card-header-content">
+
                             <div class="card-title">
-                                Itens da venda
+                                Itens adicionados
                             </div>
 
                             <div class="card-subtitle">
-                                Alterar os produtos e quantidades desta venda.
+                                Altere os produtos e quantidades desta venda.
                             </div>
+
                         </div>
                     </div>
+
                     <div class="table-wrapper">
                         <table class="table">
                             <thead>
@@ -88,8 +96,9 @@
                 </div>
             </div>
 
-            <!-- Resumo -->
-            <div class="summary">
+            <!-- Resumo da venda -->
+            <aside class="sale-summary">
+
                 <h2>
                     Resumo da venda
                 </h2>
@@ -104,7 +113,8 @@
                         type="text"
                         id="customerName"
                         name="customer_name"
-                        value="<?php echo e($sale->customer_name); ?>" placeholder="Ex: Maria da Silva">
+                        value="<?php echo e($_POST['customer_name'] ?? $sale->customer_name); ?>"
+                        placeholder="Ex: Maria da Silva">
                 </div>
 
                 <div class="field">
@@ -118,71 +128,118 @@
                         name="discount_amount"
                         min="0"
                         step="0.01"
-                        value="<?php echo e($sale->discount_amount); ?>">
+                        value="<?php echo e($_POST['discount_amount'] ?? $sale->discount_amount); ?>">
                 </div>
 
-                <div class="field">
-                    <label class="form-label" for="statusSelect">
+                <fieldset class="field sale-status-field">
+
+                    <legend class="form-label">
                         Status
-                    </label>
-                    <select
-                        class="form-select"
-                        id="statusSelect"
-                        name="status">
+                    </legend>
 
-                        <option
-                            value="pending" <?php echo $sale->status === 'pending' ? 'selected' : ''; ?>>
-                            Pendente
-                        </option>
+                    <?php $selectedStatus = $_POST['status'] ?? $sale->status; ?>
 
-                        <option
-                            value="completed" <?php echo $sale->status === 'completed' ? 'selected' : ''; ?>>
-                            Concluída
-                        </option>
+                    <div class="sale-status-options">
 
-                        <option
-                            value="cancelled" <?php echo $sale->status === 'cancelled' ? 'selected' : ''; ?>>
-                            Cancelada
-                        </option>
-                    </select>
+                        <label class="sale-status-option sale-status-pending">
+
+                            <input
+                                type="radio"
+                                name="status"
+                                value="pending"
+                                <?php echo $selectedStatus === 'pending' ? 'checked' : ''; ?>>
+
+                            <span class="sale-status-content">
+                                <?php echo icon('clock'); ?>
+
+                                <span>
+                                    Pendente
+                                </span>
+                            </span>
+
+                        </label>
+
+                        <label class="sale-status-option sale-status-completed">
+
+                            <input
+                                type="radio"
+                                name="status"
+                                value="completed"
+                                <?php echo $selectedStatus === 'completed' ? 'checked' : ''; ?>>
+
+                            <span class="sale-status-content">
+                                <?php echo icon('check'); ?>
+
+                                <span>
+                                    Concluída
+                                </span>
+                            </span>
+                        </label>
+
+                        <label class="sale-status-option sale-status-cancelled">
+                            <input
+                                type="radio"
+                                name="status"
+                                value="cancelled"
+                                <?php echo $selectedStatus === 'cancelled' ? 'checked' : ''; ?>>
+
+                            <span class="sale-status-content">
+                                <?php echo icon('x'); ?>
+
+                                <span>
+                                    Cancelada
+                                </span>
+                            </span>
+                        </label>
+
+                    </div>
+                </fieldset>
+
+                <div class="sale-summary-divider"></div>
+
+                <div class="sale-summary-info">
+
+                    <div class="sale-summary-row">
+                        <span>Itens distintos</span>
+                        <strong id="sumDistinct">0</strong>
+                    </div>
+
+                    <div class="sale-summary-row">
+                        <span>Quantidade total</span>
+                        <strong id="sumQty">0</strong>
+                    </div>
+
+                    <div class="sale-summary-row">
+                        <span>Subtotal</span>
+                        <strong id="sumSubtotal">R$ 0,00</strong>
+                    </div>
+
                 </div>
 
-                <div class="summary-divider"></div>
-
-                <div class="summary-row">
-                    <span>Itens distintos</span>
-                    <span id="sumDistinct">0</span>
-                </div>
-
-                <div class="summary-row">
-                    <span>Quantidade total</span>
-                    <span id="sumQty">0</span>
-                </div>
-
-                <div class="summary-row">
-                    <span>Subtotal</span>
-                    <span id="sumSubtotal">R$ 0,00</span>
-                </div>
-
-                <div class="summary-row">
+                <div class="sale-summary-total">
                     <span>Total</span>
-                    <span id="sumTotal">R$ 0,00</span>
-                </div>
 
-                <button
-                    type="submit"
-                    class="btn btn-primary">
-                    Salvar Alterações
-                </button>
+                    <strong id="sumTotal">
+                        R$ 0,00
+                    </strong>
+                </div>
 
                 <input
                     type="hidden"
                     name="items"
                     id="saleItems">
-            </div>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+                    Salvar alterações
+                </button>
+
+            </aside>
         </div>
     </div>
 </form>
+
 <script>
     const products = <?php echo json_encode($products); ?>;
     const existingSaleItems = <?php echo json_encode($items); ?>;

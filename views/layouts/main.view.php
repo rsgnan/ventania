@@ -1,3 +1,9 @@
+<?php
+
+$route = $_GET['route'] ?? '';
+$isAdmin = $this->authService->isAdmin();
+
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -5,12 +11,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Ventania - Painel Administrativo</title>
+    <title>Ventania - Gestão de Estoque</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <link href="assets/css/admin.css" rel="stylesheet">
     <link href="assets/css/sale.css" rel="stylesheet">
-
 </head>
 
 <body>
@@ -21,11 +32,24 @@
         <aside class="app-sidebar" id="app-sidebar">
 
             <div class="sidebar-header">
-                <a class="sidebar-brand" href="?route=dashboard/index">
-                    <img
-                        class="sidebar-brand-logo"
-                        src="assets/img/logo-inside.png"
-                        alt="Ventania - Painel Administrativo">
+                <a
+                    class="sidebar-brand"
+                    href="?route=dashboard/index"
+                    aria-label="Ir para o Dashboard">
+
+                    <div class="sidebar-brand-icon">
+                        V
+                    </div>
+
+                    <div class="sidebar-brand-text">
+                        <span class="sidebar-brand-name">
+                            Ventania
+                        </span>
+
+                        <span class="sidebar-brand-description">
+                            Gestão de estoque
+                        </span>
+                    </div>
                 </a>
 
                 <button
@@ -48,18 +72,18 @@
                 </button>
             </div>
 
-            <nav class="sidebar-nav">
+            <nav
+                class="sidebar-nav"
+                aria-label="Navegação principal">
 
                 <div class="sidebar-nav-section">
                     <div class="sidebar-nav-label">
-                        Principal
+                        Geral
                     </div>
-                    <a class="sidebar-nav-link
-                    <?php if (
-                        str_starts_with($_GET['route'] ?? '', 'dashboard/')
-                    ) {
-                        echo ' active';
-                    } ?>" href="?route=dashboard/index">
+
+                    <a
+                        class="sidebar-nav-link<?php echo str_starts_with($route, 'dashboard/') ? ' active' : ''; ?>"
+                        href="?route=dashboard/index">
 
                         <svg
                             viewBox="0 0 24 24"
@@ -69,26 +93,18 @@
                             stroke-linejoin="round"
                             stroke-linecap="round">
 
-                            <rect x="3" y="3" width="7" height="7" rx="1" />
-                            <rect x="14" y="3" width="7" height="7" rx="1" />
-                            <rect x="3" y="14" width="7" height="7" rx="1" />
-                            <rect x="14" y="14" width="7" height="7" rx="1" />
+                            <rect x="3" y="3" width="7" height="9" rx="1.5" />
+                            <rect x="14" y="3" width="7" height="5" rx="1.5" />
+                            <rect x="14" y="12" width="7" height="9" rx="1.5" />
+                            <rect x="3" y="16" width="7" height="5" rx="1.5" />
                         </svg>
 
                         <span>Dashboard</span>
                     </a>
-                </div>
 
-                <div class="sidebar-nav-section">
-                    <div class="sidebar-nav-label">
-                        Estoque
-                    </div>
-                    <a class="sidebar-nav-link
-                    <?php if (
-                        str_starts_with($_GET['route'] ?? '', 'products/')
-                    ) {
-                        echo ' active';
-                    } ?>" href="?route=products/index">
+                    <a
+                        class="sidebar-nav-link<?php echo str_starts_with($route, 'products/') ? ' active' : ''; ?>"
+                        href="?route=products/index">
 
                         <svg
                             viewBox="0 0 24 24"
@@ -98,25 +114,16 @@
                             stroke-linejoin="round"
                             stroke-linecap="round">
 
-                            <path d="M6 2h12l4 7H2l4-7Z" />
-                            <path d="M3 9v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9" />
-                            <path d="M9 22V13h6v9" />
+                            <path d="M21 8L12 3 3 8l9 5 9-5z" />
+                            <path d="M3 8v8l9 5 9-5V8" />
                         </svg>
 
                         <span>Produtos</span>
                     </a>
-                </div>
 
-                <div class="sidebar-nav-section">
-                    <div class="sidebar-nav-label">
-                        Comercial
-                    </div>
-
-                    <a class="sidebar-nav-link
-                    <?php if (str_starts_with($_GET['route'] ?? '', 'sales/')) {
-                        echo ' active';
-                    }
-                    ?>" href="?route=sales/index">
+                    <a
+                        class="sidebar-nav-link<?php echo str_starts_with($route, 'sales/') ? ' active' : ''; ?>"
+                        href="?route=sales/index">
 
                         <svg
                             viewBox="0 0 24 24"
@@ -126,27 +133,24 @@
                             stroke-linejoin="round"
                             stroke-linecap="round">
 
-                            <circle cx="9" cy="20" r="1" />
-                            <circle cx="19" cy="20" r="1" />
-                            <path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 2-1.6L22 8H6" />
+                            <circle cx="9" cy="21" r="1" />
+                            <circle cx="20" cy="21" r="1" />
+                            <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6" />
                         </svg>
 
                         <span>Vendas</span>
                     </a>
                 </div>
 
-                <?php if ($this->authService->isAdmin()): ?>
+                <?php if ($isAdmin): ?>
                     <div class="sidebar-nav-section">
                         <div class="sidebar-nav-label">
                             Administração
                         </div>
 
-                        <a class="sidebar-nav-link
-                    <?php
-                    if (str_starts_with($_GET['route'] ?? '', 'users/')) {
-                        echo ' active';
-                    }
-                    ?>" href="?route=users/index">
+                        <a
+                            class="sidebar-nav-link<?php echo str_starts_with($route, 'users/') ? ' active' : ''; ?>"
+                            href="?route=users/index">
 
                             <svg
                                 viewBox="0 0 24 24"
@@ -172,7 +176,11 @@
             <!-- Rodapé da sidebar -->
             <div class="sidebar-footer">
 
-                <div class="sidebar-user">
+                <a
+                    class="sidebar-user"
+                    href="?route=account/edit"
+                    title="Editar minha conta">
+
                     <div class="sidebar-user-avatar">
                         RG
                     </div>
@@ -186,7 +194,20 @@
                             Administrador
                         </span>
                     </div>
-                </div>
+
+                    <svg
+                        class="sidebar-user-arrow"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linejoin="round"
+                        stroke-linecap="round"
+                        aria-hidden="true">
+
+                        <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                </a>
 
                 <div class="sidebar-user-actions">
                     <a
@@ -243,6 +264,7 @@
                         stroke-width="2"
                         stroke-linejoin="round"
                         stroke-linecap="round">
+
                         <line x1="4" y1="6" x2="20" y2="6" />
                         <line x1="4" y1="12" x2="20" y2="12" />
                         <line x1="4" y1="18" x2="20" y2="18" />
@@ -297,7 +319,6 @@
 
             if (sidebarOpen) {
                 sidebarOpen.setAttribute('aria-expanded', 'true');
-
             }
         }
 
@@ -311,7 +332,6 @@
 
             if (sidebarOpen) {
                 sidebarOpen.setAttribute('aria-expanded', 'false');
-
             }
         }
 

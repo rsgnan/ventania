@@ -130,26 +130,54 @@
                         value="<?php echo e($_POST['discount_amount'] ?? 0); ?>">
                 </div>
 
-                <div class="field">
-                    <label class="form-label" for="statusSelect">
+                <?php $selectedStatus = $_POST['status'] ?? 'pending'; ?>
+
+                <fieldset class="field sale-status-field">
+
+                    <legend class="form-label">
                         Status
-                    </label>
+                    </legend>
 
-                    <select
-                        class="form-select"
-                        id="statusSelect"
-                        name="status">
+                    <div class="sale-status-options">
 
-                        <option value="pending" <?php echo e($_POST['status'] ?? 'pending') === 'pending' ? 'selected' : ''; ?>>
-                            Pendente
-                        </option>
+                        <label class="sale-status-option sale-status-pending">
 
-                        <option value="completed" <?php echo e($_POST['status'] ?? 'pending') === 'completed' ? 'selected' : ''; ?>>
-                            Concluída
-                        </option>
+                            <input
+                                type="radio"
+                                name="status"
+                                value="pending"
+                                <?php echo $selectedStatus === 'pending' ? 'checked' : ''; ?>>
 
-                    </select>
-                </div>
+                            <span class="sale-status-content">
+                                <?php echo icon('clock'); ?>
+
+                                <span>
+                                    Pendente
+                                </span>
+                            </span>
+
+                        </label>
+
+                        <label class="sale-status-option sale-status-completed">
+
+                            <input
+                                type="radio"
+                                name="status"
+                                value="completed"
+                                <?php echo $selectedStatus === 'completed' ? 'checked' : ''; ?>>
+
+                            <span class="sale-status-content">
+                                <?php echo icon('check'); ?>
+
+                                <span>
+                                    Concluída
+                                </span>
+                            </span>
+
+                        </label>
+                    </div>
+
+                </fieldset>
 
                 <div class="sale-summary-divider"></div>
 

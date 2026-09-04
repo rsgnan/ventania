@@ -146,7 +146,7 @@ class SaleController extends ViewController
         }
 
         // Somente vendas pendentes podem ser alteradas
-        if ($sale->status !== 'pending') {
+        if ($sale->status === 'cancelled') {
             header('Location: index.php?route=sales/index');
             return;
         }
@@ -263,6 +263,25 @@ class SaleController extends ViewController
             'items' => $items,
             'products' => $products,
             'errors' => $errors
+        ]);
+    }
+
+    public function show(): void
+    {
+        $saleId = (int) ($_GET['id'] ?? 0);
+
+        $sale = $this->saleItemRepository->getBySaleId($saleId);
+
+        if ($sale === null) {
+            (new ErrorController())->notFound();
+            return;
+        }
+
+        $items = $this->saleItemRepository->getBySaleId($saleId);
+
+        $this->render('sales/show', [
+            'sale' => $sale,
+            'items' => $items
         ]);
     }
 
