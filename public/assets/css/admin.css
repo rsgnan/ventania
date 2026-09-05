@@ -1,7 +1,7 @@
 /* Variáveis */
 :root {
     /* Cores principais */
-    --color-background: #f5f6fb;
+    --color-background: #f5f4fb;
 
     --color-sidebar-start: #1e1b4b;
     --color-sidebar-end: #26225f;
@@ -10,9 +10,9 @@
     --color-sidebar-subtle: #8b89bf;
 
     --color-surface: #ffffff;
-    --color-surface-secondary: #f5f6fb;
-    --color-surface-tertiary: #f0f1f8;
-    --color-surface-hover: #f1f2f8;
+    --color-surface-secondary: #f8f8fc;
+    --color-surface-tertiary: #f1f1f8;
+    --color-surface-hover: #f7f7fb;
 
     --color-border: #eaeaf3;
     --color-border-strong: #dcddea;
@@ -150,6 +150,8 @@ svg {
     min-height: 100vh;
 
     margin-left: var(--sidebar-width);
+
+    background: var(--color-background);
 }
 
 .app-main {
@@ -265,8 +267,7 @@ svg {
 
     cursor: pointer;
 
-    transition:
-        background-color var(--transition-fast),
+    transition: background-color var(--transition-fast),
         color var(--transition-fast);
 }
 
@@ -315,8 +316,7 @@ svg {
     font-size: 13.5px;
     font-weight: 500;
 
-    transition:
-        background-color var(--transition-normal),
+    transition: background-color var(--transition-normal),
         color var(--transition-normal);
 }
 
@@ -365,8 +365,7 @@ svg {
 
     color: inherit;
 
-    transition:
-        background-color var(--transition-fast);
+    transition: background-color var(--transition-fast);
 }
 
 .sidebar-user:hover {
@@ -430,8 +429,7 @@ svg {
 
     color: var(--color-sidebar-muted);
 
-    transition:
-        color var(--transition-fast),
+    transition: color var(--transition-fast),
         transform var(--transition-fast);
 }
 
@@ -466,8 +464,7 @@ svg {
     font-size: 13px;
     font-weight: 600;
 
-    transition:
-        background-color var(--transition-fast),
+    transition: background-color var(--transition-fast),
         border-color var(--transition-fast),
         color var(--transition-fast);
 }
@@ -538,8 +535,7 @@ svg {
 
     cursor: pointer;
 
-    transition:
-        background-color var(--transition-fast),
+    transition: background-color var(--transition-fast),
         border-color var(--transition-fast),
         color var(--transition-fast);
 }
@@ -668,8 +664,7 @@ svg {
     font-size: 13px;
     font-weight: 600;
 
-    transition:
-        background-color var(--transition-fast),
+    transition: background-color var(--transition-fast),
         border-color var(--transition-fast),
         color var(--transition-fast);
 }
@@ -752,6 +747,8 @@ svg {
 
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
+
+    box-shadow: 0 4px 16px rgba(28, 26, 58, 0.025);
 }
 
 .card-header {
@@ -811,8 +808,9 @@ svg {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
 
-    transition:
-        border-color var(--transition-fast),
+    box-shadow: 0 4px 16px rgba(28, 26, 58, 0.025);
+
+    transition: border-color var(--transition-fast),
         box-shadow var(--transition-fast);
 }
 
@@ -912,6 +910,7 @@ svg {
 
 /* Dashboard */
 .dashboard-grid {
+    margin-bottom: 26px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
@@ -921,6 +920,124 @@ svg {
 
 .dashboard-grid .card {
     min-width: 0;
+}
+
+.dashboard-ranking {
+    padding: 4px 18px;
+}
+
+.dashboard-ranking-item {
+    padding: 14px 0;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    border-bottom: 1px solid var(--color-border);
+}
+
+.dashboard-ranking-item:last-child {
+    border-bottom: 0;
+}
+
+.dashboard-ranking-position {
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    background: var(--color-primary-soft);
+
+    border-radius: var(--radius-md);
+
+    color: var(--color-primary);
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.dashboard-ranking-content {
+    min-width: 0;
+
+    flex: 1;
+}
+
+.dashboard-ranking-header {
+    margin-bottom: 7px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.dashboard-ranking-name {
+    overflow: hidden;
+
+    color: var(--color-text);
+
+    font-size: 13px;
+    font-weight: 500;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboard-ranking-value {
+    flex-shrink: 0;
+
+    color: var(--color-text-muted);
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.dashboard-ranking-bar {
+    width: 100%;
+    height: 5px;
+
+    overflow: hidden;
+
+    background: var(--color-surface-tertiary);
+
+    border-radius: var(--radius-pill);
+}
+
+.dashboard-ranking-progress {
+    height: 100%;
+
+    background: var(--color-primary);
+
+    border-radius: var(--radius-pill);
+}
+
+.dashboard-ranking-empty {
+    padding: 24px 0;
+
+    color: var(--color-text-muted);
+
+    font-size: 13px;
+    align-items: center;
+}
+
+.dashboard-lastest-sales {
+    margin-top: 20px;
+}
+
+.dashboard-sale-id {
+    font-weight: 600;
+}
+
+.dashboard-product-name {
+    font-weight: 500;
+}
+
+.dashboard-value {
+    font-weight: 600;
 }
 
 /* Tabelas */
@@ -1029,8 +1146,7 @@ svg {
     font-weight: 500;
     white-space: nowrap;
 
-    transition:
-        background-color var(--transition-fast),
+    transition: background-color var(--transition-fast),
         color var(--transition-fast);
 }
 
@@ -1149,8 +1265,7 @@ svg {
 
     outline: none;
 
-    transition:
-        border-color var(--transition-fast),
+    transition: border-color var(--transition-fast),
         box-shadow var(--transition-fast);
 }
 
@@ -1246,8 +1361,7 @@ svg {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
 
-    transition:
-        border-color var(--transition-fast),
+    transition: border-color var(--transition-fast),
         box-shadow var(--transition-fast);
 }
 

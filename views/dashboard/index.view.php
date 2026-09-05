@@ -11,7 +11,6 @@
 </div>
 
 <div class="stat-grid">
-
     <div class="stat-card stat-card-revenue">
         <div class="stat-icon">
             <?php echo icon('dollar-sign'); ?>
@@ -99,6 +98,144 @@
 </div>
 
 <div class="dashboard-grid">
+    <!-- Produtos mais vendidos -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-header-content">
+                <div class="card-title">
+                    Produtos mais vendidos
+                </div>
+
+                <div class="card-subtitle">
+                    Produtos com maior volume de vendas
+                </div>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Qtd.</th>
+                        <th>Faturamento</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <?php if (!empty($bestSellingProducts)): ?>
+                        <?php foreach ($bestSellingProducts as $product): ?>
+                            <tr>
+                                <td class="dashboard-product-name">
+                                    <?php echo e($product['name']); ?>
+                                </td>
+
+                                <td>
+                                    <?php echo e($product['quantity_sold']); ?>
+                                </td>
+
+                                <td class="dashboard-value">
+                                    R$ <?php echo number_format(
+                                            $product['revenue'],
+                                            2,
+                                            ',',
+                                            '.'
+                                        ); ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="3" class="table-empty">
+                                Nenhum produto vendido no período.
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- Categorias mais vendidas -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-header-content">
+                <div class="card-title">
+                    Categorias mais vendidas
+                </div>
+
+                <div class="card-subtitle">
+                    Produtos vendidos nos últimos 30 dias
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-ranking">
+            <?php if (!empty($topSellingCategories)): ?>
+
+                <?php
+                $maxCategorySales = max(
+                    array_column($topSellingCategories, 'quantity_sold')
+                );
+                ?>
+
+                <?php foreach ($topSellingCategories as $index => $category): ?>
+
+                    <?php
+                    $percentage = $maxCategorySales > 0
+                        ? ((int) $category['quantity_sold'] / $maxCategorySales) * 100
+                        : 0;
+                    ?>
+
+                    <div class="dashboard-ranking-item">
+
+                        <div class="dashboard-ranking-position">
+                            <?php echo $index + 1; ?>
+                        </div>
+
+                        <div class="dashboard-ranking-content">
+                            <div class="dashboard-ranking-header">
+
+                                <span class="dashboard-ranking-name">
+                                    <?php echo e($category['name']); ?>
+                                </span>
+
+                                <span class="dashboard-ranking-value">
+                                    <?php echo e($category['quantity_sold']); ?> itens
+                                </span>
+                            </div>
+
+                            <div class="dashboard-ranking-bar">
+                                <div
+                                    class="dashboard-ranking-progress"
+                                    style="width: <?php echo number_format(
+                                                        $percentage,
+                                                        2,
+                                                        '.',
+                                                        ''
+                                                    ); ?>%">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                <?php endforeach; ?>
+
+            <?php else: ?>
+
+                <div class="dashboard-ranking-empty">
+                    Nenhuma venda encontrada nos últimos 30 dias.
+                </div>
+
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
+
+<!-- Ultimas vendas -->
+<div class="dashboard-latest-sales">
     <div class="card">
         <div class="card-header">
             <div class="card-header-content">
@@ -111,7 +248,10 @@
                 </div>
             </div>
 
-            <a class="btn btn-ghost btn-sm" href="?route=sales/index">
+            <a
+                class="btn btn-ghost btn-sm"
+                href="?route=sales/index">
+
                 Ver todas
             </a>
         </div>
@@ -159,10 +299,8 @@
                             }
                             ?>
                             <tr>
-                                <td class="table-hide-mobile"
-                                    <strong>
-                                        #<?php echo e($sale['id']); ?>
-                                    </strong>
+                                <td class="table-hide-mobile dashboard-sale-id">
+                                    #<?php echo e($sale['id']); ?>
                                 </td>
 
                                 <td>
@@ -176,7 +314,7 @@
                                     <?php echo e($sale['items_quantity']); ?>
                                 </td>
 
-                                <td>
+                                <td class="dashboard-value">
                                     R$ <?php echo number_format(
                                             $sale['total_amount'],
                                             2,
@@ -193,7 +331,10 @@
 
                                 <td class="table-hide-mobile">
                                     <div class="table-actions">
-                                        <a class="btn btn-ghost btn-sm" href="?route=sales/edit&id=<?php echo e($sale['id']); ?>">
+                                        <a
+                                            class="btn btn-ghost btn-sm"
+                                            href="?route=sales/edit&id=<?php echo e($sale['id']); ?>">
+
                                             Ver
                                         </a>
                                     </div>
@@ -202,7 +343,7 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="6" class="text-center text-muted">
+                            <td colspan="6" class="table-empty">
                                 Nenhuma venda encontrada.
                             </td>
                         </tr>
@@ -211,63 +352,4 @@
             </table>
         </div>
     </div>
-    <div class="card">
-        <div class="card-header">
-            <div class="card-header-content">
-                <div class="card-title">
-                    Produtos mais vendidos
-                </div>
-
-                <div class="card-subtitle">
-                    Produtos com maior volume de vendas
-                </div>
-            </div>
-        </div>
-
-        <div class="table-wrapper">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Produto</th>
-                        <th>Qtd.</th>
-                        <th>Faturamento</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <?php if (!empty($bestSellingProducts)): ?>
-                        <?php foreach ($bestSellingProducts as $product): ?>
-                            <tr>
-                                <td>
-                                    <strong>
-                                        <?php echo e($product['name']); ?>
-                                    </strong>
-                                </td>
-
-                                <td>
-                                    <?php echo e($product['quantity_sold']); ?>
-                                </td>
-
-                                <td>
-                                    R$ <?php echo number_format(
-                                            $product['revenue'],
-                                            2,
-                                            ',',
-                                            '.'
-                                        ); ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="3" class="text-center text-muted">
-                                Nenhum produto vendido no período.
-                            </td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
 </div>
