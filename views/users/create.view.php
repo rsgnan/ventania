@@ -7,7 +7,8 @@
                 <a
                     class="btn btn-ghost btn-icon"
                     href="?route=users/index"
-                    title="Voltar para Usuários">
+                    title="Voltar para Usuários"
+                    aria-label="Voltar para Usuários">
 
                     <?php echo icon('arrow-left'); ?>
 
@@ -28,7 +29,7 @@
     <div class="form-panel">
         <?php if (!empty($errors)): ?>
             <div class="alert alert-danger">
-                
+
                 <?php echo icon('alert-circle'); ?>
 
                 <ul class="alert-list">
@@ -157,20 +158,20 @@
                             Status
                         </label>
 
-                        <select 
-                            class="form-input" 
-                            id="is_active" 
-                            name="is_active" 
+                        <select
+                            class="form-input"
+                            id="is_active"
+                            name="is_active"
                             required>
 
                             <option value="1"
-                            <?php echo ($_POST['is_active'] ?? '1') === '1' ? 'selected' : ''; ?>>
-                            Ativo
+                                <?php echo ($_POST['is_active'] ?? '1') === '1' ? 'selected' : ''; ?>>
+                                Ativo
                             </option>
 
                             <option value="0"
-                            <?php echo ($_POST['is_active'] ?? '') === '0' ? 'selected' : ''; ?>>
-                            Inativo
+                                <?php echo ($_POST['is_active'] ?? '') === '0' ? 'selected' : ''; ?>>
+                                Inativo
                             </option>
                         </select>
                     </div>

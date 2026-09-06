@@ -53,7 +53,6 @@
                                     : 'stat-change-negative'; ?>">
 
             <?php echo $salesChange >= 0 ? '↑' : '↓'; ?>
-
             <?php echo number_format(abs($salesChange), 1, ',', '.'); ?>%
 
             <span>vs. mês anterior</span>
@@ -107,7 +106,7 @@
                 </div>
 
                 <div class="card-subtitle">
-                    Produtos com maior volume de vendas
+                    Ranking por quantidade vendida nos últimos 30 dias
                 </div>
             </div>
         </div>
@@ -156,7 +155,6 @@
         </div>
     </div>
 
-
     <!-- Categorias mais vendidas -->
     <div class="card">
         <div class="card-header">
@@ -166,14 +164,13 @@
                 </div>
 
                 <div class="card-subtitle">
-                    Produtos vendidos nos últimos 30 dias
+                    Ranking por quantidade vendida nos últimos 30 dias
                 </div>
             </div>
         </div>
 
         <div class="dashboard-ranking">
             <?php if (!empty($topSellingCategories)): ?>
-
                 <?php
                 $maxCategorySales = max(
                     array_column($topSellingCategories, 'quantity_sold')
@@ -181,7 +178,6 @@
                 ?>
 
                 <?php foreach ($topSellingCategories as $index => $category): ?>
-
                     <?php
                     $percentage = $maxCategorySales > 0
                         ? ((int) $category['quantity_sold'] / $maxCategorySales) * 100
@@ -189,14 +185,12 @@
                     ?>
 
                     <div class="dashboard-ranking-item">
-
                         <div class="dashboard-ranking-position">
                             <?php echo $index + 1; ?>
                         </div>
 
                         <div class="dashboard-ranking-content">
                             <div class="dashboard-ranking-header">
-
                                 <span class="dashboard-ranking-name">
                                     <?php echo e($category['name']); ?>
                                 </span>
@@ -219,137 +213,116 @@
                             </div>
                         </div>
                     </div>
-
                 <?php endforeach; ?>
-
             <?php else: ?>
-
                 <div class="dashboard-ranking-empty">
                     Nenhuma venda encontrada nos últimos 30 dias.
                 </div>
-
             <?php endif; ?>
         </div>
     </div>
 </div>
 
-
-<!-- Ultimas vendas -->
-<div class="dashboard-latest-sales">
-    <div class="card">
-        <div class="card-header">
-            <div class="card-header-content">
-                <div class="card-title">
-                    Últimas vendas
-                </div>
-
-                <div class="card-subtitle">
-                    Vendas registradas recentemente
-                </div>
+<!-- Últimas vendas -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-header-content">
+            <div class="card-title">
+                Últimas vendas
             </div>
 
-            <a
-                class="btn btn-ghost btn-sm"
-                href="?route=sales/index">
-
-                Ver todas
-            </a>
+            <div class="card-subtitle">
+                Vendas registradas recentemente
+            </div>
         </div>
 
-        <div class="table-wrapper">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th class="table-hide-mobile">Venda</th>
-                        <th>Data</th>
-                        <th class="table-hide-mobile">Itens</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                        <th class="table-hide-mobile">Ações</th>
-                    </tr>
-                </thead>
+        <a
+            class="btn btn-ghost btn-sm"
+            href="?route=sales/index">
 
-                <tbody>
-                    <?php if (!empty($latestSales)) : ?>
-                        <?php foreach ($latestSales as $sale): ?>
-                            <?php
-                            $statusLabel = '';
-                            $statusClass = '';
+            Ver todas
+        </a>
+    </div>
 
-                            switch ($sale['status']) {
-                                case 'completed':
-                                    $statusLabel = 'Concluída';
-                                    $statusClass = 'badge-success';
-                                    break;
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="table-hide-mobile">Venda</th>
+                    <th>Data</th>
+                    <th class="table-hide-mobile">Itens</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th class="table-hide-mobile">Ações</th>
+                </tr>
+            </thead>
 
-                                case 'pending':
-                                    $statusLabel = 'Pendente';
-                                    $statusClass = 'badge-warning';
-                                    break;
+            <tbody>
+                <?php if (!empty($latestSales)): ?>
+                    <?php foreach ($latestSales as $sale): ?>
+                        <?php
+                        [$statusLabel, $statusClass] = match ($sale['status']) {
+                            'completed' => ['Concluída', 'badge-success'],
+                            'pending' => ['Pendente', 'badge-warning'],
+                            'cancelled' => ['Cancelada', 'badge-danger'],
+                            default => [
+                                ucfirst((string) $sale['status']),
+                                'badge-info'
+                            ],
+                        };
+                        ?>
 
-                                case 'cancelled':
-                                    $statusLabel = 'Cancelada';
-                                    $statusClass = 'badge-danger';
-                                    break;
-
-                                default:
-                                    $statusLabel = ucfirst((string) $sale['status']);
-                                    $statusClass = 'badge-info';
-                                    break;
-                            }
-                            ?>
-                            <tr>
-                                <td class="table-hide-mobile dashboard-sale-id">
-                                    #<?php echo e($sale['id']); ?>
-                                </td>
-
-                                <td>
-                                    <?php echo date(
-                                        'd/m/Y H:i',
-                                        strtotime($sale['created_at'])
-                                    ); ?>
-                                </td>
-
-                                <td class="table-hide-mobile">
-                                    <?php echo e($sale['items_quantity']); ?>
-                                </td>
-
-                                <td class="dashboard-value">
-                                    R$ <?php echo number_format(
-                                            $sale['total_amount'],
-                                            2,
-                                            ',',
-                                            '.'
-                                        ); ?>
-                                </td>
-
-                                <td>
-                                    <span class="badge <?php echo e($statusClass); ?>">
-                                        <?php echo e($statusLabel); ?>
-                                    </span>
-                                </td>
-
-                                <td class="table-hide-mobile">
-                                    <div class="table-actions">
-                                        <a
-                                            class="btn btn-ghost btn-sm"
-                                            href="?route=sales/edit&id=<?php echo e($sale['id']); ?>">
-
-                                            Ver
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
                         <tr>
-                            <td colspan="6" class="table-empty">
-                                Nenhuma venda encontrada.
+                            <td class="table-hide-mobile dashboard-sale-id">
+                                #<?php echo e($sale['id']); ?>
+                            </td>
+
+                            <td>
+                                <?php echo date(
+                                    'd/m/Y H:i',
+                                    strtotime($sale['created_at'])
+                                ); ?>
+                            </td>
+
+                            <td class="table-hide-mobile">
+                                <?php echo e($sale['items_quantity']); ?>
+                            </td>
+
+                            <td class="dashboard-value">
+                                R$ <?php echo number_format(
+                                        $sale['total_amount'],
+                                        2,
+                                        ',',
+                                        '.'
+                                    ); ?>
+                            </td>
+
+                            <td>
+                                <span class="badge <?php echo e($statusClass); ?>">
+                                    <?php echo e($statusLabel); ?>
+                                </span>
+                            </td>
+
+                            <td class="table-hide-mobile">
+                                <div class="table-actions">
+                                    <a
+                                        class="btn btn-ghost btn-sm"
+                                        href="?route=sales/edit&id=<?php echo e($sale['id']); ?>">
+
+                                        Ver
+                                    </a>
+                                </div>
                             </td>
                         </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="6" class="table-empty">
+                            Nenhum produto vendido nos últimos 30 dias.
+                        </td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
     </div>
 </div>

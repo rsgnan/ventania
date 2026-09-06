@@ -13,10 +13,12 @@ class DashboardRepository
         $stmt = $this->pdo->prepare(
             'SELECT COUNT(*)
             FROM `sales`
-            WHERE YEAR(`created_at`) = YEAR(CURDATE())
+            WHERE `status` = :status
+            AND YEAR(`created_at`) = YEAR(CURDATE())
             AND MONTH(`created_at`) = MONTH(CURDATE())'
         );
 
+        $stmt->bindValue(':status', 'completed');
         $stmt->execute();
 
         return (int) $stmt->fetchColumn();
@@ -27,10 +29,12 @@ class DashboardRepository
         $stmt = $this->pdo->prepare(
             'SELECT COALESCE(SUM(`total_amount`), 0)
             FROM `sales`
-            WHERE YEAR(`created_at`) = YEAR(CURDATE())
+            WHERE `status` = :status
+            AND YEAR(`created_at`) = YEAR(CURDATE())
             AND MONTH(`created_at`) = MONTH(CURDATE())'
         );
 
+        $stmt->bindValue(':status', 'completed');
         $stmt->execute();
 
         return (float) $stmt->fetchColumn();
@@ -41,10 +45,12 @@ class DashboardRepository
         $stmt = $this->pdo->prepare(
             'SELECT COUNT(*)
             FROM `sales`
-            WHERE YEAR(`created_at`) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+            WHERE `status` = :status
+            AND YEAR(`created_at`) = YEAR(CURDATE() - INTERVAL 1 MONTH)
             AND MONTH(`created_at`) = MONTH(CURDATE() - INTERVAL 1 MONTH)'
         );
 
+        $stmt->bindValue(':status', 'completed');
         $stmt->execute();
 
         return (int) $stmt->fetchColumn();
@@ -55,10 +61,12 @@ class DashboardRepository
         $stmt = $this->pdo->prepare(
             'SELECT COALESCE(SUM(`total_amount`), 0)
             FROM `sales`
-            WHERE YEAR(`created_at`) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+            WHERE `status` = :status
+            AND YEAR(`created_at`) = YEAR(CURDATE() - INTERVAL 1 MONTH)
             AND MONTH(`created_at`) = MONTH(CURDATE() - INTERVAL 1 MONTH)'
         );
 
+        $stmt->bindValue(':status', 'completed');
         $stmt->execute();
 
         return (float) $stmt->fetchColumn();
@@ -123,24 +131,56 @@ class DashboardRepository
     {
         $stmt = $this->pdo->prepare(
             'SELECT
-                products.id,
-                products.name,
-                SUM(sale_items.quantity) AS quantity_sold,
-                SUM(sale_items.subtotal) AS revenue
-            FROM sale_items
-            INNER JOIN products
-                ON products.id = sale_items.product_id
-            INNER JOIN sales
-                ON sales.id = sale_items.sale_id
-            WHERE sales.status = :status
-            GROUP BY products.id, products.name
-            ORDER BY quantity_sold DESC
+                `products`.`id`,
+                `products`.`name`,
+                SUM(`sale_items`.`quantity`) AS `quantity_sold`,
+                SUM(`sale_items`.`subtotal`) AS `revenue`
+            FROM `sale_items`
+            INNER JOIN `products`
+                ON `products`.`id` = `sale_items`.`product_id`
+            INNER JOIN `sales`
+                ON `sales`.`id` = `sale_items`.`sale_id`
+            WHERE `sales`.`status` = :status
+            AND `sales`.`created_at` >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+            GROUP BY
+                `products`.`id`,
+                `products`.`name`
+            ORDER BY `quantity_sold` DESC
             LIMIT 5'
         );
 
         $stmt->bindValue(':status', 'completed');
         $stmt->execute();
 
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getTopSellingCategories(): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT
+                `categories`.`id`,
+                `categories`.`name`,
+                SUM(`sale_items`.`quantity`) AS `quantity_sold`
+            FROM `sale_items`
+            INNER JOIN `sales`
+                ON `sales`.`id` = `sale_items`.`sale_id`
+            INNER JOIN `products`
+                ON `products`.`id` = `sale_items`.`product_id`
+            INNER JOIN `categories`
+                ON `categories`.`id` = `products`.`category_id`
+            WHERE `sales`.`status` = :status
+            AND `sales`.`created_at` >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+            GROUP BY
+                `categories`.`id`,
+                `categories`.`name`
+            ORDER BY `quantity_sold` DESC
+            LIMIT 5'
+        );
+
+        $stmt->bindValue(':status', 'completed');
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

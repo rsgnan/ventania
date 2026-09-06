@@ -1,5 +1,4 @@
 <!-- Usuários -->
-<?php echo csrf_field(); ?>
 
 <div class="page-header">
     <div class="page-header-content">
@@ -16,11 +15,12 @@
         <a class="btn btn-primary" href="?route=users/create">
 
             <?php echo icon('plus'); ?>
-            
+
             Novo Usuário
         </a>
     </div>
 </div>
+
 <div class="card">
     <div class="table-wrapper">
         <table class="table">
@@ -37,6 +37,12 @@
             <tbody>
                 <?php if (!empty($users)): ?>
                     <?php foreach ($users as $user): ?>
+                        <?php
+                        [$statusLabel, $statusClass] = $user->is_active
+                            ? ['Ativo', 'badge-success']
+                            : ['Inativo', 'badge-danger'];
+                        ?>
+
                         <tr>
                             <td>
                                 <strong>
@@ -60,12 +66,9 @@
                                 ); ?>
                             </td>
                             <td>
-                                <span class="badge <?php echo $user->is_active
-                                                        ? 'badge-success'
-                                                        : 'badge-danger'; ?>">
-                                    <?php echo $user->is_active
-                                        ? 'Ativo'
-                                        : 'Inativo'; ?></span>
+                                <span class="badge <?php echo $statusClass; ?>">
+                                    <?php echo $statusLabel; ?>
+                                </span>
                             </td>
                             <td>
                                 <div class="table-actions">

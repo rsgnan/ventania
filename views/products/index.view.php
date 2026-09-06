@@ -38,12 +38,12 @@ $selectedCategory = isset($_GET['category'])
     <?php foreach ($categories as $category): ?>
         <a
             class="tab <?php echo $selectedCategory === (int) $category->id
-                ? 'active'
-                : ''; ?>"
+                            ? 'active'
+                            : ''; ?>"
             href="?route=products/index&category=<?php echo e($category->id); ?>">
             <?php echo e($category->name); ?>
         </a>
-        <?php endforeach; ?>
+    <?php endforeach; ?>
 </div>
 
 <div class="card">
@@ -76,7 +76,7 @@ $selectedCategory = isset($_GET['category'])
                         </td>
 
                         <td>
-                            <?php echo e($product->price); ?>
+                            R$<?php echo e($product->price); ?>
                         </td>
 
                         <td>

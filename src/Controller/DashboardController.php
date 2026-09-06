@@ -15,14 +15,15 @@ class DashboardController extends ViewController
         parent::__construct($authService);
     }
 
-    public function index()
+    public function index(): void
     {
+        // Dados do mês atual e anteriores usados nos indicadores de variação
         $salesCurrentMonth = $this->dashboardRepository->countSalesCurrentMonth();
-        $revenueCurrentMonth = $this->dashboardRepository->getRevenueCurrentMonth();
-
         $salesPreviousMonth = $this->dashboardRepository->countSalesPreviousMonth();
+
+        $revenueCurrentMonth = $this->dashboardRepository->getRevenueCurrentMonth();
         $revenuePreviousMonth = $this->dashboardRepository->getRevenuePreviousMonth();
-        
+
         $salesChange = $this->calculatePercentageChange(
             $salesCurrentMonth,
             $salesPreviousMonth
@@ -33,10 +34,12 @@ class DashboardController extends ViewController
             $revenuePreviousMonth
         );
 
+        // Demais informações exibidas no dashboard
         $pendingSalesCount = $this->dashboardRepository->countPendingSales();
         $lowStockCount = $this->dashboardRepository->countLowStockProducts();
         $latestSales = $this->dashboardRepository->getLatestSales();
         $bestSellingProducts = $this->dashboardRepository->getBestSellingProducts();
+        $topSellingCategories = $this->dashboardRepository->getTopSellingCategories();
 
         $this->render('dashboard/index', [
             'salesCurrentMonth' => $salesCurrentMonth,
@@ -46,7 +49,8 @@ class DashboardController extends ViewController
             'pendingSalesCount' => $pendingSalesCount,
             'lowStockCount' => $lowStockCount,
             'latestSales' => $latestSales,
-            'bestSellingProducts' => $bestSellingProducts
+            'bestSellingProducts' => $bestSellingProducts,
+            'topSellingCategories' => $topSellingCategories
         ]);
     }
 

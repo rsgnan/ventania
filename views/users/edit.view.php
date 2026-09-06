@@ -7,7 +7,8 @@
                 <a
                     class="btn btn-ghost btn-icon"
                     href="?route=users/index"
-                    title="Voltar para Usuários">
+                    title="Voltar para Usuários"
+                    aria-label="Voltar para Usuários">
 
                     <?php echo icon('arrow-left'); ?>
 
@@ -141,12 +142,14 @@
                             name="role"
                             required>
 
-                            <option value="operator"
+                            <option
+                                value="operator"
                                 <?php echo ($_POST['role'] ?? $user->role) === 'operator' ? 'selected' : ''; ?>>
                                 Operador
                             </option>
 
-                            <option value="admin"
+                            <option
+                                value="admin"
                                 <?php echo ($_POST['role'] ?? $user->role) === 'admin' ? 'selected' : ''; ?>>
                                 Administrador
                             </option>
@@ -164,11 +167,15 @@
                             name="is_active"
                             required>
 
-                            <option value="1" <?php echo (string) ($_POST['is_active'] ?? $user->is_active) === '1' ? 'selected' : ''; ?>>
+                            <option
+                                value="1"
+                                <?php echo (string) ($_POST['is_active'] ?? $user->is_active) === '1' ? 'selected' : ''; ?>>
                                 Ativo
                             </option>
 
-                            <option value="0" <?php echo (string) ($_POST['is_active'] ?? $user->is_active) === '0' ? 'selected' : ''; ?>>
+                            <option
+                                value="0"
+                                <?php echo (string) ($_POST['is_active'] ?? $user->is_active) === '0' ? 'selected' : ''; ?>>
                                 Inativo
                             </option>
                         </select>
@@ -181,7 +188,7 @@
             <button type="submit" class="btn btn-primary">
 
                 <?php echo icon('check'); ?>
-                
+
                 Salvar Alterações
             </button>
 

@@ -17,7 +17,7 @@ class UserController extends ViewController
         parent::__construct($authService);
     }
 
-    public function index()
+    public function index(): void
     {
         $users = $this->userRepository->getAll();
 
@@ -26,7 +26,7 @@ class UserController extends ViewController
         ]);
     }
 
-    public function create()
+    public function create(): void
     {
         $errors = [];
 
@@ -47,7 +47,6 @@ class UserController extends ViewController
                 $errors
             );
 
-            // A senha é obrigatória no cadastro
             if ($password === '') {
                 $errors[] = 'Informe a senha.';
             } elseif (strlen($password) < 6) {
@@ -105,14 +104,14 @@ class UserController extends ViewController
         ]);
     }
 
-    public function edit()
+    public function edit(): void
     {
         $id = (int) ($_GET['id'] ?? 0);
         $errors = [];
 
         $user = $this->userRepository->getById($id);
 
-        if (!$user) {
+        if ($user === null) {
             header('Location: index.php?' . http_build_query([
                 'route' => 'users/index'
             ]));
@@ -174,7 +173,7 @@ class UserController extends ViewController
                     $isActive
                 );
 
-                // A senha só é alterada quando um novo valor é infomado
+                // A senha só é alterada quando um novo valor é informado
                 if ($password !== '') {
                     $passwordHash = password_hash(
                         $password,

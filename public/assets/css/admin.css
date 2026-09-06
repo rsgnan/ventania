@@ -911,15 +911,17 @@ svg {
 /* Dashboard */
 .dashboard-grid {
     margin-bottom: 26px;
+
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
 
-    align-items: start;
+    align-items: stretch;
 }
 
 .dashboard-grid .card {
     min-width: 0;
+    height: 100%;
 }
 
 .dashboard-ranking {
@@ -927,7 +929,7 @@ svg {
 }
 
 .dashboard-ranking-item {
-    padding: 14px 0;
+    padding: 10px 0;
 
     display: flex;
     align-items: center;
@@ -1021,11 +1023,7 @@ svg {
     color: var(--color-text-muted);
 
     font-size: 13px;
-    align-items: center;
-}
-
-.dashboard-lastest-sales {
-    margin-top: 20px;
+    text-align: center;
 }
 
 .dashboard-sale-id {
@@ -1326,7 +1324,7 @@ svg {
     line-height: 1.5;
 }
 
-.alert>svg {
+.alert svg {
     width: 18px;
     height: 18px;
 

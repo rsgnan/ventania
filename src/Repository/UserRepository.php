@@ -12,7 +12,14 @@ class UserRepository
     public function getAll(): array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT *
+            'SELECT
+                `id`,
+                `name`,
+                `username`,
+                `email`,
+                `password`,
+                `role`,
+                `is_active`
             FROM `users`
             ORDER BY `name` ASC'
         );
@@ -25,7 +32,17 @@ class UserRepository
     public function getById(int $id): ?UserModel
     {
         $stmt = $this->pdo->prepare(
-            'SELECT *
+            'SELECT
+                `id`,
+                `name`,
+                `username`,
+                `email`,
+                `password`,
+                `role`,
+                `is_active`,
+                `last_ip`,
+                `created_at`,
+                `updated_at`
             FROM `users`
             WHERE `id` = :id'
         );
