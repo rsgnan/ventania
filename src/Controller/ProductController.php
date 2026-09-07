@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Core\ViewController;
 use App\Repository\ProductRepository;
-use App\Controller\ErrorController;
 use App\Support\AuthService;
 use App\Support\ActivityLogService;
 
@@ -13,40 +12,71 @@ class ProductController extends ViewController
     public function __construct(
         AuthService $authService,
         private ProductRepository $productRepository,
-        private ActivityLogService $activityLogService
+        private ActivityLogService $activityLogService,
+        private ErrorController $errorController
     ) {
         parent::__construct($authService);
     }
 
     public function index(): void
     {
-
         $categoryId = isset($_GET['category'])
             ? (int) $_GET['category']
             : null;
 
-        if ($categoryId) {
-            $products = $this->productRepository->getByCategory($categoryId);
+        $search = trim((string) ($_GET['search'] ?? ''));
+
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+        $limit = 10;
+
+        if ($search !== '') {
+            $totalProducts = $this->productRepository->countSearch(
+                $search,
+                $categoryId
+            );
+        } elseif ($categoryId !== null) {
+            $totalProducts = $this->productRepository->countByCategory(
+                $categoryId
+            );
         } else {
-            $products = $this->productRepository->getAll();
+            $totalProducts = $this->productRepository->countAll();
         }
-        
+
+        $totalPages = max(1, (int) ceil($totalProducts / $limit));
+        $page = min($page, $totalPages);
+
+        $offset = ($page - 1) * $limit;
+
+        if ($search !== '') {
+            $products = $this->productRepository->search(
+                $search,
+                $categoryId,
+                $limit,
+                $offset
+            );
+        } elseif ($categoryId !== null) {
+            $products = $this->productRepository->getByCategory(
+                $categoryId,
+                $limit,
+                $offset
+            );
+        } else {
+            $products = $this->productRepository->getAll(
+                $limit,
+                $offset
+            );
+        }
+
         $categories = $this->productRepository->getAllCategories();
-        $productCategoryRows = $this->productRepository->getWithCategoryName();
-
-        $categoryMap = [];
-
-        foreach ($productCategoryRows as $row) {
-            $categoryMap[$row['id']] = $row['category_name'];
-        }
-
-        foreach ($products as $product) {
-            $product->category_name = $categoryMap[$product->id] ?? '';
-        }
 
         $this->render('products/index', [
             'products' => $products,
-            'categories' => $categories
+            'categories' => $categories,
+            'selectedCategory' => $categoryId,
+            'search' => $search,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'totalProducts' => $totalProducts
         ]);
     }
 
@@ -91,8 +121,9 @@ class ProductController extends ViewController
                     $name,
                     'create'
                 );
+
                 header('Location: index.php?route=products/index');
-                return;
+                exit;
             }
         }
 
@@ -103,14 +134,13 @@ class ProductController extends ViewController
         ]);
     }
 
-    public function update(): void
+    public function edit(): void
     {
         $id = (int) ($_GET['id'] ?? 0);
         $product = $this->productRepository->getById($id);
 
         if ($product === null) {
-            (new ErrorController())->notFound();
-            return;
+            $this->errorController->notFound();
         }
 
         $categories = $this->productRepository->getAllCategories();
@@ -157,7 +187,7 @@ class ProductController extends ViewController
                 if (!empty($oldPhoto) && $oldPhoto !== $photo) {
                     $oldPhotoPath = __DIR__ . '/../../public/uploads/products/' . $oldPhoto;
                     if (is_file($oldPhotoPath)) {
-                        @unlink($oldPhotoPath);
+                        unlink($oldPhotoPath);
                     }
                 }
 
@@ -169,7 +199,7 @@ class ProductController extends ViewController
                 );
 
                 header('Location: index.php?route=products/index');
-                return;
+                exit;
             }
         }
 
@@ -188,11 +218,11 @@ class ProductController extends ViewController
         float $price,
         array &$errors
     ): void {
-        if (trim($name) === '') {
+        if ($name === '') {
             $errors[] = 'Preencha o nome do produto corretamente.';
         }
 
-        if ($categoryId === 0) {
+        if ($categoryId <= 0) {
             $errors[] = 'Selecione uma categoria.';
         } elseif (!$this->productRepository->categoryExists($categoryId)) {
             $errors[] = 'A categoria selecionada não existe.';
@@ -214,9 +244,7 @@ class ProductController extends ViewController
     ): string {
         $photo = $currentPhoto ?? '';
 
-        $hasNewPhoto = !empty($_FILES['photo']['name']);
-
-        if ($hasNewPhoto) {
+        if (!empty($_FILES['photo']['name'])) {
             $validation = validatePhoto($_FILES['photo']);
 
             if (!$validation['success']) {
@@ -228,7 +256,10 @@ class ProductController extends ViewController
             $isTemporary = !empty($errors);
             $folder = $isTemporary ? 'tmp' : 'products';
 
-            $upload = uploadPhoto($_FILES['photo'], __DIR__ . '/../../public/uploads/' . $folder);
+            $upload = uploadPhoto(
+                $_FILES['photo'],
+                __DIR__ . '/../../public/uploads/' . $folder
+            );
 
             if (!$upload['success']) {
                 $errors[] = $upload['error'];
@@ -239,6 +270,7 @@ class ProductController extends ViewController
                 $tempPhoto = $upload['filename'];
 
                 // Registra o arquivo para impedir o uso de fotos de outra sessão
+                $_SESSION['temp_photos'] ??= [];
                 $_SESSION['temp_photos'][] = $tempPhoto;
             } else {
                 $photo = $upload['filename'];
@@ -256,13 +288,13 @@ class ProductController extends ViewController
         $tempPath = __DIR__ . '/../../public/uploads/tmp/' . $tempPhotoName;
 
         // Confirma que a foto temporária pertence à sessão atual
-        $belongToUser = in_array(
+        $belongsToUser = in_array(
             $tempPhotoName,
             $_SESSION['temp_photos'] ?? [],
             true
         );
 
-        if (!$belongToUser || !is_file($tempPath)) {
+        if (!$belongsToUser || !is_file($tempPath)) {
             $tempPhoto = null;
             return $photo;
         }
@@ -280,7 +312,7 @@ class ProductController extends ViewController
         if (!$validation['success']) {
             $errors[] = $validation['error'];
 
-            @unlink($tempPath);
+            unlink($tempPath);
 
             $this->forgetTempPhoto($tempPhotoName);
 
@@ -298,7 +330,6 @@ class ProductController extends ViewController
 
         if (rename($tempPath, $finalPath)) {
             $this->forgetTempPhoto($tempPhotoName);
-
             $tempPhoto = null;
 
             return $tempPhotoName;

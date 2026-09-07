@@ -20,6 +20,12 @@ $container->bind('authService', function () use ($container) {
     return new \App\Support\AuthService($pdo);
 });
 
+// Error
+$container->bind('errorController', function () use ($container) {
+    $authService = $container->get('authService');
+    return new \App\Controller\ErrorController($authService);
+});
+
 // Logs de atividade
 $container->bind('activityLogRepository', function () use ($container) {
     $pdo = $container->get('pdo');
@@ -52,11 +58,13 @@ $container->bind('productController', function () use ($container) {
     $authService = $container->get('authService');
     $productRepository = $container->get('productRepository');
     $activityLogService = $container->get('activityLogService');
+    $errorController = $container->get('errorController');
 
     return new \App\Controller\ProductController(
         $authService,
         $productRepository,
-        $activityLogService
+        $activityLogService,
+        $errorController
     );
 });
 
@@ -146,11 +154,6 @@ function csrf_field(): string
     return '<input type="hidden" name="_csrf" value="' . e(csrf_token()) . '">';
 }
 
-// Errors
-$container->bind('errorController', function () use ($container) {
-    return new \App\Controller\ErrorController();
-});
-
 // Tratamento de route
 
 $route = (string) ($_GET['route'] ?? 'pages');
@@ -183,7 +186,7 @@ if ($route == 'pages') {
     $authService->ensureLoggedIn();
 
     $adminController = $container->get('productController');
-    $adminController->update();
+    $adminController->edit();
 } else if ($route === 'login/index') {
     $adminController = $container->get('productController');
     $adminController->update();

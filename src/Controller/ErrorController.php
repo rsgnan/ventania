@@ -11,5 +11,7 @@ class ErrorController extends ViewController
         http_response_code(404);
 
         $this->render('errors/404', []);
+
+        exit();
     }
 }

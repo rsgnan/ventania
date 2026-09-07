@@ -134,7 +134,7 @@
                         </label>
 
                         <select
-                            class="form-input"
+                            class="form-select"
                             id="role"
                             name="role"
                             required>
@@ -159,7 +159,7 @@
                         </label>
 
                         <select
-                            class="form-input"
+                            class="form-select"
                             id="is_active"
                             name="is_active"
                             required>
