@@ -24,10 +24,21 @@ class ProductController extends ViewController
             ? (int) $_GET['category']
             : null;
 
+        if (
+            $categoryId !== null
+            && !$this->productRepository->categoryExists($categoryId)
+        ) {
+            $categoryId = null;
+        }
+
         $search = trim((string) ($_GET['search'] ?? ''));
 
         $page = max(1, (int) ($_GET['page'] ?? 1));
         $limit = 10;
+
+        $allProductsCount = $search !== ''
+            ? $this->productRepository->countSearch($search, null)
+            : $this->productRepository->countAll();
 
         if ($search !== '') {
             $totalProducts = $this->productRepository->countSearch(
@@ -39,10 +50,11 @@ class ProductController extends ViewController
                 $categoryId
             );
         } else {
-            $totalProducts = $this->productRepository->countAll();
+            $totalProducts = $allProductsCount;
         }
 
         $totalPages = max(1, (int) ceil($totalProducts / $limit));
+
         $page = min($page, $totalPages);
 
         $offset = ($page - 1) * $limit;
@@ -67,7 +79,7 @@ class ProductController extends ViewController
             );
         }
 
-        $categories = $this->productRepository->getAllCategories();
+        $categories = $this->productRepository->getAllCategories($search);
 
         $this->render('products/index', [
             'products' => $products,
@@ -76,7 +88,8 @@ class ProductController extends ViewController
             'search' => $search,
             'currentPage' => $page,
             'totalPages' => $totalPages,
-            'totalProducts' => $totalProducts
+            'totalProducts' => $totalProducts,
+            'allProductsCount' => $allProductsCount
         ]);
     }
 

@@ -157,6 +157,20 @@ function icon(string $name): string
             </svg>
         ',
 
+        'search' => '
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linejoin="round"
+                stroke-linecap="round">
+
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+            </svg>
+        ',
+
     ];
 
     return $icons[$name] ?? '';

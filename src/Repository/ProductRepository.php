@@ -119,7 +119,10 @@ class ProductRepository
             FROM `products`
             LEFT JOIN `categories`
                 ON `categories`.`id` = `products`.`category_id`
-            WHERE `products`.`name` LIKE :search';
+            WHERE (
+                `products`.`name` LIKE :search_name
+                OR `products`.`tag` LIKE :search_tag
+            )';
 
         if ($categoryId !== null) {
             $sql .= '
@@ -133,7 +136,8 @@ class ProductRepository
 
         $stmt = $this->pdo->prepare($sql);
 
-        $stmt->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
+        $stmt->bindValue(':search_name', '%' . $search . '%', PDO::PARAM_STR);
+        $stmt->bindValue(':search_tag', '%' . $search . '%', PDO::PARAM_STR);
 
         if ($categoryId !== null) {
             $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
@@ -154,7 +158,10 @@ class ProductRepository
         $sql =
             'SELECT COUNT(*)
             FROM `products`
-            WHERE `products`.`name` LIKE :search';
+            WHERE (
+                `products`.`name` LIKE :search_name
+                OR `products`.`tag` LIKE :search_tag
+            )';
 
         if ($categoryId !== null) {
             $sql .= '
@@ -163,7 +170,8 @@ class ProductRepository
 
         $stmt = $this->pdo->prepare($sql);
 
-        $stmt->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
+        $stmt->bindValue(':search_name', '%' . $search . '%', PDO::PARAM_STR);
+        $stmt->bindValue(':search_tag', '%' . $search . '%', PDO::PARAM_STR);
 
         if ($categoryId !== null) {
             $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
@@ -200,15 +208,37 @@ class ProductRepository
         return $entry !== false ? $entry : null;
     }
 
-    public function getAllCategories(): array
+    public function getAllCategories(string $search = ''): array
     {
-        $stmt = $this->pdo->prepare(
+        $sql =
             'SELECT
-                `id`,
-                `name`
+                `categories`.`id`,
+                `categories`.`name`,
+                COUNT(`products`.`id`) AS `product_count`
             FROM `categories` 
-            ORDER BY `name` ASC'
-        );
+            LEFT JOIN `products`
+                ON `products`.`category_id` = `categories`.`id`';
+
+        if ($search !== '') {
+            $sql .= '
+                AND (
+                    `products`.`name` LIKE :search_name
+                    OR `products`.`tag` LIKE :search_tag
+                    )';
+        }
+
+        $sql .= '
+            GROUP BY
+                `categories`.`id`,
+                `categories`.`name`
+            ORDER BY `categories`.`name` ASC';
+
+        $stmt = $this->pdo->prepare($sql);
+
+        if ($search !== '') {
+            $stmt->bindValue(':search_name', '%' . $search . '%', PDO::PARAM_STR);
+            $stmt->bindValue(':search_tag', '%' . $search . '%', PDO::PARAM_STR);
+        }
 
         $stmt->execute();
 
