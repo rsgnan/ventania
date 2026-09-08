@@ -48,7 +48,23 @@
                     <?php else: ?>
                         <tr>
                             <td colspan="5" class="table-empty">
-                                Nenhum produto encontrado.
+                                <?php if ($search !== '' && $selectedCategory !== null): ?>
+
+                                    Nenhum produto encontrado nesta categoria.
+
+                                    <a
+                                        class="table-empty-link"
+                                        href="?<?php echo e(http_build_query([
+                                                    'route' => 'products/index',
+                                                    'search' => $search
+                                                ])); ?>">
+                                        Buscar em todas as categorias.
+                                    </a>
+                                <?php else: ?>
+
+                                    Nenhum produto encontrado.
+
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endif; ?>

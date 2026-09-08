@@ -1,6 +1,6 @@
 <?php
 
-// Proteção de ataque XSS
+// Proteção contra XSS na saída HTML
 function e($value): string
 {
     return htmlspecialchars(
@@ -63,10 +63,12 @@ function validatePhoto(array $file): array
     // Limite de 5MB
     $maxSize = 5 * 1024 * 1024;
 
-    if ($file['size'] > $maxSize) {
+    $size = (int) ($file['size'] ?? 0);
+
+    if ($size <= 0 || $size > $maxSize) {
         return [
             'success' => false,
-            'error' => 'O arquivo deve ter no máximo 5MB.'
+            'error' => 'O arquivo deve ter no máximo 5 MB.'
         ];
     }
 
@@ -83,7 +85,7 @@ function validatePhoto(array $file): array
         ];
     }
 
-    // Verifica se o arquivo temporário existe
+    // Verifica se o arquivo temporário é válido
     if (
         empty($file['tmp_name']) ||
         !is_file($file['tmp_name'])
@@ -101,6 +103,15 @@ function validatePhoto(array $file): array
     $allowedMimeTypes = ['image/jpeg', 'image/png'];
 
     if (!in_array($mimeType, $allowedMimeTypes, true)) {
+        return [
+            'success' => false,
+            'error' => 'O arquivo não é uma imagem válida.'
+        ];
+    }
+
+    $imageInfo = getimagesize($file['tmp_name']);
+
+    if ($imageInfo === false) {
         return [
             'success' => false,
             'error' => 'O arquivo não é uma imagem válida.'

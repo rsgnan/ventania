@@ -1035,6 +1035,18 @@ svg {
     text-align: center;
 }
 
+.table-empty-link {
+    color: var(--color-primary);
+
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+.table-empty-link:hover {
+    text-decoration: underline;
+}
+
 /* Filtros */
 .filters {
     width: 100%;

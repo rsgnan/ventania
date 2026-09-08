@@ -54,6 +54,7 @@
             </div>
             <div class="card-body">
                 <div class="form-grid">
+
                     <div class="form-field form-field-full">
                         <label class="form-label" for="name">
                             Nome do Produto
@@ -64,6 +65,7 @@
                             id="name"
                             type="text"
                             name="name"
+                            maxlength="150"
                             value="<?php echo e($_POST['name'] ?? ''); ?>"
                             placeholder="Ex: Saia de Malha com Bolso">
                     </div>
@@ -87,7 +89,9 @@
                             <?php foreach ($categories as $category): ?>
                                 <option
                                     value="<?php echo e($category->id); ?>"
-                                    <?php echo $category->id == $selectedCategory ? 'selected' : ''; ?>>
+                                    <?php echo (string) $category->id === (string) $selectedCategory
+                                        ? 'selected'
+                                        : ''; ?>>
 
                                     <?php echo e($category->name); ?>
                                 </option>
@@ -105,9 +109,11 @@
                             id="tag"
                             type="text"
                             name="tag"
+                            maxlength="100"
                             value="<?php echo e($_POST['tag'] ?? ''); ?>"
                             placeholder="Ex: Rendada">
                     </div>
+
                     <div class="form-field form-field-full">
                         <label class="form-label" for="description">
                             Descrição
@@ -149,7 +155,7 @@
                             id="price"
                             type="number"
                             name="price"
-                            min="0"
+                            min="0.01"
                             step="0.01"
                             value="<?php echo e($_POST['price'] ?? ''); ?>"
                             placeholder="0,00">
@@ -191,7 +197,9 @@
                 <label class="image-upload" for="product-image-input">
 
                     <img id="image-preview" class="image-preview"
-                        src="<?php echo !empty($tempPhoto) ? 'uploads/tmp/' . e($tempPhoto) : ''; ?>"
+                        src="<?php echo !empty($tempPhoto)
+                                    ? e('uploads/tmp/' . $tempPhoto)
+                                    : ''; ?>"
                         alt="Pré-visualização"
                         style="<?php echo !empty($tempPhoto) ? '' : 'display:none;'; ?>">
 
@@ -239,9 +247,12 @@
                 <input
                     type="hidden"
                     name="temp_photo"
-                    value="<?php echo !empty($tempPhoto) ? e($tempPhoto) : ''; ?>">
+                    value="<?php echo !empty($tempPhoto)
+                                ? e($tempPhoto)
+                                : ''; ?>">
             </div>
         </div>
+
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">
 

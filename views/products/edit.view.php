@@ -1,37 +1,30 @@
 <form method="POST" enctype="multipart/form-data">
     <?php echo csrf_field(); ?>
 
-    <input
-        type="hidden"
-        name="product_id"
-        value="<?php echo e($product->id); ?>">
-
     <div class="page-header">
-        <div class="page-header-left">
-            <div class="page-header-title">
-                <a
-                    class="btn btn-ghost btn-icon"
-                    href="?route=products/index"
-                    title="Voltar para Produtos"
-                    aria-label="Voltar para Produtos">
+        <div class="page-header-title">
+            <a
+                class="btn btn-ghost btn-icon"
+                href="?route=products/index"
+                title="Voltar para Produtos"
+                aria-label="Voltar para Produtos">
 
-                    <?php echo icon('arrow-left'); ?>
+                <?php echo icon('arrow-left'); ?>
 
-                </a>
-                <div>
-                    <h1 class="page-title">
-                        Editar Produto
-                    </h1>
+            </a>
+            <div class="page-header-left">
+                <h1 class="page-title">
+                    Editar Produto
+                </h1>
 
-                    <p class="page-description">
-                        Preencha as informações para editar o produto.
-                    </p>
-                </div>
+                <p class="page-description">
+                    Altere as informações do produto.
+                </p>
             </div>
         </div>
     </div>
 
-    <div class="form-panel form-panel-wide">
+    <div class="form-panel">
         <?php if (!empty($errors)): ?>
             <div class="alert alert-danger">
 
@@ -53,7 +46,7 @@
                     </div>
 
                     <div class="card-subtitle">
-                        Nome, categoria e identificação do produto
+                        Dados principais e descrição do produto.
                     </div>
                 </div>
             </div>
@@ -70,8 +63,8 @@
                             type="text"
                             id="name"
                             name="name"
-                            value="<?php echo e($_POST['name'] ?? $product->name); ?>"
-                            required>
+                            maxlength="150"
+                            value="<?php echo e($_POST['name'] ?? $product->name); ?>">
                     </div>
 
                     <div class="form-field">
@@ -84,8 +77,7 @@
                         <select
                             class="form-select"
                             id="category"
-                            name="category_id"
-                            required>
+                            name="category_id">
 
                             <?php $selectedCategory = $_POST['category_id'] ?? $product->category_id; ?>
 
@@ -96,7 +88,9 @@
                             <?php foreach ($categories as $category): ?>
                                 <option
                                     value="<?php echo e($category->id); ?>"
-                                    <?php echo $category->id == $selectedCategory ? 'selected' : ''; ?>>
+                                    <?php echo (string) $category->id === (string) $selectedCategory
+                                        ? 'selected'
+                                        : ''; ?>>
 
                                     <?php echo e($category->name); ?>
                                 </option>
@@ -104,6 +98,7 @@
                         </select>
 
                     </div>
+
                     <div class="form-field">
                         <label class="form-label" for="tag">
                             Tag
@@ -114,7 +109,9 @@
                             type="text"
                             id="tag"
                             name="tag"
-                            value="<?php echo e($_POST['tag'] ?? $product->tag); ?>">
+                            maxlength="100"
+                            value="<?php echo e($_POST['tag'] ?? $product->tag); ?>"
+                            placeholder="Ex: Rendada">
                     </div>
 
                     <div class="form-field form-field-full">
@@ -125,11 +122,13 @@
                         <textarea
                             class="form-textarea"
                             id="description"
-                            name="description"><?php echo e($_POST['description'] ?? $product->description); ?></textarea>
+                            name="description"
+                            placeholder="Descreva o produto..."><?php echo e($_POST['description'] ?? $product->description); ?></textarea>
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="card">
             <div class="card-header">
                 <div class="card-header-content">
@@ -138,7 +137,7 @@
                     </div>
 
                     <div class="card-subtitle">
-                        Valores de venda e controle de inventário
+                        Valores de venda e controle de inventário.
                     </div>
                 </div>
             </div>
@@ -155,10 +154,9 @@
                             type="number"
                             id="price"
                             name="price"
-                            min="0"
+                            min="0.01"
                             step="0.01"
-                            value="<?php echo e($_POST['price'] ?? $product->price); ?>"
-                            required>
+                            value="<?php echo e($_POST['price'] ?? $product->price); ?>">
                     </div>
 
                     <div class="form-field">
@@ -173,11 +171,13 @@
                             name="stock"
                             min="0"
                             step="1"
-                            value="<?php echo e($_POST['stock'] ?? $product->stock); ?>">
+                            value="<?php echo e($_POST['stock'] ?? $product->stock); ?>"
+                            placeholder="0">
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="card">
             <div class="card-header">
                 <div class="card-header-content">
@@ -186,14 +186,14 @@
                     </div>
 
                     <div class="card-subtitle">
-                        Foto utilizada para identificar o produto
+                        Imagem utilizada para identificar o produto.
                     </div>
                 </div>
             </div>
 
             <div class="card-body">
                 <?php
-                // Prioriza a foto temporária, caso não haja, cai para a foto já salva do produto.
+                // Prioriza a foto temporária antes da foto salva
                 $hasPreview = !empty($tempPhoto) || !empty($product->photo);
                 $previewSrc = '';
 
@@ -215,6 +215,8 @@
                         fill="none"
                         stroke="currentColor"
                         stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
                         style="<?php echo $hasPreview ? 'display:none;' : ''; ?>">
 
                         <path d="M4 16l4.6-4.6a2 2 0 012.8 0L16 16" />
@@ -233,7 +235,7 @@
                         </div>
 
                         <div class="image-upload-hint">
-                            PNG ou JPG, até 5MB
+                            PNG ou JPG, até 5 MB
                         </div>
                     </div>
 
@@ -242,7 +244,7 @@
                         type="file"
                         name="photo"
                         accept="image/png,image/jpeg"
-                        style="display:none">
+                        hidden>
                 </label>
 
                 <input

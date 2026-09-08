@@ -24,6 +24,10 @@ class ProductController extends ViewController
             ? (int) $_GET['category']
             : null;
 
+        if ($categoryId !== null && $categoryId <= 0) {
+            $categoryId = null;
+        }
+
         if (
             $categoryId !== null
             && !$this->productRepository->categoryExists($categoryId)
@@ -33,7 +37,14 @@ class ProductController extends ViewController
 
         $search = trim((string) ($_GET['search'] ?? ''));
 
+        // Limita buscas excessivamente longas
+        if (mb_strlen($search) > 100) {
+            $search = mb_substr($search, 0, 100);
+        }
+
+        // Página atual nunca menor que 1
         $page = max(1, (int) ($_GET['page'] ?? 1));
+
         $limit = 10;
 
         $allProductsCount = $search !== ''
@@ -109,6 +120,7 @@ class ProductController extends ViewController
 
             $this->validateFields(
                 $name,
+                $tag,
                 $categoryId,
                 $stock,
                 $price,
@@ -170,6 +182,7 @@ class ProductController extends ViewController
 
             $this->validateFields(
                 $name,
+                $tag,
                 $categoryId,
                 $stock,
                 $price,
@@ -226,6 +239,7 @@ class ProductController extends ViewController
 
     private function validateFields(
         string $name,
+        string $tag,
         int $categoryId,
         int $stock,
         float $price,
@@ -233,6 +247,12 @@ class ProductController extends ViewController
     ): void {
         if ($name === '') {
             $errors[] = 'Preencha o nome do produto corretamente.';
+        } elseif (mb_strlen($name) > 150) {
+            $errors[] = 'O nome do produto deve ter no máximo 150 caracteres.';
+        }
+
+        if (mb_strlen($tag) > 100) {
+            $errors[] = 'A tag deve ter no máximo 100 caracteres.';
         }
 
         if ($categoryId <= 0) {
