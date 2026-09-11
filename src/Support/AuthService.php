@@ -117,7 +117,7 @@ class AuthService
     {
         if (!$this->isLoggedIn()) {
             header('Location: index.php?' . http_build_query([
-                'route' => 'admin/login'
+                'route' => 'users/login'
             ]));
 
             exit;

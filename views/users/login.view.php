@@ -40,7 +40,7 @@
 
             <form
                 method="POST"
-                action="index.php?<?php echo http_build_query(['route' => 'admin/login']); ?>"
+                action="index.php?<?php echo http_build_query(['route' => 'users/login']); ?>"
                 class="login-form">
 
                 <?php echo csrf_field(); ?>

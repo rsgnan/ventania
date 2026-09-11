@@ -7,92 +7,54 @@
         </h1>
 
         <p class="page-description">
-            <?php echo e(count($sales)); ?> vendas registradas
+            <?php echo e($totalSales); ?>
+            <?php echo $totalSales === 1 ? 'venda encontrada' : 'vendas encontradas'; ?>
         </p>
     </div>
 
     <div class="page-header-actions">
         <a class="btn btn-primary" href="?route=sales/create">
+
             <?php echo icon('plus'); ?>
+
             Nova Venda
         </a>
     </div>
 </div>
 
-<div class="card">
-    <div class="table-wrapper">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Cliente</th>
-                    <th>Itens</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Data</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
+<div class="filters">
 
-            <tbody>
-                <?php if (empty($sales)): ?>
-                    <tr>
-                        <td colspan="6" class="table-empty">
-                            Nenhuma venda registrada ainda.
-                        </td>
-                    </tr>
-                <?php else: ?>
-                    <?php foreach ($sales as $sale): ?>
-                        <tr>
-                            <td>
-                                <strong>
-                                    <?php echo e($sale->customer_name); ?>
-                                </strong>
-                            </td>
-
-                            <td>
-                                <?php echo e($sale->items_quantity); ?>
-                                <?php echo $sale->items_quantity == 1 ? 'item' : 'itens'; ?>
-                            </td>
-
-                            <td>
-                                <strong>
-                                    R$ <?php echo e(number_format((float) $sale->total_amount, 2, ',', '.')); ?>
-                                </strong>
-                            </td>
-
-                            <td>
-                                <?php if ($sale->status === 'pending'): ?>
-                                    <span class="badge badge-warning">
-                                        Pendente
-                                    </span>
-                                <?php elseif ($sale->status === 'completed'): ?>
-                                    <span class="badge badge-success">
-                                        Concluída
-                                    </span>
-                                <?php else: ?>
-                                    <span class="badge badge-danger">
-                                        Cancelada
-                                    </span>
-                                <?php endif; ?>
-                            </td>
-
-                            <td>
-                                <?php echo e(date('d/m/Y H:i', strtotime($sale->created_at))); ?>
-                            </td>
-
-                            <td>
-                                <div class="table-actions">
-                                    <a
-                                        class="btn btn-ghost btn-sm"
-                                        href="?route=sales/edit&id=<?php echo e($sale->id); ?>">
-                                        Editar
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
+    <div id="sales-tabs">
+        <?php require __DIR__ . '/_tabs.view.php'; ?>
     </div>
+
+    <form
+        class="filters-search"
+        method="GET">
+
+        <input
+            type="hidden"
+            name="route"
+            value="sales/index">
+
+        <?php if ($status !== null): ?>
+            <input
+                type="hidden"
+                name="category"
+                value="<?php echo e($status); ?>">
+        <?php endif; ?>
+
+        <?php echo icon('search'); ?>
+
+        <input
+            class="form-input"
+            type="search"
+            id="product-search"
+            name="search"
+            value="<?php echo e($search); ?>"
+            placeholder="Buscar por cliente"
+            aria-label="Buscar vendas">
+    </form>
 </div>
+
+<?php require __DIR__ . '/_results.view.php'; ?>

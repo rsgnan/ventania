@@ -6,11 +6,9 @@
             Produtos
         </h1>
 
-        <p class="page-description">
-            <span id="products-total">
-                <?php echo e($totalProducts); ?>
-            </span>
-            produtos encontrados
+         <p class="page-description">
+            <?php echo e($totalProducts); ?>
+            <?php echo $totalProducts === 1 ? 'produto encontrado' : 'produtos encontrados'; ?>
         </p>
     </div>
 

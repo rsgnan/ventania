@@ -99,6 +99,23 @@ class ProductRepository
         return (int) $stmt->fetchColumn();
     }
 
+        public function getForSale(): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT
+                `id`,
+                `name`,
+                `price`,
+                `stock`
+            FROM `products`
+            ORDER BY `name` ASC'
+        );
+
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_CLASS, ProductModel::class);
+    }
+
     public function search(
         string $search,
         ?int $categoryId,

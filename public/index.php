@@ -163,10 +163,10 @@ if ($route == 'pages') {
 
     $adminController = $container->get('productController');
     $adminController->index();
-} else if ($route === 'admin/login') {
+} else if ($route === 'users/login') {
     $adminController = $container->get('loginController');
     $adminController->login();
-} else if ($route === 'admin/logout') {
+} else if ($route === 'users/logout') {
     $adminController = $container->get('loginController');
     $adminController->logout();
 } else if ($route === 'products/index') {

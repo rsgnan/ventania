@@ -10,7 +10,7 @@ class LoginController extends ViewController
     {
         $this->authService->logout();
         header('Location: index.php?' . http_build_query([
-            'route' => 'admin/login'
+            'route' => 'users/login'
         ]));
         return;
     }
@@ -41,7 +41,7 @@ class LoginController extends ViewController
             }
         }
 
-        $this->renderStandalone('admin/login', [
+        $this->renderStandalone('users/login', [
             'loginError' => $loginError,
             'oldUsername' => $username
         ]);

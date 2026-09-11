@@ -27,17 +27,86 @@ class SaleController extends ViewController
 
     public function index(): void
     {
-        $sales = $this->saleRepository->getList();
+        $search = trim((string) ($_GET['search'] ?? ''));
+
+        // Evita buscas desnecessariamente grandes
+        $search = mb_substr($search, 0, 100);
+
+        $status = $_GET['status'] ?? null;
+
+        if (!in_array($status, ['pending', 'completed', 'cancelled'], true)) {
+            $status = null;
+        }
+
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+        $perPage = 10;
+
+        if ($search !== '' || $status !== null) {
+            $totalSales = $this->saleRepository->countSearch(
+                $search,
+                $status
+            );
+        } else {
+            $totalSales = $this->saleRepository->countAll();
+        }
+
+        $totalPages = max(1, (int) ceil($totalSales / $perPage));
+        $page = min($page, $totalPages);
+
+        $offset = ($page - 1) * $perPage;
+
+        if ($search !== '' || $status !== null) {
+            $sales = $this->saleRepository->search(
+                $search,
+                $status,
+                $perPage,
+                $offset
+            );
+        } else {
+            $sales = $this->saleRepository->getAll(
+                $perPage,
+                $offset
+            );
+        }
+
+        $allSalesCount = $this->saleRepository->countByStatus(
+            null,
+            $search
+        );
+
+        $pendingSalesCount = $this->saleRepository->countByStatus(
+            'pending',
+            $search
+        );
+
+        $completedSalesCount = $this->saleRepository->countByStatus(
+            'completed',
+            $search
+        );
+
+        $cancelledSalesCount = $this->saleRepository->countByStatus(
+            'cancelled',
+            $search
+        );
 
         $this->render('sales/index', [
-            'sales' => $sales
+            'sales' => $sales,
+            'search' => $search,
+            'status' => $status,
+            'page' => $page,
+            'totalPages' => $totalPages,
+            'totalSales' => $totalSales,
+            'allSalesCount' => $allSalesCount,
+            'pendingSalesCount' => $pendingSalesCount,
+            'completedSalesCount' => $completedSalesCount,
+            'cancelledSalesCount' => $cancelledSalesCount
         ]);
     }
 
     public function create(): void
     {
         $errors = [];
-        $products = $this->productRepository->getAll();
+        $products = $this->productRepository->getForSale();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Recebe os produtos enviados pelo JavaScript em JSON
@@ -153,8 +222,7 @@ class SaleController extends ViewController
 
         $items = $this->saleItemRepository->getBySaleId($saleId);
 
-        // Todos os produtos são enviados para o JavaScript
-        $products = $this->productRepository->getAll();
+        $products = $this->productRepository->getForSale();
 
         $errors = [];
 
