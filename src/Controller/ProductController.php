@@ -166,6 +166,7 @@ class ProductController extends ViewController
 
         if ($product === null) {
             $this->errorController->notFound();
+            return;
         }
 
         $categories = $this->productRepository->getAllCategories();

@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Core\ViewController;
-use App\Controller\ErrorController;
 use App\Repository\ProductRepository;
 use App\Repository\SaleRepository;
 use App\Repository\SaleItemRepository;
@@ -20,7 +19,8 @@ class SaleController extends ViewController
         private ProductRepository $productRepository,
         private SaleRepository $saleRepository,
         private SaleItemRepository $saleItemRepository,
-        private ActivityLogService $activityLogService
+        private ActivityLogService $activityLogService,
+        private ErrorController $errorController
     ) {
         parent::__construct($authService);
     }
@@ -69,25 +69,7 @@ class SaleController extends ViewController
             );
         }
 
-        $allSalesCount = $this->saleRepository->countByStatus(
-            null,
-            $search
-        );
-
-        $pendingSalesCount = $this->saleRepository->countByStatus(
-            'pending',
-            $search
-        );
-
-        $completedSalesCount = $this->saleRepository->countByStatus(
-            'completed',
-            $search
-        );
-
-        $cancelledSalesCount = $this->saleRepository->countByStatus(
-            'cancelled',
-            $search
-        );
+        $statusCounts = $this->saleRepository->getStatusCounts($search);
 
         $this->render('sales/index', [
             'sales' => $sales,
@@ -96,10 +78,7 @@ class SaleController extends ViewController
             'page' => $page,
             'totalPages' => $totalPages,
             'totalSales' => $totalSales,
-            'allSalesCount' => $allSalesCount,
-            'pendingSalesCount' => $pendingSalesCount,
-            'completedSalesCount' => $completedSalesCount,
-            'cancelledSalesCount' => $cancelledSalesCount
+            'statusCounts' => $statusCounts
         ]);
     }
 
@@ -125,16 +104,20 @@ class SaleController extends ViewController
                 $items,
                 $validatedItems,
                 $subtotal,
-                $errors
+                $errors,
+                null,
+                ['pending', 'completed']
             );
 
             $discount = (float) ($_POST['discount_amount'] ?? 0);
 
             if ($discount < 0) {
                 $errors[] = 'Desconto inválido.';
+            } elseif ($discount > $subtotal) {
+                $errors[] = 'O desconto não pode ser maior que o subtotal.';
             }
 
-            $total = max(0, $subtotal - $discount);
+            $total = $subtotal - $discount;
 
             if (empty($errors)) {
                 try {
@@ -210,20 +193,18 @@ class SaleController extends ViewController
         $sale = $this->saleRepository->getById($saleId);
 
         if ($sale === null) {
-            (new ErrorController())->notFound();
+            $this->errorController->notFound();
             return;
         }
 
-        // Somente vendas pendentes podem ser alteradas
+        // Vendas canceladas não podem ser alteradas
         if ($sale->status === 'cancelled') {
             header('Location: index.php?route=sales/index');
             return;
         }
 
         $items = $this->saleItemRepository->getBySaleId($saleId);
-
         $products = $this->productRepository->getForSale();
-
         $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -245,14 +226,17 @@ class SaleController extends ViewController
                 $validatedItems,
                 $subtotal,
                 $errors,
-                $items
+                $items,
+                ['pending', 'completed', 'cancelled']
             );
 
             if ($discount < 0) {
                 $errors[] = 'Desconto inválido.';
+            } elseif ($discount > $subtotal) {
+                $errors[] = 'O desconto não pode ser maior que o subtotal.';
             }
 
-            $total = max(0, $subtotal - $discount);
+            $total = $subtotal - $discount;
 
             if (empty($errors)) {
                 try {
@@ -294,14 +278,16 @@ class SaleController extends ViewController
                             $itemSubtotal
                         );
 
-                        // Retira do estoque a quantidade da nova venda
-                        $stockUpdated = $this->productRepository->decreaseStock(
-                            $product->id,
-                            $quantity
-                        );
+                        // Vendas canceladas não retiram produtos do estoque
+                        if ($status !== 'cancelled') {
+                            $stockUpdated = $this->productRepository->decreaseStock(
+                                $product->id,
+                                $quantity
+                            );
 
-                        if (!$stockUpdated) {
-                            throw new \Exception('Estoque insuficiente.');
+                            if (!$stockUpdated) {
+                                throw new \Exception('Estoque insuficiente.');
+                            }
                         }
                     }
 
@@ -338,10 +324,10 @@ class SaleController extends ViewController
     {
         $saleId = (int) ($_GET['id'] ?? 0);
 
-        $sale = $this->saleItemRepository->getBySaleId($saleId);
+        $sale = $this->saleRepository->getById($saleId);
 
         if ($sale === null) {
-            (new ErrorController())->notFound();
+            $this->errorController->notFound();
             return;
         }
 
@@ -359,12 +345,12 @@ class SaleController extends ViewController
         $sale = $this->saleRepository->getById($saleId);
 
         if ($sale === null) {
-            (new ErrorController())->notFound();
+            $this->errorController->notFound();
             return;
         }
 
-        // Somente vendas pendentes podem ser canceladas
-        if ($sale->status !== 'pending') {
+        // Uma venda já cancelada não pode ser cancelada novamente
+        if ($sale->status === 'cancelled') {
             header('Location: index.php?route=sales/index');
             return;
         }
@@ -409,14 +395,17 @@ class SaleController extends ViewController
         array &$validatedItems,
         float &$subtotal,
         array &$errors,
-        ?array $currentItems = null
+        ?array $currentItems = null,
+        array $allowedStatuses = ['pending', 'completed']
     ): void {
         if ($customerName === '') {
             $errors[] = 'Informe o nome do cliente.';
+        } elseif (mb_strlen($customerName) > 150) {
+            $errors[] = 'O nome do cliente deve ter no máximo 150 caracteres.';
         }
 
-        if (!in_array($status, ['pending', 'completed', 'cancelled'], true)) {
-            $errors[] = 'Status da venda inválida.';
+        if (!in_array($status, $allowedStatuses, true)) {
+            $errors[] = 'Status da venda inválido.';
         }
 
         if (empty($items)) {
@@ -454,8 +443,11 @@ class SaleController extends ViewController
                 continue;
             }
 
-            // Considera também a quantidade da venda antes da edição
-            if ($quantity > ($product->stock + $currentQuantity)) {
+            // Vendas canceladas não precisam reservar estoque
+            if (
+                $status !== 'cancelled'
+                && $quantity > ($product->stock + $currentQuantity)
+            ) {
                 $errors[] = 'Quantidade maior que o estoque disponível.';
                 continue;
             }

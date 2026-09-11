@@ -32,45 +32,6 @@ class SaleRepository
         return $stmt->fetchAll(PDO::FETCH_CLASS, SaleModel::class);
     }
 
-    public function countAll(): int
-    {
-        $stmt = $this->pdo->prepare(
-            'SELECT COUNT(*)
-            FROM `sales`'
-        );
-
-        $stmt->execute();
-
-        return (int) $stmt->fetchColumn();
-    }
-
-    public function getStatusCounts(string $search = ''): array
-    {
-        $stmt = $this->pdo->prepare(
-            'SELECT
-                COUNT(*) AS `all_count`,
-                SUM(`status` = \'pending\') AS `pending_count`,
-                SUM(`status` = \'completed\') AS `completed_count`,
-                SUM(`status` = \'cancelled\') AS `cancelled_count`
-            FROM `sales`
-            WHERE `customer_name` LIKE :search'
-        );
-
-        $stmt->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
-
-        $stmt->execute();
-
-        $counts = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        return [
-            'all' => (int) ($counts['all_count'] ?? 0),
-            'pending' => (int) ($counts['pending_count'] ?? 0),
-            'completed' => (int) ($counts['completed_count'] ?? 0),
-            'cancelled' => (int) ($counts['cancelled_count'] ?? 0)
-        ];
-    }
-
-
     public function getById(int $id): ?SaleModel
     {
         $stmt = $this->pdo->prepare(
@@ -135,6 +96,18 @@ class SaleRepository
         return $stmt->fetchAll(PDO::FETCH_CLASS, SaleModel::class);
     }
 
+    public function countAll(): int
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT COUNT(*)
+            FROM `sales`'
+        );
+
+        $stmt->execute();
+
+        return (int) $stmt->fetchColumn();
+    }
+
     public function countSearch(
         string $search,
         ?string $status
@@ -160,6 +133,32 @@ class SaleRepository
         $stmt->execute();
 
         return (int) $stmt->fetchColumn();
+    }
+
+    public function getStatusCounts(string $search = ''): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT
+                COUNT(*) AS `all_count`,
+                SUM(`status` = \'pending\') AS `pending_count`,
+                SUM(`status` = \'completed\') AS `completed_count`,
+                SUM(`status` = \'cancelled\') AS `cancelled_count`
+            FROM `sales`
+            WHERE `customer_name` LIKE :search'
+        );
+
+        $stmt->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
+
+        $stmt->execute();
+
+        $counts = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return [
+            'all' => (int) ($counts['all_count'] ?? 0),
+            'pending' => (int) ($counts['pending_count'] ?? 0),
+            'completed' => (int) ($counts['completed_count'] ?? 0),
+            'cancelled' => (int) ($counts['cancelled_count'] ?? 0)
+        ];
     }
 
     public function create(

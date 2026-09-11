@@ -106,6 +106,7 @@ $container->bind('saleController', function () use ($container) {
     $saleRepository = $container->get('saleRepository');
     $saleItemRepository = $container->get('saleItemRepository');
     $activityLogService = $container->get('activityLogService');
+    $errorController = $container->get('errorController');
 
     return new \App\Controller\SaleController(
         $authService,
@@ -113,7 +114,8 @@ $container->bind('saleController', function () use ($container) {
         $productRepository,
         $saleRepository,
         $saleItemRepository,
-        $activityLogService
+        $activityLogService,
+        $errorController
     );
 });
 

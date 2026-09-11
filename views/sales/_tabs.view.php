@@ -1,11 +1,5 @@
 <div class="filters-tabs">
     <?php
-    $statuses = [
-        'pending' => 'Pendentes',
-        'completed' => 'Concluídas',
-        'cancelled' => 'Canceladas'
-    ];
-
     $allParams = [
         'route' => 'sales/index'
     ];
@@ -16,15 +10,25 @@
     ?>
 
     <a
-        class="filters-tab <?php echo $status === null ? 'active' : ''; ?>"
+        class="filters-tab <?php echo $status === null
+                                ? 'active'
+                                : ''; ?>"
         href="?<?php echo e(http_build_query($allParams)); ?>">
 
         Todas
 
         <span class="filters-tab-count">
-            <?php echo e($allSalesCount); ?>
+            <?php echo e($statusCounts['all']); ?>
         </span>
     </a>
+
+    <?php
+    $statuses = [
+        'pending' => 'Pendentes',
+        'completed' => 'Concluídas',
+        'cancelled' => 'Canceladas'
+    ];
+    ?>
 
     <?php foreach ($statuses as $statusValue => $statusLabel): ?>
         <?php
@@ -47,7 +51,7 @@
             <?php echo e($statusLabel); ?>
 
             <span class="filters-tab-count">
-                <?php echo e($statusCounts[$statusValue] ?? 0); ?>
+                <?php echo e($statusCounts[$statusValue]); ?>
             </span>
         </a>
     <?php endforeach; ?>
