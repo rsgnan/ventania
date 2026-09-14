@@ -3,50 +3,94 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ventania - Painel Administrativo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    <!-- CSS -->
-    <link href="assets/css/admin.css" rel="stylesheet">
-    <link href="assets/css/login.css" rel="stylesheet">
-    <!-- Favicon -->
-    <link rel="icon" href="assets/img/favicon.ico" sizes="any">
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Entrar | Ventania</title>
+    <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+
+    <link
+        rel="stylesheet"
+        href="assets/css/admin.css">
+
+    <link
+        rel="stylesheet"
+        href="assets/css/login.css">
+
+    <link
+        rel="icon"
+        href="assets/img/favicon.ico"
+        sizes="any">
+
+    <link
+        rel="apple-touch-icon"
+        sizes="180x180"
+        href="assets/img/apple-touch-icon.png">
 </head>
 
 <body>
 
-    <div class="login-wrap">
+    <main class="login-page">
+
         <div class="login-brand">
-            <img
-                class="login-logo"
-                src="assets/img/ventania-logo.png"
-                alt="Ventania - Sistema de Gestão">
+            <div class="login-mark">
+                V
+            </div>
+
+            <div>
+                <div class="login-name">
+                    Ventania
+                </div>
+
+                <div class="login-description">
+                    Gestão de estoque
+                </div>
+            </div>
         </div>
 
         <div class="card login-card">
 
-            <!-- Alerta de erro -->
-            <div class="login-alert<?php if (!empty($loginError)) echo ' show'; ?>" id="loginAlert">
-                <?php echo icon('alert-circle'); ?>
-                <span>Usuário ou senha incorretos. Tente novamente.</span>
+            <div class="login-header">
+                <h1 class="login-title">Acessar painel</h1>
+
+                <p class="login-subtitle">
+                    Entre com suas credenciais para continuar.
+                </p>
             </div>
 
-            <h1 class="login-title">Acessar painel</h1>
+            <!-- Alerta de erro -->
+            <?php if (!empty($loginError)): ?>
 
-            <p class="login-subtitle">
-                Entre com suas credenciais para continuar
-            </p>
+                <div class="alert alert-danger">
+
+                    <?php echo icon('alert-circle'); ?>
+
+                    <span>
+                        Usuário ou senha incorretos. Tente novamente.
+                    </span>
+                </div>
+            <?php endif; ?>
 
             <form
+                class="login-form"
                 method="POST"
-                action="index.php?<?php echo http_build_query(['route' => 'users/login']); ?>"
-                class="login-form">
+                action="index.php?<?php echo http_build_query([
+                                        'route' => 'users/login'
+                                    ]); ?>">
 
                 <?php echo csrf_field(); ?>
 
-                <div class="form-group">
-                    <label class="form-label" for="username">Usuário</label>
+                <div class="form-field">
+                    <label
+                        class="form-label"
+                        for="username">
+
+                        Usuário
+                    </label>
                     <input
                         class="form-input"
                         type="text" id="username"
@@ -54,11 +98,18 @@
                         value="<?php echo e($oldUsername ?? ''); ?>"
                         placeholder="Digite seu usuário"
                         autocomplete="username"
+                        autofocus
                         required>
                 </div>
 
-                <div class="form-group login-field">
-                    <label class="form-label" for="password">Senha</label>
+                <div class="form-field">
+                    <label
+                        class="form-label"
+                        for="password">
+
+                        Senha
+                    </label>
+
                     <div class="login-password">
                         <input
                             class="form-input"
@@ -68,41 +119,44 @@
                             placeholder="Digite sua senha"
                             autocomplete="current-password"
                             required>
+
                         <button
                             type="button"
-                            class="login-toggle-pass"
+                            class="login-toggle"
                             id="togglePass"
                             aria-label="Mostrar senha">
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                aria-hidden="true">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                <circle cx="12" cy="12" r="3" />
-                            </svg>
+                            <?php echo icon('eye'); ?>
+
                         </button>
                     </div>
                 </div>
 
-                <div class="login-options">
-                    <label class="login-remember">
-                        <input type="checkbox" id="remember" name="remember">
-                        Lembrar-me
-                    </label>
-                    <a href="#">Esqueci minha senha</a>
-                </div>
+                <label class="login-remember">
+                    <input
+                        type="checkbox"
+                        name="remember"
+                        value="1">
 
-                <button type="submit" class="btn btn-primary">
+                    <span>
+                        Lembrar-me
+                    </span>
+                </label>
+
+
+                <button
+                    class="btn btn-primary login-submit"
+                    type="submit">
                     Entrar
                 </button>
+
             </form>
-            <p class="login-footer">
-                &copy; 2026 Ventania. Todos os direitos reservados.
-            </p>
         </div>
-    </div>
+
+        <div class="login-footer">
+            &copy; 2026 Ventania
+        </div>
+    </main>
+
     <script>
         // Visibilidade da senha
         const togglePass = document.getElementById('togglePass');
