@@ -15,29 +15,6 @@ class AuthService
         }
     }
 
-    public function logout(): void
-    {
-        $this->ensureSession();
-        
-        // Remove os dados do usuário da sessão
-        unset(
-            $_SESSION['user_id'],
-            $_SESSION['user_name'],
-            $_SESSION['user_role']
-        );
-
-        session_regenerate_id(true);
-    }
-
-    public function getUserId(): ?int
-    {
-        $this->ensureSession();
-
-        return isset($_SESSION['user_id'])
-            ? (int) $_SESSION['user_id']
-            : null;
-    }
-
     public function handleLogin(string $username, string $password): bool
     {
         if ($username === '' || $password === '') {
@@ -57,7 +34,7 @@ class AuthService
 
         $stmt->bindValue(':username', $username);
         $stmt->execute();
-        
+
         $entry = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($entry === false) {
@@ -85,11 +62,27 @@ class AuthService
         return true;
     }
 
-    public function isAdmin(): bool
+    public function logout(): void
     {
         $this->ensureSession();
 
-        return ($_SESSION['user_role'] ?? null) === 'admin';
+        // Remove os dados do usuário da sessão
+        unset(
+            $_SESSION['user_id'],
+            $_SESSION['user_name'],
+            $_SESSION['user_role']
+        );
+
+        session_regenerate_id(true);
+    }
+
+    public function getUserId(): ?int
+    {
+        $this->ensureSession();
+
+        return isset($_SESSION['user_id'])
+            ? (int) $_SESSION['user_id']
+            : null;
     }
 
     public function isLoggedIn(): bool
@@ -97,6 +90,24 @@ class AuthService
         $this->ensureSession();
 
         return !empty($_SESSION['user_id']);
+    }
+
+    public function isAdmin(): bool
+    {
+        $this->ensureSession();
+
+        return ($_SESSION['user_role'] ?? null) === 'admin';
+    }
+
+    public function ensureLoggedIn(): void
+    {
+        if (!$this->isLoggedIn()) {
+            header('Location: index.php?' . http_build_query([
+                'route' => 'users/login'
+            ]));
+
+            exit;
+        }
     }
 
     public function ensureAdmin(): void
@@ -107,17 +118,6 @@ class AuthService
         if (!$this->isAdmin()) {
             header('Location: index.php?' . http_build_query([
                 'route' => 'dashboard/index'
-            ]));
-
-            exit;
-        }
-    }
-
-    public function ensureLoggedIn(): void
-    {
-        if (!$this->isLoggedIn()) {
-            header('Location: index.php?' . http_build_query([
-                'route' => 'users/login'
             ]));
 
             exit;

@@ -6,15 +6,6 @@ use App\Core\ViewController;
 
 class LoginController extends ViewController
 {
-    public function logout(): void
-    {
-        $this->authService->logout();
-        header('Location: index.php?' . http_build_query([
-            'route' => 'users/login'
-        ]));
-        return;
-    }
-
     public function login(): void
     {
         if ($this->authService->isLoggedIn()) {
@@ -45,5 +36,14 @@ class LoginController extends ViewController
             'loginError' => $loginError,
             'oldUsername' => $username
         ]);
+    }
+
+    public function logout(): void
+    {
+        $this->authService->logout();
+        header('Location: index.php?' . http_build_query([
+            'route' => 'users/login'
+        ]));
+        return;
     }
 }

@@ -2,26 +2,25 @@
     <?php echo csrf_field(); ?>
 
     <div class="page-header">
-        <div class="page-header-left">
-            <div class="page-header-title">
-                <a
-                    class="btn btn-ghost btn-icon"
-                    href="?route=users/index"
-                    title="Voltar para Usuários"
-                    aria-label="Voltar para Usuários">
+        <div class="page-header-title">
+            <a
+                class="btn btn-ghost btn-icon"
+                href="?route=users/index"
+                title="Voltar para Usuários"
+                aria-label="Voltar para Usuários">
 
-                    <?php echo icon('arrow-left'); ?>
+                <?php echo icon('arrow-left'); ?>
 
-                </a>
-                <div>
-                    <h1 class="page-title">
-                        Editar Usuário
-                    </h1>
+            </a>
 
-                    <p class="page-description">
-                        Atualize os dados e permissões do usuário.
-                    </p>
-                </div>
+            <div class="page-header-left">
+                <h1 class="page-title">
+                    Editar Usuário
+                </h1>
+
+                <p class="page-description">
+                    Atualize os dados e permissões do usuário.
+                </p>
             </div>
         </div>
     </div>
@@ -42,7 +41,7 @@
 
         <div class="card">
             <div class="card-header">
-                <div>
+                <div class="card-header-content">
                     <div class="card-title">
                         Dados do Usuário
                     </div>
@@ -118,7 +117,7 @@
 
         <div class="card">
             <div class="card-header">
-                <div>
+                <div class="card-header-content">
                     <div class="card-title">
                         Acesso e Permissões
                     </div>

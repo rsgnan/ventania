@@ -32,7 +32,32 @@ function icon(string $name): string
             </svg>
         ',
 
-        'shopping-cart' => '
+        'arrow-left' => '
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round">
+
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+            </svg>
+        ',
+
+        'check' => '
+            <svg 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                stroke-width="2.5">
+                    
+                <polyline points="20 6 9 17 4 12" />
+                </svg>
+        ',
+
+        'clock' => '
             <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -40,9 +65,8 @@ function icon(string $name): string
                 stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round">
-                <circle cx="9" cy="20" r="1" />
-                <circle cx="19" cy="20" r="1" />
-                <path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 8H6" />
+                <circle cx="12" cy="12" r="9" />
+                <polyline points="12 7 12 12 15 14" />
             </svg>
         ',
 
@@ -73,44 +97,6 @@ function icon(string $name): string
             </svg>
         ',
 
-        'clock' => '
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round">
-                <circle cx="12" cy="12" r="9" />
-                <polyline points="12 7 12 12 15 14" />
-            </svg>
-        ',
-
-        'arrow-left' => '
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linecap="round"
-                stroke-linejoin="round">
-
-                <line x1="19" y1="12" x2="5" y2="12" />
-                <polyline points="12 19 5 12 12 5" />
-            </svg>
-        ',
-
-        'check' => '
-            <svg 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                stroke-width="2.5">
-                    
-                <polyline points="20 6 9 17 4 12" />
-                </svg>
-        ',
-
         'plus' => '
             <svg
                 viewBox="0 0 24 24"
@@ -122,6 +108,34 @@ function icon(string $name): string
 
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+        ',
+
+        'search' => '
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linejoin="round"
+                stroke-linecap="round">
+
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+            </svg>
+        ',
+
+        'shopping-cart' => '
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="9" cy="20" r="1" />
+                <circle cx="19" cy="20" r="1" />
+                <path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 8H6" />
             </svg>
         ',
 
@@ -154,20 +168,6 @@ function icon(string $name): string
 
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-        ',
-
-        'search' => '
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linejoin="round"
-                stroke-linecap="round">
-
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.35-4.35" />
             </svg>
         ',
 

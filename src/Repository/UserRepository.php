@@ -57,6 +57,74 @@ class UserRepository
         return $entry !== false ? $entry : null;
     }
 
+    public function usernameExists(string $username): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT 1
+            FROM `users`
+            WHERE `username` = :username
+            LIMIT 1'
+        );
+
+        $stmt->bindValue(':username', $username, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return $stmt->fetchColumn() !== false;
+    }
+
+    public function usernameExistsForOtherUser(
+        string $username,
+        int $userId
+    ): bool {
+        $stmt = $this->pdo->prepare(
+            'SELECT 1
+            FROM `users`
+            WHERE `username` = :username
+            AND `id` != :id
+            LIMIT 1'
+        );
+
+        $stmt->bindValue(':username', $username, PDO::PARAM_STR);
+        $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchColumn() !== false;
+    }
+
+    public function emailExists(string $email): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT 1
+            FROM `users`
+            WHERE `email` = :email
+            LIMIT 1'
+        );
+
+        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return $stmt->fetchColumn() !== false;
+    }
+
+    public function emailExistsForOtherUser(
+        string $email,
+        int $userId
+    ): bool {
+        $stmt = $this->pdo->prepare(
+            'SELECT 1
+            FROM `users`
+            WHERE `email` = :email
+            AND `id` != :id
+            LIMIT 1'
+        );
+
+        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
+        $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchColumn() !== false;
+    }
+
     public function create(
         string $name,
         string $username,
@@ -127,73 +195,5 @@ class UserRepository
         $stmt->bindValue(':password', $password, PDO::PARAM_STR);
 
         return $stmt->execute();
-    }
-
-    public function usernameExists(string $username): bool
-    {
-        $stmt = $this->pdo->prepare(
-            'SELECT 1
-            FROM `users`
-            WHERE `username` = :username
-            LIMIT 1'
-        );
-
-        $stmt->bindValue(':username', $username, PDO::PARAM_STR);
-        $stmt->execute();
-
-        return $stmt->fetchColumn() !== false;
-    }
-
-    public function usernameExistsForOtherUser(
-        string $username,
-        int $userId
-    ): bool {
-        $stmt = $this->pdo->prepare(
-            'SELECT 1
-            FROM `users`
-            WHERE `username` = :username
-            AND `id` != :id
-            LIMIT 1'
-        );
-
-        $stmt->bindValue(':username', $username, PDO::PARAM_STR);
-        $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
-        $stmt->execute();
-
-        return $stmt->fetchColumn() !== false;
-    }
-
-    public function emailExists(string $email): bool
-    {
-        $stmt = $this->pdo->prepare(
-            'SELECT 1
-            FROM `users`
-            WHERE `email` = :email
-            LIMIT 1'
-        );
-
-        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
-        $stmt->execute();
-
-        return $stmt->fetchColumn() !== false;
-    }
-
-    public function emailExistsForOtherUser(
-        string $email,
-        int $userId
-    ): bool {
-        $stmt = $this->pdo->prepare(
-            'SELECT 1
-            FROM `users`
-            WHERE `email` = :email
-            AND `id` != :id
-            LIMIT 1'
-        );
-
-        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
-        $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
-        $stmt->execute();
-
-        return $stmt->fetchColumn() !== false;
     }
 }

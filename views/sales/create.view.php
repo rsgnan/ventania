@@ -1,3 +1,18 @@
+<?php
+
+$selectedStatus = $_POST['status'] ?? 'pending';
+
+$existingSaleItems = [];
+
+if (!empty($_POST['items'])) {
+    $decodedItems = json_decode($_POST['items'], true);
+
+    if (is_array($decodedItems)) {
+        $existingSaleItems = $decodedItems;
+    }
+}
+?>
+
 <form method="POST">
     <?php echo csrf_field(); ?>
 
@@ -12,6 +27,7 @@
                 <?php echo icon('arrow-left'); ?>
 
             </a>
+
             <div class="page-header-left">
                 <h1 class="page-title">
                     Nova Venda
@@ -42,36 +58,63 @@
 
         <div class="sale-layout">
 
-            <!-- Itens da venda -->
-            <div class="sale-main">
+            <!-- Produtos da venda -->
+            <div class="items-manager">
 
-                <div class="autocomplete">
-                    <?php echo icon('search'); ?>
-
-                    <input
-                        type="text"
-                        id="searchInput"
-                        placeholder="Buscar produto pelo nome..."
-                        autocomplete="off"
-                        aria-label="Buscar produto">
-
-                    <div
-                        class="autocomplete-results"
-                        id="autocompleteResults">
-                    </div>
-                </div>
-
-                <div class="card sale-items-card">
+                <!-- Adicionar produtos -->
+                <div class="card items-selector">
 
                     <div class="card-header">
                         <div class="card-header-content">
 
                             <div class="card-title">
-                                Itens adicionados
+                                Adicionar produtos
                             </div>
 
                             <div class="card-subtitle">
-                                Os produtos adicionados à venda aparecerão aqui.
+                                Busque pelo nome e selecione os produtos da venda.
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="selector-content">
+
+                        <div class="item-search">
+
+                            <?php echo icon('search'); ?>
+
+                            <input
+                                class="form-input"
+                                type="text"
+                                id="searchInput"
+                                placeholder="Buscar produto pelo nome..."
+                                autocomplete="off"
+                                aria-label="Buscar produto">
+
+                            <div
+                                class="search-results"
+                                id="productSearchResults">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Itens adicionados -->
+                <div class="card items-list">
+
+                    <div class="card-header">
+                        <div class="card-header-content">
+
+                            <div class="card-title">
+                                Itens da venda
+                            </div>
+
+                            <div class="card-subtitle">
+                                Confira os produtos adicionados antes de finalizar.
                             </div>
 
                         </div>
@@ -88,10 +131,13 @@
                                     <th></th>
                                 </tr>
                             </thead>
+
                             <tbody id="itemsBody"></tbody>
                         </table>
                     </div>
+
                 </div>
+
             </div>
 
             <!-- Resumo da venda -->
@@ -102,7 +148,10 @@
                 </h2>
 
                 <div class="field">
-                    <label class="form-label" for="customerName">
+                    <label
+                        class="form-label"
+                        for="customerName">
+
                         Nome do Cliente
                     </label>
 
@@ -117,6 +166,7 @@
 
                 <div class="field">
                     <label class="form-label" for="discountAmount">
+
                         Desconto (R$)
                     </label>
 
@@ -129,8 +179,6 @@
                         step="0.01"
                         value="<?php echo e($_POST['discount_amount'] ?? 0); ?>">
                 </div>
-
-                <?php $selectedStatus = $_POST['status'] ?? 'pending'; ?>
 
                 <fieldset class="field sale-status-field">
 
@@ -175,6 +223,7 @@
                             </span>
 
                         </label>
+
                     </div>
 
                 </fieldset>
@@ -210,7 +259,8 @@
                 <input
                     type="hidden"
                     name="items"
-                    id="saleItems">
+                    id="saleItems"
+                    value="<?php echo e($_POST['items'] ?? ''); ?>">
 
                 <button
                     type="submit"
@@ -227,8 +277,24 @@
 </form>
 
 <script>
-    const products = <?php echo json_encode($products); ?>;
-    const existingSaleItems = [];
+    const products = <?php echo json_encode(
+                            $products,
+                            JSON_UNESCAPED_UNICODE
+                                | JSON_UNESCAPED_SLASHES
+                                | JSON_HEX_TAG
+                                | JSON_HEX_AMP
+                                | JSON_HEX_APOS
+                                | JSON_HEX_QUOT
+                        ); ?>;
+    const existingSaleItems = <?php echo json_encode(
+                                    $existingSaleItems,
+                                    JSON_UNESCAPED_UNICODE
+                                        | JSON_UNESCAPED_SLASHES
+                                        | JSON_HEX_TAG
+                                        | JSON_HEX_AMP
+                                        | JSON_HEX_APOS
+                                        | JSON_HEX_QUOT
+                                ); ?>;
 </script>
 
 <script src="assets/js/sales/sales.js"></script>

@@ -21,7 +21,9 @@ $isAdmin = $this->authService->isAdmin();
         rel="stylesheet">
 
     <link href="assets/css/admin.css" rel="stylesheet">
-    <link href="assets/css/sale.css" rel="stylesheet">
+    <link href="assets/css/dashboard.css" rel="stylesheet">
+    <link href="assets/css/products.css" rel="stylesheet">
+    <link href="assets/css/sales.css" rel="stylesheet">
 </head>
 
 <body>

@@ -82,6 +82,25 @@ class SaleController extends ViewController
         ]);
     }
 
+    public function show(): void
+    {
+        $saleId = (int) ($_GET['id'] ?? 0);
+
+        $sale = $this->saleRepository->getById($saleId);
+
+        if ($sale === null) {
+            $this->errorController->notFound();
+            return;
+        }
+
+        $items = $this->saleItemRepository->getBySaleId($saleId);
+
+        $this->render('sales/show', [
+            'sale' => $sale,
+            'items' => $items
+        ]);
+    }
+
     public function create(): void
     {
         $errors = [];
@@ -317,25 +336,6 @@ class SaleController extends ViewController
             'items' => $items,
             'products' => $products,
             'errors' => $errors
-        ]);
-    }
-
-    public function show(): void
-    {
-        $saleId = (int) ($_GET['id'] ?? 0);
-
-        $sale = $this->saleRepository->getById($saleId);
-
-        if ($sale === null) {
-            $this->errorController->notFound();
-            return;
-        }
-
-        $items = $this->saleItemRepository->getBySaleId($saleId);
-
-        $this->render('sales/show', [
-            'sale' => $sale,
-            'items' => $items
         ]);
     }
 

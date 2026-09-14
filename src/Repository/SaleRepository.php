@@ -32,24 +32,6 @@ class SaleRepository
         return $stmt->fetchAll(PDO::FETCH_CLASS, SaleModel::class);
     }
 
-    public function getById(int $id): ?SaleModel
-    {
-        $stmt = $this->pdo->prepare(
-            'SELECT * 
-            FROM `sales`
-            WHERE `id` = :id'
-        );
-
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-        $stmt->execute();
-
-        $stmt->setFetchMode(PDO::FETCH_CLASS, SaleModel::class);
-
-        $sale = $stmt->fetch();
-
-        return $sale !== false ? $sale : null;
-    }
-
     public function search(
         string $search,
         ?string $status,
@@ -133,6 +115,24 @@ class SaleRepository
         $stmt->execute();
 
         return (int) $stmt->fetchColumn();
+    }
+
+    public function getById(int $id): ?SaleModel
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT * 
+            FROM `sales`
+            WHERE `id` = :id'
+        );
+
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $stmt->setFetchMode(PDO::FETCH_CLASS, SaleModel::class);
+
+        $sale = $stmt->fetch();
+
+        return $sale !== false ? $sale : null;
     }
 
     public function getStatusCounts(string $search = ''): array

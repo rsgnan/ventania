@@ -24,22 +24,6 @@ class DashboardRepository
         return (int) $stmt->fetchColumn();
     }
 
-    public function getRevenueCurrentMonth(): float
-    {
-        $stmt = $this->pdo->prepare(
-            'SELECT COALESCE(SUM(`total_amount`), 0)
-            FROM `sales`
-            WHERE `status` = :status
-            AND YEAR(`created_at`) = YEAR(CURDATE())
-            AND MONTH(`created_at`) = MONTH(CURDATE())'
-        );
-
-        $stmt->bindValue(':status', 'completed');
-        $stmt->execute();
-
-        return (float) $stmt->fetchColumn();
-    }
-
     public function countSalesPreviousMonth(): int
     {
         $stmt = $this->pdo->prepare(
@@ -54,22 +38,6 @@ class DashboardRepository
         $stmt->execute();
 
         return (int) $stmt->fetchColumn();
-    }
-
-    public function getRevenuePreviousMonth(): float
-    {
-        $stmt = $this->pdo->prepare(
-            'SELECT COALESCE(SUM(`total_amount`), 0)
-            FROM `sales`
-            WHERE `status` = :status
-            AND YEAR(`created_at`) = YEAR(CURDATE() - INTERVAL 1 MONTH)
-            AND MONTH(`created_at`) = MONTH(CURDATE() - INTERVAL 1 MONTH)'
-        );
-
-        $stmt->bindValue(':status', 'completed');
-        $stmt->execute();
-
-        return (float) $stmt->fetchColumn();
     }
 
     public function countPendingSales(): int
@@ -98,6 +66,38 @@ class DashboardRepository
         $stmt->execute();
 
         return (int) $stmt->fetchColumn();
+    }
+
+    public function getRevenueCurrentMonth(): float
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT COALESCE(SUM(`total_amount`), 0)
+            FROM `sales`
+            WHERE `status` = :status
+            AND YEAR(`created_at`) = YEAR(CURDATE())
+            AND MONTH(`created_at`) = MONTH(CURDATE())'
+        );
+
+        $stmt->bindValue(':status', 'completed');
+        $stmt->execute();
+
+        return (float) $stmt->fetchColumn();
+    }
+
+    public function getRevenuePreviousMonth(): float
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT COALESCE(SUM(`total_amount`), 0)
+            FROM `sales`
+            WHERE `status` = :status
+            AND YEAR(`created_at`) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+            AND MONTH(`created_at`) = MONTH(CURDATE() - INTERVAL 1 MONTH)'
+        );
+
+        $stmt->bindValue(':status', 'completed');
+        $stmt->execute();
+
+        return (float) $stmt->fetchColumn();
     }
 
     public function getLatestSales(int $limit = 5): array

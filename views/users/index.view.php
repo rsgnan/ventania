@@ -6,8 +6,13 @@
             Usuários
         </h1>
 
+        <?php $totalUsers = count($users); ?>
+
         <p class="page-description">
-            <?php echo e(count($users)); ?> usuários cadastrados
+            <?php echo e($totalUsers); ?>
+            <?php echo $totalUsers === 1
+                ? 'usuário cadastrado'
+                : 'usuários cadastrados'; ?>
         </p>
     </div>
 
@@ -66,8 +71,8 @@
                                 ); ?>
                             </td>
                             <td>
-                                <span class="badge <?php echo $statusClass; ?>">
-                                    <?php echo $statusLabel; ?>
+                                <span class="badge <?php echo e($statusClass); ?>">
+                                    <?php echo e($statusLabel); ?>
                                 </span>
                             </td>
                             <td>
@@ -83,7 +88,7 @@
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="6" class="text-center text-muted">
+                        <td colspan="6" class="table-empty">
                             Nenhum usuário cadastrado.
                         </td>
                     </tr>

@@ -17,16 +17,16 @@ const saleItems = typeof existingSaleItems !== 'undefined'
     : [];
 
 const searchInput = document.getElementById('searchInput');
-const autocompleteResults = document.getElementById('autocompleteResults');
+const productSearchResults = document.getElementById('productSearchResults');
 
 // Buscar por produto
 searchInput.addEventListener('input', function () {
     const search = this.value.trim().toLowerCase();
 
-    autocompleteResults.innerHTML = '';
+    productSearchResults.innerHTML = '';
 
     if (search === '') {
-        autocompleteResults.style.display = 'none';
+        productSearchResults.style.display = 'none';
         return;
     }
 
@@ -35,21 +35,20 @@ searchInput.addEventListener('input', function () {
     });
 
     if (results.length === 0) {
-        autocompleteResults.innerHTML = `
-            <div class="autocomplete-empty">
+        productSearchResults.innerHTML = `
+            <div class="search-empty">
                 Nenhum produto encontrado.
             </div>
         `;
 
-        autocompleteResults.style.display = 'block';
+        productSearchResults.style.display = 'block';
         return;
     }
 
     results.forEach(function (product) {
-
         const item = document.createElement('div');
 
-        item.className = 'autocomplete-item';
+        item.className = 'search-item';
         item.addEventListener('click', function () {
             addProduct(product);
         });
@@ -57,15 +56,22 @@ searchInput.addEventListener('input', function () {
         item.innerHTML = `
             <div>
                 <strong>${product.name}</strong>
-                <small>Estoque: ${product.stock}</small>
+
+                <small>
+                    Estoque: ${product.stock}
+                </small>
+
             </div>
-            <span>R$ ${Number(product.price).toFixed(2).replace('.', ',')}</span>
+
+            <span>
+                R$ ${Number(product.price).toFixed(2).replace('.', ',')}
+            </span>
             `;
 
-        autocompleteResults.appendChild(item);
+        productSearchResults.appendChild(item);
     });
 
-    autocompleteResults.style.display = 'block';
+    productSearchResults.style.display = 'block';
 });
 
 // Adicionar produto
@@ -100,8 +106,8 @@ function addProduct(product) {
     updateSaleItemsInput();
 
     searchInput.value = '';
-    autocompleteResults.innerHTML = '';
-    autocompleteResults.style.display = 'none';
+    productSearchResults.innerHTML = '';
+    productSearchResults.style.display = 'none';
 }
 
 // Renderizar produtos
@@ -153,7 +159,9 @@ function renderItems() {
         const row = document.createElement('tr');
 
         row.innerHTML = `
-            <td>${item.name}</td>
+            <td>
+                ${item.name}
+            </td>
             
             <td>
                 <input
@@ -181,7 +189,7 @@ function renderItems() {
                     Remover
                 </button>
             </td>
-            `;
+        `;
 
         itemsBody.appendChild(row);
 
@@ -283,7 +291,7 @@ saleForm.addEventListener('submit', function () {
     updateSaleItemsInput();
 });
 
-// Carrega itens ao editar
+// Carregar itens ao editar
 renderItems();
 updateSummary();
 updateSaleItemsInput();

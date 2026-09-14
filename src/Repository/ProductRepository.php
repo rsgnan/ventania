@@ -39,18 +39,6 @@ class ProductRepository
         return $stmt->fetchAll(PDO::FETCH_CLASS, ProductModel::class);
     }
 
-    public function countAll(): int
-    {
-        $stmt = $this->pdo->prepare(
-            'SELECT COUNT(*)
-            FROM `products`'
-        );
-
-        $stmt->execute();
-
-        return (int) $stmt->fetchColumn();
-    }
-
     public function getByCategory(
         int $categoryId,
         int $limit,
@@ -79,37 +67,6 @@ class ProductRepository
         $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_CLASS, ProductModel::class);
-    }
-
-    public function countByCategory(int $categoryId): int
-    {
-        $stmt = $this->pdo->prepare(
-            'SELECT COUNT(*)
-            FROM `products`
-            WHERE `products`.`category_id` = :category_id'
-        );
-
-        $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
-        $stmt->execute();
-
-        return (int) $stmt->fetchColumn();
-    }
-
-        public function getForSale(): array
-    {
-        $stmt = $this->pdo->prepare(
-            'SELECT
-                `id`,
-                `name`,
-                `price`,
-                `stock`
-            FROM `products`
-            ORDER BY `name` ASC'
-        );
 
         $stmt->execute();
 
@@ -166,6 +123,49 @@ class ProductRepository
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_CLASS, ProductModel::class);
+    }
+
+    public function getForSale(): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT
+                `id`,
+                `name`,
+                `price`,
+                `stock`
+            FROM `products`
+            ORDER BY `name` ASC'
+        );
+
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_CLASS, ProductModel::class);
+    }
+
+    public function countAll(): int
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT COUNT(*)
+            FROM `products`'
+        );
+
+        $stmt->execute();
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    public function countByCategory(int $categoryId): int
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT COUNT(*)
+            FROM `products`
+            WHERE `products`.`category_id` = :category_id'
+        );
+
+        $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return (int) $stmt->fetchColumn();
     }
 
     public function countSearch(

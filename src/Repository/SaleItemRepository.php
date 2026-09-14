@@ -8,6 +8,20 @@ class SaleItemRepository
 {
     public function __construct(private PDO $pdo) {}
 
+    public function getBySaleId(int $saleId): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT * 
+            FROM `sale_items`
+            WHERE `sale_id` = :sale_id'
+        );
+
+        $stmt->bindValue(':sale_id', $saleId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function create(
         int $saleId,
         int $productId,
@@ -33,20 +47,6 @@ class SaleItemRepository
         $stmt->bindValue(':subtotal', $subtotal);
 
         $stmt->execute();
-    }
-
-    public function getBySaleId(int $saleId): array
-    {
-        $stmt = $this->pdo->prepare(
-            'SELECT * 
-            FROM `sale_items`
-            WHERE `sale_id` = :sale_id'
-        );
-
-        $stmt->bindValue(':sale_id', $saleId, PDO::PARAM_INT);
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function deleteBySaleId(int $saleId): void

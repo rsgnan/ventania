@@ -11,7 +11,7 @@
 </div>
 
 <div class="stat-grid">
-    <div class="stat-card stat-card-revenue">
+    <div class="stat-card">
         <div class="stat-icon">
             <?php echo icon('dollar-sign'); ?>
         </div>
@@ -25,8 +25,8 @@
         </div>
 
         <div class="stat-change <?php echo $revenueChange >= 0
-                                    ? 'stat-change-positive'
-                                    : 'stat-change-negative'; ?>">
+                                    ? 'stat-positive'
+                                    : 'stat-negative'; ?>">
 
             <?php echo $revenueChange >= 0 ? '↑' : '↓'; ?>
             <?php echo number_format(abs($revenueChange), 1, ',', '.'); ?>%
@@ -35,7 +35,7 @@
         </div>
     </div>
 
-    <div class="stat-card stat-card-sales">
+    <div class="stat-card stat-sales">
         <div class="stat-icon">
             <?php echo icon('shopping-cart'); ?>
         </div>
@@ -49,8 +49,8 @@
         </div>
 
         <div class="stat-change <?php echo $salesChange >= 0
-                                    ? 'stat-change-positive'
-                                    : 'stat-change-negative'; ?>">
+                                    ? 'stat-positive'
+                                    : 'stat-negative'; ?>">
 
             <?php echo $salesChange >= 0 ? '↑' : '↓'; ?>
             <?php echo number_format(abs($salesChange), 1, ',', '.'); ?>%
@@ -59,7 +59,7 @@
         </div>
     </div>
 
-    <div class="stat-card stat-card-pending">
+    <div class="stat-card stat-pending">
         <div class="stat-icon">
             <?php echo icon('clock'); ?>
         </div>
@@ -77,7 +77,7 @@
         </div>
     </div>
 
-    <div class="stat-card stat-card-stock">
+    <div class="stat-card stat-stock">
         <div class="stat-icon">
             <?php echo icon('alert-triangle'); ?>
         </div>
@@ -125,7 +125,7 @@
                     <?php if (!empty($bestSellingProducts)): ?>
                         <?php foreach ($bestSellingProducts as $product): ?>
                             <tr>
-                                <td class="dashboard-product-name">
+                                <td class="dashboard-product">
                                     <?php echo e($product['name']); ?>
                                 </td>
 
@@ -169,7 +169,7 @@
             </div>
         </div>
 
-        <div class="dashboard-ranking">
+        <div class="ranking">
             <?php if (!empty($topSellingCategories)): ?>
                 <?php
                 $maxCategorySales = max(
@@ -184,25 +184,25 @@
                         : 0;
                     ?>
 
-                    <div class="dashboard-ranking-item">
-                        <div class="dashboard-ranking-position">
+                    <div class="ranking-item">
+                        <div class="ranking-position">
                             <?php echo $index + 1; ?>
                         </div>
 
-                        <div class="dashboard-ranking-content">
-                            <div class="dashboard-ranking-header">
-                                <span class="dashboard-ranking-name">
+                        <div class="ranking-content">
+                            <div class="ranking-header">
+                                <span class="ranking-name">
                                     <?php echo e($category['name']); ?>
                                 </span>
 
-                                <span class="dashboard-ranking-value">
+                                <span class="ranking-value">
                                     <?php echo e($category['quantity_sold']); ?> itens
                                 </span>
                             </div>
 
-                            <div class="dashboard-ranking-bar">
+                            <div class="ranking-bar">
                                 <div
-                                    class="dashboard-ranking-progress"
+                                    class="ranking-progress"
                                     style="width: <?php echo number_format(
                                                         $percentage,
                                                         2,
@@ -215,7 +215,7 @@
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <div class="dashboard-ranking-empty">
+                <div class="ranking-empty">
                     Nenhuma venda encontrada nos últimos 30 dias.
                 </div>
             <?php endif; ?>
@@ -273,7 +273,7 @@
                         ?>
 
                         <tr>
-                            <td class="table-hide-mobile dashboard-sale-id">
+                            <td class="table-hide-mobile dashboard-value">
                                 #<?php echo e($sale['id']); ?>
                             </td>
 
@@ -318,7 +318,7 @@
                 <?php else: ?>
                     <tr>
                         <td colspan="6" class="table-empty">
-                            Nenhum produto vendido nos últimos 30 dias.
+                            Nenhuma venda encontrada.
                         </td>
                     </tr>
                 <?php endif; ?>

@@ -40,7 +40,7 @@
         <?php if ($status !== null): ?>
             <input
                 type="hidden"
-                name="category"
+                name="status"
                 value="<?php echo e($status); ?>">
         <?php endif; ?>
 
@@ -49,7 +49,7 @@
         <input
             class="form-input"
             type="search"
-            id="product-search"
+            id="sale-search"
             name="search"
             value="<?php echo e($search); ?>"
             placeholder="Buscar por cliente"
