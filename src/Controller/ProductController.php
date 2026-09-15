@@ -310,10 +310,15 @@ class ProductController extends ViewController
                 return $photo;
             }
 
+            // Remove a foto temporária anterior após o novo upload ter sucesso
+            if (!empty($tempPhoto)) {
+                $this->deletePhoto($tempPhoto, 'tmp');
+                $this->forgetTempPhoto($tempPhoto);
+            }
+
             if ($isTemporary) {
                 $tempPhoto = $upload['filename'];
 
-                // Registra o arquivo para impedir o uso de fotos de outra sessão
                 $_SESSION['temp_photos'] ??= [];
                 $_SESSION['temp_photos'][] = $tempPhoto;
             } else {
@@ -343,28 +348,6 @@ class ProductController extends ViewController
             return $photo;
         }
 
-        $checkFile = [
-            'error'     => UPLOAD_ERR_OK,
-            'name'      => $tempPhotoName,
-            'tmp_name'  => $tempPath,
-            'size'      => filesize($tempPath)
-        ];
-
-        // Valida novamente o arquivo antes de movê-lo
-        $validation = validatePhoto($checkFile);
-
-        if (!$validation['success']) {
-            $errors[] = $validation['error'];
-
-            unlink($tempPath);
-
-            $this->forgetTempPhoto($tempPhotoName);
-
-            $tempPhoto = null;
-
-            return $photo;
-        }
-
         if (!empty($errors)) {
             $tempPhoto = $tempPhotoName;
             return $photo;
@@ -381,6 +364,7 @@ class ProductController extends ViewController
 
         $errors[] = 'Falha ao salvar a imagem no servidor.';
         $tempPhoto = $tempPhotoName;
+
         return $photo;
     }
 
