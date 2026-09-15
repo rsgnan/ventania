@@ -1,11 +1,20 @@
 <?php
 
+$host = 'localhost';
+$database = 'ventania';
+$username = 'seu_usuario';
+$password = 'sua_senha';
+
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname=ventania;charset=utf8mb4', '', '', [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-    ]);
-}
-catch (PDOException $e) {
+    $pdo = new PDO(
+        "mysql:host={$host};dbname={$database};charset=utf8mb4",
+        $username,
+        $password,
+        [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+        ]
+    );
+} catch (PDOException $e) {
     var_dump($e->getMessage());
     die();
 }
