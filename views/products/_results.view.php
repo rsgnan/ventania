@@ -72,4 +72,59 @@
             </table>
         </div>
     </div>
+    <?php if ($totalPages > 1): ?>
+        <nav class="pagination" aria-label="Paginação">
+
+            <?php
+            $baseParams = [
+                'route' => 'products/index'
+            ];
+
+            if ($search !== '') {
+                $baseParams['search'] = $search;
+            }
+
+            if ($selectedCategory !== null) {
+                $baseParams['category'] = $selectedCategory;
+            }
+            ?>
+
+            <?php if ($currentPage > 1): ?>
+                <a
+                    class="pagination-link"
+                    href="?<?php echo e(http_build_query(
+                                $baseParams + [
+                                    'page' => $currentPage - 1
+                                ]
+                            )); ?>">
+                    Anterior
+                </a>
+            <?php endif; ?>
+
+            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                <a
+                    class="pagination-link <?php echo $i === $currentPage ? 'active' : ''; ?>"
+                    href="?<?php echo e(http_build_query(
+                                $baseParams + [
+                                    'page' => $i
+                                ]
+                            )); ?>">
+
+                    <?php echo e($i); ?>
+                </a>
+            <?php endfor; ?>
+
+            <?php if ($currentPage < $totalPages): ?>
+                <a
+                    class="pagination-link"
+                    href="?<?php echo e(http_build_query(
+                                $baseParams + [
+                                    'page' => $currentPage + 1
+                                ]
+                            )); ?>">
+                    Próxima
+                </a>
+            <?php endif; ?>
+        </nav>
+    <?php endif; ?>
 </div>

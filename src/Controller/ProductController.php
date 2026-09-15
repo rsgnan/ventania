@@ -130,15 +130,21 @@ class ProductController extends ViewController
             $photo = $this->handlePhoto($errors, $tempPhoto, null);
 
             if (empty($errors)) {
-                $productId = $this->productRepository->create(
-                    $name,
-                    $categoryId,
-                    $tag,
-                    $price,
-                    $stock,
-                    $description,
-                    $photo
-                );
+                try {
+                    $productId = $this->productRepository->create(
+                        $name,
+                        $categoryId,
+                        $tag,
+                        $price,
+                        $stock,
+                        $description,
+                        $photo
+                    );
+                } catch (\Throwable $exception) {
+                    $this->deletePhoto($photo, 'products');
+
+                    throw $exception;
+                }
 
                 $this->activityLogService->log(
                     'product',
@@ -199,23 +205,27 @@ class ProductController extends ViewController
             );
 
             if (empty($errors)) {
-                $this->productRepository->update(
-                    $id,
-                    $name,
-                    $categoryId,
-                    $tag,
-                    $price,
-                    $stock,
-                    $description,
-                    $photo
-                );
-
-                // Remove a foto antiga somente após atualizar o produto
-                if (!empty($oldPhoto) && $oldPhoto !== $photo) {
-                    $oldPhotoPath = __DIR__ . '/../../public/uploads/products/' . $oldPhoto;
-                    if (is_file($oldPhotoPath)) {
-                        unlink($oldPhotoPath);
+                try {
+                    $this->productRepository->update(
+                        $id,
+                        $name,
+                        $categoryId,
+                        $tag,
+                        $price,
+                        $stock,
+                        $description,
+                        $photo
+                    );
+                } catch (\Throwable $exception) {
+                    if ($photo !== $oldPhoto) {
+                        $this->deletePhoto($photo, 'products');
                     }
+
+                    throw $exception;
+                }
+
+                if ($oldPhoto !== $photo) {
+                    $this->deletePhoto($oldPhoto, 'products');
                 }
 
                 $this->activityLogService->log(
@@ -383,5 +393,24 @@ class ProductController extends ViewController
         $_SESSION['temp_photos'] = array_values(
             array_diff($_SESSION['temp_photos'], [$filename])
         );
+    }
+
+    private function deletePhoto(string $filename, string $folder): void
+    {
+        if ($filename === '') {
+            return;
+        }
+
+        $filename = basename($filename);
+
+        $path = __DIR__
+            . '/../../public/uploads/'
+            . $folder
+            . '/'
+            . $filename;
+
+        if (is_file($path)) {
+            unlink($path);
+        }
     }
 }

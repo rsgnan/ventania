@@ -1,65 +1,72 @@
 /* Produtos */
-.product-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-lg);
-}
-
-.product-card {
-    min-width: 0;
-    padding: 14px;
-
-    background: var(--color-surface);
-
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-
-    transition: box-shadow var(--transition-fast);
-}
-
-.product-card:hover {
-    box-shadow: var(--shadow-md);
-}
-
-.product-image {
+.image-upload {
     width: 100%;
-    aspect-ratio: 16 / 10;
-    margin-bottom: 12px;
+    min-height: 220px;
+    padding: 24px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+
+    position: relative;
+
+    overflow: hidden;
 
     background: var(--color-surface-secondary);
 
+    border: 1px dashed var(--color-border-strong);
     border-radius: var(--radius-md);
 
-    object-fit: cover;
+    color: var(--color-text-muted);
+
+    cursor: pointer;
+
+    transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast);
 }
 
-.product-name {
+.image-upload:hover {
+    background: var(--color-primary-soft);
+
+    border-color: var(--color-primary);
+}
+
+.image-upload>svg {
+    width: 42px;
+    height: 42px;
+
+    color: var(--color-text-subtle);
+}
+
+.image-preview {
+    width: 100%;
+    max-height: 320px;
+
+    display: block;
+
+    border-radius: var(--radius-md);
+
+    object-fit: contain;
+}
+
+.image-content {
+    text-align: center;
+}
+
+.image-title {
     color: var(--color-text);
 
     font-size: 13px;
     font-weight: 600;
 }
 
-.product-meta {
+.image-hint {
     margin-top: 4px;
 
     color: var(--color-text-muted);
 
-    font-size: 11px;
-}
-
-.product-footer {
-    margin-top: 12px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.product-price {
-    color: var(--color-success);
-
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 11.5px;
 }

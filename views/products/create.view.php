@@ -222,17 +222,17 @@
                     </svg>
 
                     <div
-                        class="image-upload-text"
+                        class="image-content"
                         id="image-upload-text"
                         style="<?php echo !empty($tempPhoto)
                                     ? 'display:none;'
                                     : ''; ?>">
 
-                        <div class="image-upload-title">
+                        <div class="image-title">
                             Clique para enviar uma imagem
                         </div>
 
-                        <div class="image-upload-hint">
+                        <div class="image-hint">
                             PNG ou JPG, até 5 MB
                         </div>
 

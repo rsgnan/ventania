@@ -1,12 +1,9 @@
-<!-- Produtos -->
-
 <div class="page-header">
     <div class="page-header-content">
         <h1 class="page-title">
             Produtos
         </h1>
-
-         <p class="page-description">
+        <p class="page-description">
             <?php echo e($totalProducts); ?>
             <?php echo $totalProducts === 1 ? 'produto encontrado' : 'produtos encontrados'; ?>
         </p>
