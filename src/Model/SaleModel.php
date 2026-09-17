@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-class SaleModel 
+class SaleModel
 {
     public int $id;
     public string $customer_name;
@@ -10,4 +10,6 @@ class SaleModel
     public float $total_amount;
     public string $status;
     public ?int $user_id;
+    public int $items_quantity;
+    public string $created_at;
 }

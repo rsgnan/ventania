@@ -29,7 +29,6 @@ class SaleController extends ViewController
     {
         $search = trim((string) ($_GET['search'] ?? ''));
 
-        // Evita buscas desnecessariamente grandes
         $search = mb_substr($search, 0, 100);
 
         $status = $_GET['status'] ?? null;
@@ -101,13 +100,41 @@ class SaleController extends ViewController
         ]);
     }
 
+    public function searchProducts(): void
+    {
+        $search = trim((string) ($_GET['search'] ?? ''));
+        $search = mb_substr($search, 0, 100);
+
+        $productIds = $_GET['product_ids'] ?? [];
+
+        if (!is_array($productIds)) {
+            $productIds = [];
+        }
+
+        if (!empty($productIds)) {
+            $products = $this->productRepository->getForSaleByIds($productIds);
+        } elseif ($search !== '') {
+            $products = $this->productRepository->searchForSale($search);
+        } else {
+            $products = [];
+        }
+
+        header('Content-Type: application/json; charset=utf-8');
+
+        echo json_encode(
+            $products,
+            JSON_UNESCAPED_UNICODE
+                | JSON_UNESCAPED_SLASHES
+        );
+
+        exit;
+    }
+
     public function create(): void
     {
         $errors = [];
-        $products = $this->productRepository->getForSale();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Recebe os produtos enviados pelo JavaScript em JSON
             $items = json_decode($_POST['items'] ?? '', true);
 
             $customerName = trim((string) ($_POST['customer_name'] ?? ''));
@@ -140,7 +167,6 @@ class SaleController extends ViewController
 
             if (empty($errors)) {
                 try {
-                    // Garante que venda, itens e estoque sejam alterados juntos
                     $this->pdo->beginTransaction();
 
                     $saleId = $this->saleRepository->create(
@@ -167,7 +193,6 @@ class SaleController extends ViewController
                             $itemSubtotal
                         );
 
-                        // Retira do estoque a quantidade vendida
                         $stockUpdated = $this->productRepository->decreaseStock(
                             $product->id,
                             $quantity
@@ -190,7 +215,6 @@ class SaleController extends ViewController
                     header('Location: index.php?route=sales/index');
                     return;
                 } catch (\Throwable $e) {
-                    // Desfaz todas as alterações se qualquer etapa falhar
                     if ($this->pdo->inTransaction()) {
                         $this->pdo->rollBack();
                     }
@@ -200,8 +224,7 @@ class SaleController extends ViewController
         }
 
         $this->render('sales/create', [
-            'errors' => $errors,
-            'products' => $products
+            'errors' => $errors
         ]);
     }
 
@@ -223,7 +246,6 @@ class SaleController extends ViewController
         }
 
         $items = $this->saleItemRepository->getBySaleId($saleId);
-        $products = $this->productRepository->getForSale();
         $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -231,7 +253,6 @@ class SaleController extends ViewController
             $discount = (float) ($_POST['discount_amount'] ?? 0);
             $status = $_POST['status'] ?? '';
 
-            // Novos itens enviados pelo JavaScript após a edição
             $newItems = json_decode($_POST['items'] ?? '', true);
 
             $subtotal = 0;
@@ -259,7 +280,6 @@ class SaleController extends ViewController
 
             if (empty($errors)) {
                 try {
-                    // Todas as alterações da edição devem ser feitas juntas
                     $this->pdo->beginTransaction();
 
                     // Devolve ao estoque os produtos da venda antiga
@@ -278,7 +298,6 @@ class SaleController extends ViewController
                         $status
                     );
 
-                    // Remove os itens antigos antes de inserir os novos
                     $this->saleItemRepository->deleteBySaleId($saleId);
 
                     foreach ($validatedItems as $item) {
@@ -322,8 +341,6 @@ class SaleController extends ViewController
                     header('Location: index.php?route=sales/index');
                     return;
                 } catch (\Throwable $e) {
-
-                    // Se alguma etapa falhar, desfaz toda a edição
                     if ($this->pdo->inTransaction()) {
                         $this->pdo->rollBack();
                     }
@@ -334,7 +351,6 @@ class SaleController extends ViewController
         $this->render('sales/edit', [
             'sale' => $sale,
             'items' => $items,
-            'products' => $products,
             'errors' => $errors
         ]);
     }
@@ -371,6 +387,13 @@ class SaleController extends ViewController
             $this->saleRepository->updateStatus(
                 $saleId,
                 'cancelled'
+            );
+
+            $this->activityLogService->log(
+                'sale',
+                $saleId,
+                'Venda #' . $saleId,
+                'cancel'
             );
 
             $this->pdo->commit();
@@ -413,9 +436,17 @@ class SaleController extends ViewController
             return;
         }
 
+        $productIds = [];
+
         foreach ($items as $item) {
-            // Busca no banco os dados reais do produto
             $productId = (int) ($item['id'] ?? 0);
+
+            if (in_array($productId, $productIds, true)) {
+                $errors[] = 'Produto duplicado na venda.';
+                continue;
+            }
+
+            $productIds[] = $productId;
 
             $product = $this->productRepository->getById($productId);
 

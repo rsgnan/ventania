@@ -288,7 +288,10 @@ class ProductController extends ViewController
     ): string {
         $photo = $currentPhoto ?? '';
 
-        if (!empty($_FILES['photo']['name'])) {
+        if (
+            isset($_FILES['photo']['error'])
+            && $_FILES['photo']['error'] !== UPLOAD_ERR_NO_FILE
+        ) {
             $validation = validatePhoto($_FILES['photo']);
 
             if (!$validation['success']) {

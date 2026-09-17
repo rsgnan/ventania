@@ -40,11 +40,7 @@ class SaleRepository
     ): array {
         $sql =
             'SELECT
-                `sales`.`id`,
-                `sales`.`customer_name`,
-                `sales`.`total_amount`,
-                `sales`.`status`,
-                `sales`.`created_at`,
+                `sales`.*,
                 COALESCE(SUM(`sale_items`.`quantity`), 0) AS `items_quantity`
             FROM `sales`
             LEFT JOIN `sale_items`
@@ -117,24 +113,6 @@ class SaleRepository
         return (int) $stmt->fetchColumn();
     }
 
-    public function getById(int $id): ?SaleModel
-    {
-        $stmt = $this->pdo->prepare(
-            'SELECT * 
-            FROM `sales`
-            WHERE `id` = :id'
-        );
-
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-        $stmt->execute();
-
-        $stmt->setFetchMode(PDO::FETCH_CLASS, SaleModel::class);
-
-        $sale = $stmt->fetch();
-
-        return $sale !== false ? $sale : null;
-    }
-
     public function getStatusCounts(string $search = ''): array
     {
         $stmt = $this->pdo->prepare(
@@ -159,6 +137,24 @@ class SaleRepository
             'completed' => (int) ($counts['completed_count'] ?? 0),
             'cancelled' => (int) ($counts['cancelled_count'] ?? 0)
         ];
+    }
+
+    public function getById(int $id): ?SaleModel
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT * 
+            FROM `sales`
+            WHERE `id` = :id'
+        );
+
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $stmt->setFetchMode(PDO::FETCH_CLASS, SaleModel::class);
+
+        $sale = $stmt->fetch();
+
+        return $sale !== false ? $sale : null;
     }
 
     public function create(

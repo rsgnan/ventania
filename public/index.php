@@ -213,6 +213,12 @@ if ($route == 'pages') {
 
     $salesController = $container->get('saleController');
     $salesController->show();
+} else if ($route === 'sales/searchProducts') {
+    $authService = $container->get('authService');
+    $authService->ensureLoggedIn();
+
+    $salesController = $container->get('saleController');
+    $salesController->searchProducts();
 } else if ($route === 'users/index') {
     $authService = $container->get('authService');
     $authService->ensureAdmin();

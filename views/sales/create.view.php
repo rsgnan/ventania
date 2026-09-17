@@ -58,10 +58,8 @@ if (!empty($_POST['items'])) {
 
         <div class="sale-layout">
 
-            <!-- Produtos da venda -->
             <div class="items-manager">
 
-                <!-- Adicionar produtos -->
                 <div class="card items-selector">
 
                     <div class="card-header">
@@ -103,7 +101,6 @@ if (!empty($_POST['items'])) {
 
                 </div>
 
-                <!-- Itens adicionados -->
                 <div class="card items-list">
 
                     <div class="card-header">
@@ -140,7 +137,6 @@ if (!empty($_POST['items'])) {
 
             </div>
 
-            <!-- Resumo da venda -->
             <aside class="sale-summary">
 
                 <h2>
@@ -152,7 +148,7 @@ if (!empty($_POST['items'])) {
                         class="form-label"
                         for="customerName">
 
-                        Nome do Cliente
+                        Nome do cliente
                     </label>
 
                     <input
@@ -277,15 +273,6 @@ if (!empty($_POST['items'])) {
 </form>
 
 <script>
-    const products = <?php echo json_encode(
-                            $products,
-                            JSON_UNESCAPED_UNICODE
-                                | JSON_UNESCAPED_SLASHES
-                                | JSON_HEX_TAG
-                                | JSON_HEX_AMP
-                                | JSON_HEX_APOS
-                                | JSON_HEX_QUOT
-                        ); ?>;
     const existingSaleItems = <?php echo json_encode(
                                     $existingSaleItems,
                                     JSON_UNESCAPED_UNICODE
@@ -295,6 +282,8 @@ if (!empty($_POST['items'])) {
                                         | JSON_HEX_APOS
                                         | JSON_HEX_QUOT
                                 ); ?>;
+
+    const originalSaleItems = [];
 </script>
 
-<script src="assets/js/sales/sales.js"></script>
+<script src="assets/js/sales.js"></script>

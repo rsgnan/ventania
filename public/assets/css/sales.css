@@ -12,6 +12,10 @@
      min-width: 0;
  }
 
+ .items-selector {
+     overflow: visible;
+ }
+
  .selector-content {
      padding: 18px;
  }
@@ -42,24 +46,20 @@
  }
 
  .search-results {
-     width: 100%;
-     max-height: 280px;
-
-     display: none;
-
      position: absolute;
      top: calc(100% + 6px);
      left: 0;
-     z-index: 50;
+     right: 0;
+     z-index: 20;
 
+     display: none;
+
+     max-height: 280px;
      overflow-y: auto;
 
      background: var(--color-surface);
-
      border: 1px solid var(--color-border);
-     border-radius: var(--radius-md);
-
-     box-shadow: var(--shadow-md);
+     border-radius: var(--radius-sm);
  }
 
  .search-item {

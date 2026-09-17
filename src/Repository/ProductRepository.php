@@ -125,7 +125,7 @@ class ProductRepository
         return $stmt->fetchAll(PDO::FETCH_CLASS, ProductModel::class);
     }
 
-    public function getForSale(): array
+    public function searchForSale(string $search, int $limit = 10): array
     {
         $stmt = $this->pdo->prepare(
             'SELECT
@@ -134,8 +134,57 @@ class ProductRepository
                 `price`,
                 `stock`
             FROM `products`
+            WHERE (
+                `name` LIKE :search_name
+                OR `tag` LIKE :search_tag
+            )
+            ORDER BY `name` ASC
+            LIMIT :limit'
+        );
+
+        $stmt->bindValue(':search_name', '%' . $search . '%', PDO::PARAM_STR);
+        $stmt->bindValue(':search_tag', '%' . $search . '%', PDO::PARAM_STR);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_CLASS, ProductModel::class);
+    }
+
+    public function getForSaleByIds(array $productIds): array
+    {
+        $productIds = array_map('intval', $productIds);
+        $productIds = array_unique($productIds);
+        $productIds = array_values($productIds);
+
+        if (empty($productIds)) {
+            return [];
+        }
+
+        $placeholders = [];
+
+        foreach ($productIds as $index => $id) {
+            $placeholders[] = ':id' . $index;
+        }
+
+        $stmt = $this->pdo->prepare(
+            'SELECT
+                `id`,
+                `name`,
+                `price`,
+                `stock`
+            FROM `products`
+            WHERE `id` IN (' . implode(', ', $placeholders) . ')
             ORDER BY `name` ASC'
         );
+
+        foreach ($productIds as $index => $productId) {
+            $stmt->bindValue(
+                ':id' . $index,
+                $productId,
+                PDO::PARAM_INT
+            );
+        }
 
         $stmt->execute();
 

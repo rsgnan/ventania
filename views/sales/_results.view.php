@@ -26,7 +26,7 @@
 
                                 <td>
                                     <?php echo e($sale->items_quantity); ?>
-                                    <?php echo $sale->items_quantity == 1 ? 'item' : 'itens'; ?>
+                                    <?php echo $sale->items_quantity === 1 ? 'item' : 'itens'; ?>
                                 </td>
 
                                 <td>
@@ -72,9 +72,17 @@
                                     <div class="table-actions">
                                         <a
                                             class="btn btn-ghost btn-sm"
-                                            href="?route=sales/edit&id=<?php echo e($sale->id); ?>">
-                                            Editar
+                                            href="?route=sales/show&id=<?php echo e($sale->id); ?>">
+                                            Ver
                                         </a>
+
+                                        <?php if ($sale->status !== 'cancelled'): ?>
+                                            <a
+                                                class="btn btn-ghost btn-sm"
+                                                href="?route=sales/edit&id=<?php echo e($sale->id); ?>">
+                                                Editar
+                                            </a>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>

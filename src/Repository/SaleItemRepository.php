@@ -40,7 +40,7 @@ class SaleItemRepository
 
         $stmt->bindValue(':sale_id', $saleId, PDO::PARAM_INT);
         $stmt->bindValue(':product_id', $productId, PDO::PARAM_INT);
-        $stmt->bindValue(':product_name', $productName);
+        $stmt->bindValue(':product_name', $productName, PDO::PARAM_STR);
         $stmt->bindValue(':original_price', $originalPrice);
         $stmt->bindValue(':unit_price', $unitPrice);
         $stmt->bindValue(':quantity', $quantity, PDO::PARAM_INT);

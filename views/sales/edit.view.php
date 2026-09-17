@@ -1,3 +1,18 @@
+<?php
+
+$selectedStatus = $_POST['status'] ?? $sale->status;
+
+$existingSaleItems = $items;
+
+if (!empty($_POST['items'])) {
+    $decodedItems = json_decode($_POST['items'], true);
+
+    if (is_array($decodedItems)) {
+        $existingSaleItems = $decodedItems;
+    }
+}
+?>
+
 <form method="POST">
     <?php echo csrf_field(); ?>
 
@@ -12,6 +27,7 @@
                 <?php echo icon('arrow-left'); ?>
 
             </a>
+
             <div class="page-header-left">
                 <h1 class="page-title">
                     Editar Venda
@@ -41,33 +57,56 @@
 
         <div class="sale-layout">
 
-            <!-- Itens da venda -->
-            <div class="sale-main">
+            <div class="items-manager">
 
-                <div class="autocomplete">
-
-                    <?php echo icon('search'); ?>
-
-                    <input
-                        type="text"
-                        id="searchInput"
-                        placeholder="Buscar produto pelo nome..."
-                        autocomplete="off"
-                        aria-label="Buscar produto">
-
-                    <div
-                        class="autocomplete-results"
-                        id="autocompleteResults">
-                    </div>
-                </div>
-
-                <div class="card sale-items-card">
+                <div class="card items-selector">
 
                     <div class="card-header">
                         <div class="card-header-content">
 
                             <div class="card-title">
-                                Itens adicionados
+                                Adicionar produtos
+                            </div>
+
+                            <div class="card-subtitle">
+                                Busque pelo nome e selecione os produtos da venda.
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="selector-content">
+
+                        <div class="item-search">
+
+                            <?php echo icon('search'); ?>
+
+                            <input
+                                class="form-input"
+                                type="text"
+                                id="searchInput"
+                                placeholder="Buscar produto pelo nome..."
+                                autocomplete="off"
+                                aria-label="Buscar produto">
+
+                            <div
+                                class="search-results"
+                                id="productSearchResults">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card items-list">
+
+                    <div class="card-header">
+                        <div class="card-header-content">
+
+                            <div class="card-title">
+                                Itens da venda
                             </div>
 
                             <div class="card-subtitle">
@@ -89,14 +128,14 @@
                                 </tr>
                             </thead>
 
-                            <tbody id="itemsBody">
-                            </tbody>
+                            <tbody id="itemsBody"></tbody>
                         </table>
                     </div>
+
                 </div>
+
             </div>
 
-            <!-- Resumo da venda -->
             <aside class="sale-summary">
 
                 <h2>
@@ -104,8 +143,11 @@
                 </h2>
 
                 <div class="field">
-                    <label class="form-label" for="customerName">
-                        Nome do Cliente
+                    <label
+                        class="form-label"
+                        for="customerName">
+
+                        Nome do cliente
                     </label>
 
                     <input
@@ -118,9 +160,13 @@
                 </div>
 
                 <div class="field">
-                    <label class="form-label" for="discountAmount">
+                    <label
+                        class="form-label"
+                        for="discountAmount">
+
                         Desconto (R$)
                     </label>
+
                     <input
                         class="form-input"
                         type="number"
@@ -136,8 +182,6 @@
                     <legend class="form-label">
                         Status
                     </legend>
-
-                    <?php $selectedStatus = $_POST['status'] ?? $sale->status; ?>
 
                     <div class="sale-status-options">
 
@@ -174,9 +218,11 @@
                                     Concluída
                                 </span>
                             </span>
+
                         </label>
 
                         <label class="sale-status-option sale-status-cancelled">
+
                             <input
                                 type="radio"
                                 name="status"
@@ -190,9 +236,11 @@
                                     Cancelada
                                 </span>
                             </span>
+
                         </label>
 
                     </div>
+
                 </fieldset>
 
                 <div class="sale-summary-divider"></div>
@@ -227,7 +275,8 @@
                 <input
                     type="hidden"
                     name="items"
-                    id="saleItems">
+                    id="saleItems"
+                    value="<?php echo e($_POST['items'] ?? ''); ?>">
 
                 <button
                     type="submit"
@@ -236,12 +285,33 @@
                 </button>
 
             </aside>
+
         </div>
+
     </div>
+
 </form>
 
 <script>
-    const products = <?php echo json_encode($products); ?>;
-    const existingSaleItems = <?php echo json_encode($items); ?>;
+    const existingSaleItems = <?php echo json_encode(
+                                    $existingSaleItems,
+                                    JSON_UNESCAPED_UNICODE
+                                        | JSON_UNESCAPED_SLASHES
+                                        | JSON_HEX_TAG
+                                        | JSON_HEX_AMP
+                                        | JSON_HEX_APOS
+                                        | JSON_HEX_QUOT
+                                ); ?>;
+
+    const originalSaleItems = <?php echo json_encode(
+                                    $items,
+                                    JSON_UNESCAPED_UNICODE
+                                        | JSON_UNESCAPED_SLASHES
+                                        | JSON_HEX_TAG
+                                        | JSON_HEX_AMP
+                                        | JSON_HEX_APOS
+                                        | JSON_HEX_QUOT
+                                ); ?>;
 </script>
-<script src="assets/js/sales/sales.js"></script>
+
+<script src="assets/js/sales.js"></script>
