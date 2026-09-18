@@ -28,7 +28,6 @@ class SaleController extends ViewController
     public function index(): void
     {
         $search = trim((string) ($_GET['search'] ?? ''));
-
         $search = mb_substr($search, 0, 100);
 
         $status = $_GET['status'] ?? null;
@@ -218,6 +217,7 @@ class SaleController extends ViewController
                     if ($this->pdo->inTransaction()) {
                         $this->pdo->rollBack();
                     }
+
                     $errors[] = 'Não foi possível registrar a venda.';
                 }
             }
@@ -239,7 +239,6 @@ class SaleController extends ViewController
             return;
         }
 
-        // Vendas canceladas não podem ser alteradas
         if ($sale->status === 'cancelled') {
             header('Location: index.php?route=sales/index');
             return;
@@ -258,7 +257,6 @@ class SaleController extends ViewController
             $subtotal = 0;
             $validatedItems = [];
 
-            // Valida os novos itens e considera o estoque da venda antiga
             $this->validateFields(
                 $customerName,
                 $status,
@@ -282,14 +280,6 @@ class SaleController extends ViewController
                 try {
                     $this->pdo->beginTransaction();
 
-                    // Devolve ao estoque os produtos da venda antiga
-                    foreach ($items as $item) {
-                        $this->productRepository->increaseStock(
-                            (int) $item['product_id'],
-                            (int) $item['quantity']
-                        );
-                    }
-
                     $this->saleRepository->update(
                         $saleId,
                         $customerName,
@@ -298,11 +288,88 @@ class SaleController extends ViewController
                         $status
                     );
 
-                    $this->saleItemRepository->deleteBySaleId($saleId);
+                    foreach ($items as $currentItem) {
+                        $productId = (int) $currentItem['product_id'];
 
-                    foreach ($validatedItems as $item) {
-                        $product = $item['product'];
-                        $quantity = (int) $item['quantity'];
+                        $newItem = null;
+
+                        foreach ($validatedItems as $validatedItem) {
+                            if ($validatedItem['product']->id === $productId) {
+                                $newItem = $validatedItem;
+                                break;
+                            }
+                        }
+
+                        if ($newItem === null) {
+                            $this->saleItemRepository->softDelete(
+                                (int) $currentItem['id']
+                            );
+
+                            $this->productRepository->increaseStock(
+                                $productId,
+                                (int) $currentItem['quantity']
+                            );
+
+                            continue;
+                        }
+
+                        $product = $newItem['product'];
+                        $newQuantity = (int) $newItem['quantity'];
+                        $currentQuantity = (int) $currentItem['quantity'];
+
+                        $quantityDifference = $newQuantity - $currentQuantity;
+
+                        if ($status !== 'cancelled') {
+                            if ($quantityDifference > 0) {
+                                $stockUpdated = $this->productRepository->decreaseStock(
+                                    $productId,
+                                    $quantityDifference
+                                );
+
+                                if (!$stockUpdated) {
+                                    throw new \Exception('Estoque insuficiente.');
+                                }
+                            } elseif ($quantityDifference < 0) {
+                                $this->productRepository->increaseStock(
+                                    $productId,
+                                    abs($quantityDifference)
+                                );
+                            }
+                        } else {
+                            $this->productRepository->increaseStock(
+                                $productId,
+                                $currentQuantity
+                            );
+                        }
+
+                        $itemSubtotal = $product->price * $newQuantity;
+
+                        $this->saleItemRepository->update(
+                            (int) $currentItem['id'],
+                            $product->name,
+                            $product->price,
+                            $product->price,
+                            $newQuantity,
+                            $itemSubtotal
+                        );
+                    }
+
+                    foreach ($validatedItems as $newItem) {
+                        $product = $newItem['product'];
+                        $quantity = (int) $newItem['quantity'];
+
+                        $exists = false;
+
+                        foreach ($items as $currentItem) {
+                            if ((int) $currentItem['product_id'] === $product->id) {
+                                $exists = true;
+                                break;
+                            }
+                        }
+
+                        if ($exists) {
+                            continue;
+                        }
 
                         $itemSubtotal = $product->price * $quantity;
 
@@ -316,13 +383,11 @@ class SaleController extends ViewController
                             $itemSubtotal
                         );
 
-                        // Vendas canceladas não retiram produtos do estoque
                         if ($status !== 'cancelled') {
                             $stockUpdated = $this->productRepository->decreaseStock(
                                 $product->id,
                                 $quantity
                             );
-
                             if (!$stockUpdated) {
                                 throw new \Exception('Estoque insuficiente.');
                             }
@@ -344,6 +409,7 @@ class SaleController extends ViewController
                     if ($this->pdo->inTransaction()) {
                         $this->pdo->rollBack();
                     }
+
                     $errors[] = 'Não foi possível atualizar a venda.';
                 }
             }
@@ -376,7 +442,6 @@ class SaleController extends ViewController
         try {
             $this->pdo->beginTransaction();
 
-            // Ao cancelar, devolve os produtos da venda ao estoque
             foreach ($items as $item) {
                 $this->productRepository->increaseStock(
                     (int) $item['product_id'],
@@ -457,7 +522,6 @@ class SaleController extends ViewController
 
             $currentQuantity = 0;
 
-            // Considera o estoque devolvido pela venda antiga
             if ($currentItems !== null) {
                 foreach ($currentItems as $currentItem) {
                     if ((int) ($currentItem['product_id']) === $product->id) {
@@ -474,7 +538,6 @@ class SaleController extends ViewController
                 continue;
             }
 
-            // Vendas canceladas não precisam reservar estoque
             if (
                 $status !== 'cancelled'
                 && $quantity > ($product->stock + $currentQuantity)

@@ -34,6 +34,13 @@ para:
 
 Em seguida, edite o arquivo `Connection.php` e informe os dados de conexão com o seu banco MariaDB/MySQL, como host, nome do banco, usuário e senha.
 
+## Acesso
+
+Para acessar o sistema utilizando o banco de dados de exemplo:
+
+* **Usuário:** admin
+* **Senha:** admin
+
 ## Sobre o projeto
 
 O Ventania utiliza uma estrutura MVC própria, feita em PHP puro, sem frameworks.

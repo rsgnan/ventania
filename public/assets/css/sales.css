@@ -379,11 +379,12 @@
  }
 
  .btn-remove {
-     padding: 0;
+     padding: 6px 10px;
 
      background: transparent;
 
      border: 0;
+     border-radius: var(--radius-sm);
 
      color: var(--color-danger);
 
@@ -392,11 +393,15 @@
      font-size: 12px;
      font-weight: 600;
 
-     transition: color var(--transition-fast);
+     transition:
+         background-color var(--transition-fast),
+         color var(--transition-fast);
  }
 
  .btn-remove:hover {
-     color: #dc2626;
+     background: var(--color-danger-soft);
+
+     color: var(--color-danger);
  }
 
  /* Estado vazio */
