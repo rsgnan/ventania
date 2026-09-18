@@ -14,21 +14,6 @@ class SaleItemRepository
             'SELECT * 
             FROM `sale_items`
             WHERE `sale_id` = :sale_id
-                AND `deleted_at` IS NULL'
-        );
-
-        $stmt->bindValue(':sale_id', $saleId, PDO::PARAM_INT);
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function getAllBySaleId(int $saleId): array
-    {
-        $stmt = $this->pdo->prepare(
-            'SELECT * 
-            FROM `sale_items`
-            WHERE `sale_id` = :sale_id
             ORDER BY `id` ASC'
         );
 
@@ -46,7 +31,7 @@ class SaleItemRepository
         float $unitPrice,
         int $quantity,
         float $subtotal
-    ): void {
+    ): int {
         $stmt = $this->pdo->prepare(
             'INSERT INTO `sale_items`
                 (`sale_id`, `product_id`, `product_name`, `original_price`,
@@ -65,6 +50,8 @@ class SaleItemRepository
         $stmt->bindValue(':subtotal', $subtotal);
 
         $stmt->execute();
+
+        return (int) $this->pdo->lastInsertId();
     }
 
     public function update(
@@ -83,8 +70,7 @@ class SaleItemRepository
                 `unit_price` = :unit_price,
                 `quantity` = :quantity,
                 `subtotal` = :subtotal
-            WHERE `id` = :id
-                AND `deleted_at` IS NULL'
+            WHERE `id` = :id'
         );
 
         $stmt->bindValue(':id', $saleItemId, PDO::PARAM_INT);
@@ -97,13 +83,11 @@ class SaleItemRepository
         $stmt->execute();
     }
 
-    public function softDelete(int $saleItemId): void
+    public function delete(int $saleItemId): void
     {
         $stmt = $this->pdo->prepare(
-            'UPDATE `sale_items`
-            SET `deleted_at` = NOW()
-            WHERE `id` = :id
-                AND `deleted_at` IS NULL'
+            'DELETE FROM `sale_items`
+            WHERE `id` = :id'
         );
 
         $stmt->bindValue(':id', $saleItemId, PDO::PARAM_INT);

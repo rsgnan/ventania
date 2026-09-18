@@ -6,6 +6,7 @@ use App\Core\ViewController;
 use App\Repository\ProductRepository;
 use App\Repository\SaleRepository;
 use App\Repository\SaleItemRepository;
+use App\Repository\SaleItemChangeRepository;
 use App\Support\AuthService;
 use App\Support\ActivityLogService;
 
@@ -19,6 +20,7 @@ class SaleController extends ViewController
         private ProductRepository $productRepository,
         private SaleRepository $saleRepository,
         private SaleItemRepository $saleItemRepository,
+        private SaleItemChangeRepository $saleItemChangeRepository,
         private ActivityLogService $activityLogService,
         private ErrorController $errorController
     ) {
@@ -137,7 +139,6 @@ class SaleController extends ViewController
             $items = json_decode($_POST['items'] ?? '', true);
 
             $customerName = trim((string) ($_POST['customer_name'] ?? ''));
-            $status = $_POST['status'] ?? 'pending';
             $userId = $this->authService->getUserId();
 
             $subtotal = 0;
@@ -145,13 +146,10 @@ class SaleController extends ViewController
 
             $this->validateFields(
                 $customerName,
-                $status,
                 $items,
                 $validatedItems,
                 $subtotal,
-                $errors,
-                null,
-                ['pending', 'completed']
+                $errors
             );
 
             $discount = (float) ($_POST['discount_amount'] ?? 0);
@@ -172,7 +170,6 @@ class SaleController extends ViewController
                         $customerName,
                         $discount,
                         $total,
-                        $status,
                         $userId
                     );
 
@@ -182,7 +179,7 @@ class SaleController extends ViewController
 
                         $itemSubtotal = $product->price * $quantity;
 
-                        $this->saleItemRepository->create(
+                        $saleItemId = $this->saleItemRepository->create(
                             $saleId,
                             $product->id,
                             $product->name,
@@ -190,6 +187,19 @@ class SaleController extends ViewController
                             $product->price,
                             $quantity,
                             $itemSubtotal
+                        );
+
+                        $this->saleItemChangeRepository->create(
+                            $saleId,
+                            $saleItemId,
+                            $product->id,
+                            $product->name,
+                            'created',
+                            null,
+                            $quantity,
+                            null,
+                            $product->price,
+                            $userId
                         );
 
                         $stockUpdated = $this->productRepository->decreaseStock(
@@ -250,7 +260,7 @@ class SaleController extends ViewController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $customerName = trim((string) ($_POST['customer_name'] ?? ''));
             $discount = (float) ($_POST['discount_amount'] ?? 0);
-            $status = $_POST['status'] ?? '';
+            $userId = $this->authService->getUserId();
 
             $newItems = json_decode($_POST['items'] ?? '', true);
 
@@ -259,13 +269,11 @@ class SaleController extends ViewController
 
             $this->validateFields(
                 $customerName,
-                $status,
                 $newItems,
                 $validatedItems,
                 $subtotal,
                 $errors,
-                $items,
-                ['pending', 'completed', 'cancelled']
+                $items
             );
 
             if ($discount < 0) {
@@ -284,8 +292,7 @@ class SaleController extends ViewController
                         $saleId,
                         $customerName,
                         $discount,
-                        $total,
-                        $status
+                        $total
                     );
 
                     foreach ($items as $currentItem) {
@@ -301,7 +308,20 @@ class SaleController extends ViewController
                         }
 
                         if ($newItem === null) {
-                            $this->saleItemRepository->softDelete(
+                            $this->saleItemChangeRepository->create(
+                                $saleId,
+                                (int) $currentItem['id'],
+                                $productId,
+                                $currentItem['product_name'],
+                                'removed',
+                                (int) $currentItem['quantity'],
+                                null,
+                                (float) $currentItem['unit_price'],
+                                null,
+                                $userId
+                            );
+
+                            $this->saleItemRepository->delete(
                                 (int) $currentItem['id']
                             );
 
@@ -314,41 +334,56 @@ class SaleController extends ViewController
                         }
 
                         $product = $newItem['product'];
-                        $newQuantity = (int) $newItem['quantity'];
+
                         $currentQuantity = (int) $currentItem['quantity'];
+                        $newQuantity = (int) $newItem['quantity'];
+
+                        $currentUnitPrice = (float) $currentItem['unit_price'];
+                        $newUnitPrice = (float) $product->price;
 
                         $quantityDifference = $newQuantity - $currentQuantity;
 
-                        if ($status !== 'cancelled') {
-                            if ($quantityDifference > 0) {
-                                $stockUpdated = $this->productRepository->decreaseStock(
-                                    $productId,
-                                    $quantityDifference
-                                );
+                        if ($quantityDifference > 0) {
+                            $stockUpdated = $this->productRepository->decreaseStock(
+                                $productId,
+                                $quantityDifference
+                            );
 
-                                if (!$stockUpdated) {
-                                    throw new \Exception('Estoque insuficiente.');
-                                }
-                            } elseif ($quantityDifference < 0) {
-                                $this->productRepository->increaseStock(
-                                    $productId,
-                                    abs($quantityDifference)
-                                );
+                            if (!$stockUpdated) {
+                                throw new \Exception('Estoque insuficiente.');
                             }
-                        } else {
+                        } elseif ($quantityDifference < 0) {
                             $this->productRepository->increaseStock(
                                 $productId,
-                                $currentQuantity
+                                abs($quantityDifference)
                             );
                         }
 
-                        $itemSubtotal = $product->price * $newQuantity;
+                        $itemSubtotal = $newUnitPrice * $newQuantity;
+
+                        if (
+                            $currentQuantity !== $newQuantity
+                            || $currentUnitPrice !== $newUnitPrice
+                        ) {
+                            $this->saleItemChangeRepository->create(
+                                $saleId,
+                                (int) $currentItem['id'],
+                                $productId,
+                                $product->name,
+                                'updated',
+                                $currentQuantity,
+                                $newQuantity,
+                                $currentUnitPrice,
+                                $newUnitPrice,
+                                $userId
+                            );
+                        }
 
                         $this->saleItemRepository->update(
                             (int) $currentItem['id'],
                             $product->name,
                             $product->price,
-                            $product->price,
+                            $newUnitPrice,
                             $newQuantity,
                             $itemSubtotal
                         );
@@ -373,7 +408,7 @@ class SaleController extends ViewController
 
                         $itemSubtotal = $product->price * $quantity;
 
-                        $this->saleItemRepository->create(
+                        $saleItemId = $this->saleItemRepository->create(
                             $saleId,
                             $product->id,
                             $product->name,
@@ -383,14 +418,26 @@ class SaleController extends ViewController
                             $itemSubtotal
                         );
 
-                        if ($status !== 'cancelled') {
-                            $stockUpdated = $this->productRepository->decreaseStock(
-                                $product->id,
-                                $quantity
-                            );
-                            if (!$stockUpdated) {
-                                throw new \Exception('Estoque insuficiente.');
-                            }
+                        $this->saleItemChangeRepository->create(
+                            $saleId,
+                            $saleItemId,
+                            $product->id,
+                            $product->name,
+                            'created',
+                            null,
+                            $quantity,
+                            null,
+                            $product->price,
+                            $userId
+                        );
+
+                        $stockUpdated = $this->productRepository->decreaseStock(
+                            $product->id,
+                            $quantity
+                        );
+
+                        if (!$stockUpdated) {
+                            throw new \Exception('Estoque insuficiente.');
                         }
                     }
 
@@ -414,6 +461,7 @@ class SaleController extends ViewController
                 }
             }
         }
+
         $this->render('sales/edit', [
             'sale' => $sale,
             'items' => $items,
@@ -421,9 +469,11 @@ class SaleController extends ViewController
         ]);
     }
 
-    public function cancel(): void
+    public function updateStatus(): void
     {
-        $saleId = (int) ($_GET['id'] ?? 0);
+        $saleId = (int) ($_POST['id'] ?? 0);
+        $status = $_POST['status'] ?? '';
+
         $sale = $this->saleRepository->getById($saleId);
 
         if ($sale === null) {
@@ -431,9 +481,49 @@ class SaleController extends ViewController
             return;
         }
 
-        // Uma venda já cancelada não pode ser cancelada novamente
         if ($sale->status === 'cancelled') {
-            header('Location: index.php?route=sales/index');
+            header('Location: index.php?route=sales/show&id=' . $saleId);
+            return;
+        }
+
+        if ($sale->status === $status) {
+            header('Location: index.php?route=sales/show&id=' . $saleId);
+            return;
+        }
+
+        if (!in_array($status, ['pending', 'completed'], true)) {
+            header('Location: index.php?route=sales/show&id=' . $saleId);
+            return;
+        }
+
+        $this->saleRepository->updateStatus(
+            $saleId,
+            $status
+        );
+
+        $this->activityLogService->log(
+            'sale',
+            $saleId,
+            'Venda #' . $saleId,
+            'update'
+        );
+
+        header('Location: index.php?route=sales/show&id=' . $saleId);
+    }
+
+    public function cancel(): void
+    {
+        $saleId = (int) ($_POST['id'] ?? 0);
+
+        $sale = $this->saleRepository->getById($saleId);
+
+        if ($sale === null) {
+            $this->errorController->notFound();
+            return;
+        }
+
+        if ($sale->status === 'cancelled') {
+            header('Location: index.php?route=sales/show&id=' . $saleId);
             return;
         }
 
@@ -463,7 +553,7 @@ class SaleController extends ViewController
 
             $this->pdo->commit();
 
-            header('Location: index.php?route=sales/index');
+            header('Location: index.php?route=sales/show&id=' . $saleId);
             return;
         } catch (\Throwable $e) {
 
@@ -471,29 +561,23 @@ class SaleController extends ViewController
                 $this->pdo->rollBack();
             }
 
-            header('Location: index.php?route=sales/index');
+            header('Location: index.php?route=sales/show&id=' . $saleId);
             return;
         }
     }
 
     private function validateFields(
         string $customerName,
-        string $status,
         ?array $items,
         array &$validatedItems,
         float &$subtotal,
         array &$errors,
-        ?array $currentItems = null,
-        array $allowedStatuses = ['pending', 'completed']
+        ?array $currentItems = null
     ): void {
         if ($customerName === '') {
             $errors[] = 'Informe o nome do cliente.';
         } elseif (mb_strlen($customerName) > 150) {
             $errors[] = 'O nome do cliente deve ter no máximo 150 caracteres.';
-        }
-
-        if (!in_array($status, $allowedStatuses, true)) {
-            $errors[] = 'Status da venda inválido.';
         }
 
         if (empty($items)) {
@@ -524,7 +608,7 @@ class SaleController extends ViewController
 
             if ($currentItems !== null) {
                 foreach ($currentItems as $currentItem) {
-                    if ((int) ($currentItem['product_id']) === $product->id) {
+                    if ((int) $currentItem['product_id'] === $product->id) {
                         $currentQuantity = (int) $currentItem['quantity'];
                         break;
                     }
@@ -538,10 +622,7 @@ class SaleController extends ViewController
                 continue;
             }
 
-            if (
-                $status !== 'cancelled'
-                && $quantity > ($product->stock + $currentQuantity)
-            ) {
+            if ($quantity > ($product->stock + $currentQuantity)) {
                 $errors[] = 'Quantidade maior que o estoque disponível.';
                 continue;
             }

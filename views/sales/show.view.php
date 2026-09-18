@@ -31,6 +31,7 @@
         </div>
     <?php endif; ?>
 </div>
+
 <div class="sale-view">
 
     <div class="card">
@@ -92,6 +93,79 @@
                         </span>
                     <?php endif; ?>
                 </div>
+            </div>
+
+            <div class="sale-detail">
+                <span class="sale-label">
+                    Ações
+                </span>
+
+                <?php if ($sale->status !== 'cancelled'): ?>
+                    <div class="sale-actions">
+
+                        <form
+                            method="POST"
+                            action="?route=sales/updateStatus">
+
+                            <?php echo csrf_field(); ?>
+
+                            <input
+                                type="hidden"
+                                name="id"
+                                value="<?php echo e($sale->id); ?>">
+
+                            <?php if ($sale->status === 'pending'): ?>
+                                <input
+                                    type="hidden"
+                                    name="status"
+                                    value="completed">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-sm btn-success">
+                                    Concluir venda
+                                </button>
+                            <?php elseif ($sale->status === 'completed'): ?>
+                                <input
+                                    type="hidden"
+                                    name="status"
+                                    value="pending">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-sm btn-warning">
+                                    Voltar para pendente
+                                </button>
+                            <?php endif; ?>
+
+                        </form>
+
+                        <form
+                            method="POST"
+                            action="?route=sales/cancel"
+                            onsubmit="return confirm('Tem certeza que deseja cancelar esta venda? Esta ação não poderá ser desfeita.');">
+
+                            <?php echo csrf_field(); ?>
+
+                            <input
+                                type="hidden"
+                                name="id"
+                                value="<?php echo e($sale->id); ?>">
+
+                            <button
+                                type="submit"
+                                class="btn btn-sm btn-danger">
+                                Cancelar venda
+                            </button>
+
+                        </form>
+
+                    </div>
+                <?php else: ?>
+                    <span>
+                        —
+                    </span>
+                <?php endif; ?>
             </div>
         </div>
     </div>

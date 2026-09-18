@@ -161,20 +161,18 @@ class SaleRepository
         string $customerName,
         float $discountAmount,
         float $totalAmount,
-        string $status,
         ?int $userId
     ): int {
         $stmt = $this->pdo->prepare(
             'INSERT INTO `sales`
-            (`customer_name`, `discount_amount`, `total_amount`, `status`, `user_id`)
+            (`customer_name`, `discount_amount`, `total_amount`, `user_id`)
             VALUES
-            (:customer_name, :discount_amount, :total_amount, :status, :user_id)'
+            (:customer_name, :discount_amount, :total_amount, :user_id)'
         );
 
         $stmt->bindValue(':customer_name', $customerName);
         $stmt->bindValue(':discount_amount', $discountAmount);
         $stmt->bindValue(':total_amount', $totalAmount);
-        $stmt->bindValue(':status', $status);
         $stmt->bindValue(
             ':user_id',
             $userId,
@@ -190,16 +188,14 @@ class SaleRepository
         int $saleId,
         string $customerName,
         float $discountAmount,
-        float $totalAmount,
-        string $status
+        float $totalAmount
     ): void {
         $stmt = $this->pdo->prepare(
             'UPDATE `sales`
             SET
                 `customer_name` = :customer_name,
                 `discount_amount` = :discount_amount,
-                `total_amount` = :total_amount,
-                `status` = :status
+                `total_amount` = :total_amount
             WHERE `id` = :id'
         );
 
@@ -207,7 +203,6 @@ class SaleRepository
         $stmt->bindValue(':customer_name', $customerName);
         $stmt->bindValue(':discount_amount', $discountAmount);
         $stmt->bindValue(':total_amount', $totalAmount);
-        $stmt->bindValue(':status', $status);
 
         $stmt->execute();
     }

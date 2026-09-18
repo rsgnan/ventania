@@ -98,6 +98,11 @@ $container->bind('saleItemRepository', function () use ($container) {
     return new \App\Repository\SaleItemRepository($pdo);
 });
 
+$container->bind('saleItemChangeRepository', function () use ($container) {
+    $pdo = $container->get('pdo');
+    return new \App\Repository\SaleItemChangeRepository($pdo);
+});
+
 $container->bind('saleController', function () use ($container) {
 
     $authService = $container->get('authService');
@@ -105,6 +110,7 @@ $container->bind('saleController', function () use ($container) {
     $productRepository = $container->get('productRepository');
     $saleRepository = $container->get('saleRepository');
     $saleItemRepository = $container->get('saleItemRepository');
+    $saleItemChangeRepository = $container->get('saleItemChangeRepository');
     $activityLogService = $container->get('activityLogService');
     $errorController = $container->get('errorController');
 
@@ -114,6 +120,7 @@ $container->bind('saleController', function () use ($container) {
         $productRepository,
         $saleRepository,
         $saleItemRepository,
+        $saleItemChangeRepository,
         $activityLogService,
         $errorController
     );
@@ -192,6 +199,12 @@ if ($route == 'pages') {
 } else if ($route === 'login/index') {
     $adminController = $container->get('productController');
     $adminController->update();
+} else if ($route === 'sales/updateStatus') {
+    $salesController = $container->get('saleController');
+    $salesController->updateStatus();
+} else if ($route === 'sales/cancel') {
+    $salesController = $container->get('saleController');
+    $salesController->cancel();
 } else if ($route === 'sales/index') {
     $salesController = $container->get('saleController');
     $salesController->index();
