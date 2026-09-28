@@ -17,7 +17,7 @@ class Product extends Model
         'stock',
         'photo',
     ];
-    
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
