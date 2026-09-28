@@ -6,7 +6,7 @@
 
     <title>Login - Ventania</title>
 
-    @vite (['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="min-h-screen bg-gray-50 font-sans">
@@ -18,21 +18,14 @@
             </div>
 
             @if ($errors->any())
-                <div class="mb-5 rounded-lg bg-red-50 p-4 text-sm text-red-700">
-                    {{ $errors->first() }}
-                </div>
+                <div class="mb-5 rounded-lg bg-red-50 p-4 text-sm text-red-700">{{ $errors->first() }}</div>
             @endif
 
             <form method="POST" action="{{ route('login.store') }}">
                 @csrf
 
                 <div>
-                    <label
-                        for="username"
-                        class="mb-2 block text-sm font-medium text-gray-700"
-                    >
-                        Usuário
-                    </label>
+                    <label for="username" class="mb-2 block text-sm font-medium text-gray-700"> Usuário </label>
 
                     <input
                         type="text"
@@ -43,12 +36,7 @@
                 </div>
 
                 <div class="mt-5">
-                    <label
-                        for="password"
-                        class="mb-2 block text-sm font-medium text-gray-700"
-                    >
-                        Senha
-                    </label>
+                    <label for="password" class="mb-2 block text-sm font-medium text-gray-700"> Senha </label>
 
                     <input
                         type="password"
@@ -65,12 +53,7 @@
                             class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
 
-                        <label
-                            for="remember"
-                            class="ml-2 text-sm text-gray-600"
-                        >
-                            Lembrar-me
-                        </label>
+                        <label for="remember" class="ml-2 text-sm text-gray-600"> Lembrar-me </label>
                     </div>
 
                     <button
