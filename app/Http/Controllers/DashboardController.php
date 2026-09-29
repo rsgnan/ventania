@@ -18,11 +18,23 @@ class DashboardController extends Controller
 
         $completedSalesCount = Sale::where('status', 'completed')->count();
 
+        $recentSales = Sale::orderByDesc('created_at')
+            ->limit(5)
+            ->get();
+
+        $lowStockProducts = Product::where('minimum_stock', '>', 0)
+            ->whereColumn('stock', '<=', 'minimum_stock')
+            ->orderByRaw('(minimum_stock - stock) DESC')
+            ->limit(5)
+            ->get();
+
         return view('dashboard', [
             'productsCount' => $productsCount,
             'stockQuantity' => $stockQuantity,
             'pendingSalesCount' => $pendingSalesCount,
             'completedSalesCount' => $completedSalesCount,
+            'recentSales' => $recentSales,
+            'lowStockProducts' => $lowStockProducts,
         ]);
     }
 }
