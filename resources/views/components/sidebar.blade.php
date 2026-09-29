@@ -5,8 +5,8 @@
                 V
             </div>
             <div class="min-w-0">
-                <span class="block text-sm leading-4 font-bold text-white">Ventania</span>
-                <span class="mt-0.5 block text-[11px] leading-4 text-slate-400">Gestão de estoque e vendas</span>
+                <span class="block text-[13px] leading-4 font-bold text-white">Ventania</span>
+                <span class="mt-0.5 block text-[10px] leading-4 text-slate-400">Gestão de estoque e vendas</span>
             </div>
         </a>
     </div>
