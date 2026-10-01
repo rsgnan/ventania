@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,8 +13,9 @@
     <x-sidebar />
 
     <main class="ml-60 min-h-screen px-9 py-7">
-        @yield('content')
+        <div class="w-full max-w-5xl">
+            @yield('content')
+        </div>
     </main>
 </body>
-
 </html>

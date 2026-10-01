@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -19,7 +18,7 @@
             </div>
 
             @if ($errors->any())
-            <div class="mb-5 rounded-lg bg-red-50 p-4 text-sm text-red-700">{{ $errors->first() }}</div>
+                <div class="mb-5 rounded-lg bg-red-50 p-4 text-sm text-red-700">{{ $errors->first() }}</div>
             @endif
 
             <form method="POST" action="{{ route('login.store') }}">
@@ -32,7 +31,8 @@
                         type="text"
                         id="username"
                         name="username"
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 transition outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100" />
+                        class="focus:border-primary-500 focus:ring-primary-100 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 transition outline-none focus:ring-2"
+                    />
                 </div>
 
                 <div class="mt-5">
@@ -42,21 +42,24 @@
                         type="password"
                         id="password"
                         name="password"
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 transition outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100" />
+                        class="focus:border-primary-500 focus:ring-primary-100 w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 transition outline-none focus:ring-2"
+                    />
 
                     <div class="mt-5 flex items-center">
                         <input
                             type="checkbox"
                             id="remember"
                             name="remember"
-                            class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
+                            class="text-primary-600 focus:ring-primary-500 h-4 w-4 rounded border-gray-300"
+                        />
 
                         <label for="remember" class="ml-2 text-sm text-gray-600"> Lembrar-me </label>
                     </div>
 
                     <button
                         type="submit"
-                        class="mt-6 w-full rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:outline-none">
+                        class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 mt-6 w-full rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition focus:ring-2 focus:ring-offset-2 focus:outline-none"
+                    >
                         Entrar
                     </button>
                 </div>
@@ -64,5 +67,4 @@
         </div>
     </main>
 </body>
-
 </html>

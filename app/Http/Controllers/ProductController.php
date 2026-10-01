@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProductController extends Controller
@@ -52,7 +53,19 @@ class ProductController extends Controller
             'price' => ['required', 'numeric', 'min:0'],
             'minimum_stock' => ['required', 'integer', 'min:0'],
             'description' => ['nullable', 'string'],
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,jpg,png,webp',
+                'max:5120',
+            ],
         ]);
+
+        $photo = null;
+
+        if ($request->hasFile('image')) {
+            $photo = $request->file('image')->store('products', 'public');
+        }
 
         Product::create([
             'category_id' => $data['category_id'],
@@ -62,6 +75,7 @@ class ProductController extends Controller
             'price' => $data['price'],
             'minimum_stock' => $data['minimum_stock'],
             'stock' => 0,
+            'photo' => $photo,
         ]);
 
         return redirect()
@@ -87,7 +101,38 @@ class ProductController extends Controller
             'price' => ['required', 'numeric', 'min:0'],
             'minimum_stock' => ['required', 'integer', 'min:0'],
             'description' => ['nullable', 'string'],
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,jpg,png,webp',
+                'max:5120',
+            ],
+            'remove_image' => ['nullable', 'boolean'],
         ]);
+
+        /*
+         * Remove a imagem atual
+         */
+
+        if ($request->boolean('remove_image') && $product->photo) {
+            Storage::disk('public')->delete($product->photo);
+
+            $data['photo'] = null;
+        }
+
+        /*
+         * Se uma nova imagem foi enviada, ela substitui a imagem atual
+         */
+
+        if ($request->hasFile('image')) {
+            if ($product->photo) {
+                Storage::disk('public')->delete($product->photo);
+            }
+
+            $data['photo'] = $request->file('image')->store('products', 'public');
+        }
+
+        unset($data['remove_image']);
 
         $product->update($data);
 
