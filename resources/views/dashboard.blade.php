@@ -7,18 +7,18 @@
     <div>
         <h1 class="text-xl font-bold">Dashboard</h1>
 
-        <p class="mt-0.5 text-xs text-slate-500">Visão geral do estoque e das vendas.</p>
+        <p class="mt-0.5 text-xs text-neutral-500">Visão geral do estoque e das vendas.</p>
     </div>
 </header>
 <div class="mt-6 grid grid-cols-4 gap-4">
-    <div class="rounded-lg border border-slate-200 bg-white p-4">
+    <div class="rounded-lg border border-neutral-200 bg-white p-4">
         <div class="flex items-start justify-between">
             <div>
-                <p class="text-xs font-medium text-slate-500">Produtos cadastrados</p>
+                <p class="text-xs font-medium text-neutral-500">Produtos cadastrados</p>
 
-                <p class="mt-2 text-2xl font-bold text-slate-900">{{ $productsCount }}</p>
+                <p class="mt-2 text-2xl font-bold text-neutral-900">{{ $productsCount }}</p>
             </div>
-            <div class="flex h-8 w-8 items-center justify-center rounded-md bg-blue-50 text-blue-950">
+            <div class="flex h-8 w-8 items-center justify-center rounded-md bg-primary-50 text-primary-950">
                 {{-- Heroicon: cube --}}
                 <svg
                     class="h-4 w-4"
@@ -35,14 +35,14 @@
         </div>
     </div>
 
-    <div class="rounded-lg border border-slate-200 bg-white p-4">
+    <div class="rounded-lg border border-neutral-200 bg-white p-4">
         <div class="flex items-start justify-between">
             <div>
-                <p class="text-xs font-medium text-slate-500">Unidades em estoque</p>
+                <p class="text-xs font-medium text-neutral-500">Unidades em estoque</p>
 
-                <p class="mt-2 text-2xl font-bold text-slate-900">{{ $stockQuantity }}</p>
+                <p class="mt-2 text-2xl font-bold text-neutral-900">{{ $stockQuantity }}</p>
             </div>
-            <div class="flex h-8 w-8 items-center justify-center rounded-md bg-blue-50 text-blue-950">
+            <div class="flex h-8 w-8 items-center justify-center rounded-md bg-primary-50 text-primary-950">
                 {{-- Heroicon: archive-box --}}
                 <svg
                     class="h-4 w-4"
@@ -59,12 +59,12 @@
         </div>
     </div>
 
-    <div class="rounded-lg border border-slate-200 bg-white p-4">
+    <div class="rounded-lg border border-neutral-200 bg-white p-4">
         <div class="flex items-start justify-between">
             <div>
-                <p class="text-xs font-medium text-slate-500">Vendas pendentes</p>
+                <p class="text-xs font-medium text-neutral-500">Vendas pendentes</p>
 
-                <p class="mt-2 text-2xl font-bold text-slate-900">{{ $pendingSalesCount }}</p>
+                <p class="mt-2 text-2xl font-bold text-neutral-900">{{ $pendingSalesCount }}</p>
             </div>
             <div class="flex h-8 w-8 items-center justify-center rounded-md bg-amber-50 text-amber-600">
                 {{-- Heroicon: clock --}}
@@ -83,12 +83,12 @@
         </div>
     </div>
 
-    <div class="rounded-lg border border-slate-200 bg-white p-4">
+    <div class="rounded-lg border border-neutral-200 bg-white p-4">
         <div class="flex items-start justify-between">
             <div>
-                <p class="text-xs font-medium text-slate-500">Vendas concluídas</p>
+                <p class="text-xs font-medium text-neutral-500">Vendas concluídas</p>
 
-                <p class="mt-2 text-2xl font-bold text-slate-900">{{ $completedSalesCount }}</p>
+                <p class="mt-2 text-2xl font-bold text-neutral-900">{{ $completedSalesCount }}</p>
             </div>
             <div class="flex h-8 w-8 items-center justify-center rounded-md bg-green-50 text-green-600">
                 {{-- Heroicon: check-circle --}}
@@ -108,27 +108,27 @@
     </div>
 </div>
 
-<div class="mt-6 rounded-lg border border-slate-200 bg-white">
-    <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+<div class="mt-6 rounded-lg border border-neutral-200 bg-white">
+    <div class="flex items-center justify-between border-b border-neutral-200 px-4 py-3">
         <div>
-            <h2 class="text-sm font-semibold text-slate-900">
+            <h2 class="text-sm font-semibold text-neutral-900">
                 Vendas recentes
             </h2>
 
-            <p class="mt-0.5 text-xs text-slate-500">
+            <p class="mt-0.5 text-xs text-neutral-500">
                 Últimas vendas registradas no sistema.
             </p>
         </div>
     </div>
 
     @forelse ($recentSales as $sale)
-    <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+    <div class="flex items-center justify-between border-b border-neutral-100 px-4 py-3">
         <div>
-            <p class="text-xs font-semibold text-slate-900">
+            <p class="text-xs font-semibold text-neutral-900">
                 {{ $sale->customer_name }}
             </p>
 
-            <p class="mt-0.5 text-[11px] text-slate-500">
+            <p class="mt-0.5 text-[11px] text-neutral-500">
                 Venda #{{ $sale->id }}
             </p>
         </div>
@@ -150,58 +150,59 @@
         </div>
 
         <div class="text-right">
-            <p class="text-xs font-semibold text-slate-900">
+            <p class="text-xs font-semibold text-neutral-900">
                 R$ {{ number_format($sale->total_amount, 2, ',', '.') }}
             </p>
 
-            <p class="mt-0.5 text-[11px] text-slate-500">
+            <p class="mt-0.5 text-[11px] text-neutral-500">
                 {{ $sale->created_at->format('d/m/Y H:i') }}
             </p>
         </div>
     </div>
     @empty
     <div class="px-4 py-8 text-center">
-        <p class="text-xs text-slate-500">
+        <p class="text-xs text-neutral-500">
             Nenhuma venda registrada.
         </p>
     </div>
     @endforelse
 </div>
-<div class="mt-6 rounded-lg border border-slate-200 bg-white">
-    <div class="border-b border-slate-200 px-4 py-3">
-        <h2 class="text-sm font-semibold text-slate-900">
+
+<div class="mt-6 rounded-lg border border-neutral-200 bg-white">
+    <div class="border-b border-neutral-200 px-4 py-3">
+        <h2 class="text-sm font-semibold text-neutral-900">
             Estoque baixo
         </h2>
 
-        <p class="mt-0.5 text-xs text-slate-500">
+        <p class="mt-0.5 text-xs text-neutral-500">
             Produtos que atingiram ou estão abaixo do estoque mínimo.
         </p>
     </div>
     @forelse ($lowStockProducts as $product)
-    <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+    <div class="flex items-center justify-between border-b border-neutral-100 px-4 py-3">
         <div>
-            <p class="text-xs font-semibold text-slate-900">
+            <p class="text-xs font-semibold text-neutral-900">
                 {{ $product->name }}
             </p>
 
-            <p class="mt-0.5 text-[11px] text-slate-500">
+            <p class="mt-0.5 text-[11px] text-neutral-500">
                 Produto #{{ $product->id }}
             </p>
         </div>
 
         <div class="text-right">
-            <p class="text-xs font-semibold text-slate-900">
+            <p class="text-xs font-semibold text-neutral-900">
                 {{ $product->stock }} unidades
             </p>
 
-            <p class="mt-0.5 text-xs text-slate-500">
+            <p class="mt-0.5 text-xs text-neutral-500">
                 Mínimo: {{ $product->minimum_stock }}
             </p>
         </div>
     </div>
     @empty
     <div class="px-4 py-8 text-center">
-        <p class="text-xs text-slate-500">
+        <p class="text-xs text-neutral-500">
             Nenhum produto com estoque baixo.
         </p>
     </div>
