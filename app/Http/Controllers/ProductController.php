@@ -17,7 +17,7 @@ class ProductController extends Controller
 
         $products = Product::with('category')
             ->when($search !== '', function ($query) use ($search) {
-                $query->where('name', 'like', '%' . $search . '%');
+                $query->where('name', 'like', '%'.$search.'%');
             })
             ->when($categoryId > 0, function ($query) use ($categoryId) {
                 $query->where('category_id', $categoryId);

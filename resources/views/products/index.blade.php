@@ -1,8 +1,8 @@
-@extends('layouts.app')
+@extends ('layouts.app')
 
-@section('title', 'Produtos - Ventania')
+@section ('title', 'Produtos - Ventania')
 
-@section('content')
+@section ('content')
     <header class="flex items-center justify-between">
         <div>
             <h1 class="text-lg font-bold">Produtos</h1>
@@ -19,13 +19,19 @@
     </header>
 
     @if (session('success'))
-        <div class="mt-6 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-xs text-green-700">
+        <div
+            class="mt-6 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-xs text-green-700"
+        >
             {{ session('success') }}
         </div>
     @endif
 
     <div class="mt-6 rounded-lg border border-neutral-200 bg-white p-5">
-        <form method="GET" action="{{ route('products.index') }}" class="mb-4 flex items-center gap-3">
+        <form
+            method="GET"
+            action="{{ route('products.index') }}"
+            class="mb-4 flex items-center gap-3"
+        >
             <input
                 type="search"
                 name="search"
@@ -40,7 +46,10 @@
             >
                 <option value="">Todas as categorias</option>
                 @foreach ($categories as $category)
-                    <option value="{{ $category->id }}" @selected($categoryId === $category->id)>
+                    <option
+                        value="{{ $category->id }}"
+                        @selected ($categoryId == $category->id)
+                    >
                         {{ $category->name }}
                     </option>
                 @endforeach
@@ -58,23 +67,33 @@
             <table class="w-full table-fixed border-collapse">
                 <thead>
                     <tr class="border-b border-neutral-200">
-                        <th class="w-[30%] px-2 py-2 text-left text-[11px] font-semibold tracking-wide text-neutral-500 uppercase">
+                        <th
+                            class="w-[32%] px-2 py-2 text-left text-[11px] font-semibold tracking-wide text-neutral-500 uppercase"
+                        >
                             Produto
                         </th>
 
-                        <th class="w-[15%] px-2 py-2 text-left text-[11px] font-semibold tracking-wide text-neutral-500 uppercase">
+                        <th
+                            class="w-[21%] px-2 py-2 text-left text-[11px] font-semibold tracking-wide text-neutral-500 uppercase"
+                        >
                             Categoria
                         </th>
 
-                        <th class="w-[15%] px-2 py-2 text-left text-[11px] font-semibold tracking-wide text-neutral-500 uppercase">
+                        <th
+                            class="w-[15%] px-2 py-2 text-left text-[11px] font-semibold tracking-wide text-neutral-500 uppercase"
+                        >
                             Preço
                         </th>
 
-                        <th class="w-[35%] px-2 py-2 text-left text-[11px] font-semibold tracking-wide text-neutral-500 uppercase">
+                        <th
+                            class="w-[25%] px-2 py-2 text-left text-[11px] font-semibold tracking-wide text-neutral-500 uppercase"
+                        >
                             Estoque
                         </th>
 
-                        <th class="w-[10%] px-2 py-2 text-left text-[11px] font-semibold tracking-wide text-neutral-500 uppercase">
+                        <th
+                            class="w-[7%] px-2 py-2 text-left text-[11px] font-semibold tracking-wide text-neutral-500 uppercase"
+                        >
                             Ações
                         </th>
                     </tr>
@@ -82,23 +101,18 @@
 
                 <tbody>
                     @forelse ($products as $product)
-                        @php
-                            $percentage = $product->minimum_stock > 0
-                            ? min(($product->stock / $product->minimum_stock) * 100, 100)
-                            : 100;
-
-                            $lowStock = $product->minimum_stock > 0
-                            && $product->stock <= $product->minimum_stock;
-                        @endphp
-
-                        <tr class="border-b border-neutral-200 last:border-b-0 hover:bg-neutral-50">
+                        <tr
+                            class="border-b border-neutral-200 last:border-b-0 hover:bg-neutral-50"
+                        >
                             <td class="px-2 py-2">
                                 <p class="text-xs font-semibold text-neutral-900">{{ $product->name }}</p>
 
                                 <p class="mt-1 text-[10px] text-neutral-500">Produto #{{ $product->id }}</p>
                             </td>
 
-                            <td class="px-2 py-2 text-xs text-neutral-700">{{ $product->category->name }}</td>
+                            <td class="px-2 py-2 text-xs text-neutral-700">
+                                {{ $product->category->name }}
+                            </td>
 
                             <td class="px-2 py-2 text-xs text-neutral-700">
                                 R$ {{ number_format($product->price, 2, ',', '.') }}
@@ -106,30 +120,38 @@
 
                             <td class="px-2 py-2">
                                 <div class="w-48">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-xs font-semibold text-neutral-700">
+                                    <div
+                                        class="flex items-center justify-between"
+                                    >
+                                        <span
+                                            class="text-xs font-semibold text-neutral-700"
+                                        >
                                             {{ $product->stock }} unidades
                                         </span>
 
-                                        <span class="text-[11px] font-normal text-neutral-500">
+                                        <span
+                                            class="text-[11px] font-normal text-neutral-500"
+                                        >
                                             @if ($product->minimum_stock > 0)
-                                                Minímo: {{ $product->minimum_stock }}
+                                                Mínimo: {{ $product->minimum_stock }}
                                             @else
                                                 sem mínimo
                                             @endif
                                         </span>
                                     </div>
-                                    <div class="mt-1 h-2 overflow-hidden rounded-full bg-neutral-200">
+                                    <div
+                                        class="mt-1 h-2 overflow-hidden rounded-full bg-neutral-200"
+                                    >
                                         <div
-                                            class="h-full rounded-full {{ $lowStock ? 'bg-red-500' : 'bg-primary-950' }}"
-                                            style="width: {{ $percentage }}%"
+                                            class="h-full rounded-full {{ $product->low_stock ? 'bg-red-500' : 'bg-primary-950' }}"
+                                            style="width: {{ $product->stock_percentage }}%"
                                         ></div>
                                     </div>
                                 </div>
                             </td>
 
-                            <td class="2-px-2 py-2">
-                                <div class="flex">
+                            <td class="px-2 py-2">
+                                <div class="flex justify-center">
                                     <a
                                         href="{{ route('products.edit', $product) }}"
                                         class="hover:bg-primary-50 hover:text-primary-950 flex h-8 w-8 items-center justify-center rounded-md border border-neutral-200 text-neutral-500 transition"
@@ -154,7 +176,10 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-2 py-8 text-center text-sm text-neutral-500">
+                            <td
+                                colspan="5"
+                                class="px-2 py-8 text-center text-sm text-neutral-500"
+                            >
                                 Nenhum produto encontrado.
                             </td>
                         </tr>
@@ -163,57 +188,6 @@
             </table>
         </div>
 
-        @if ($products->total() > 0)
-            <div class="mt-4 flex items-center justify-between">
-                <p class="text-xs text-neutral-500">
-                    Mostrando {{ $products->firstItem() }}-{{ $products->lastItem() }} de {{ $products->total() }}
-                </p>
-
-                @if ($products->hasPages())
-                    <div class="flex items-center gap-1">
-                        @if ($products->onFirstPage())
-                            <span class="flex h-8 w-8 items-center justify-center rounded-md border border-neutral-200 text-xs text-neutral-300">
-                                <
-                            </span>
-                        @else
-                            <a
-                                href="{{ $products->previousPageUrl() }}"
-                                class="flex h-8 w-8 items-center justify-center rounded-md border border-neutral-200 text-xs text-neutral-700 transition hover:bg-neutral-50"
-                            >
-                                <
-                            </a>
-                        @endif
-
-                        @foreach ($products->getUrlRange(1, $products->lastPage()) as $page => $url)
-                            @if ($page === $products->currentPage())
-                                <span class="border-primary-950 bg-primary-950 flex h-8 w-8 items-center justify-center rounded-md border text-xs font-semibold text-white">
-                                    {{ $page }}
-                                </span>
-                            @else
-                                <a
-                                    href="{{ $url }}"
-                                    class="flex h-8 w-8 items-center justify-center rounded-md border border-neutral-200 text-xs text-neutral-700 transition hover:bg-neutral-50"
-                                >
-                                    {{ $page }}
-                                </a>
-                            @endif
-                        @endforeach
-
-                        @if ($products->hasMorePages())
-                            <a
-                                href="{{ $products->nextPageUrl() }}"
-                                class="flex h-8 w-8 items-center justify-center rounded-md border border-neutral-200 text-xs text-neutral-700 transition hover:bg-neutral-50"
-                            >
-                                >
-                            </a>
-                        @else
-                            <span class="flex h-8 w-8 items-center justify-center rounded-md border border-neutral-200 text-xs text-neutral-300">
-                                >
-                            </span>
-                        @endif
-                    </div>
-                @endif
-            </div>
-        @endif
+        <div class="mt-4">{{ $products->links() }}</div>
     </div>
 @endsection

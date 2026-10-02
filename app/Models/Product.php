@@ -43,4 +43,17 @@ class Product extends Model
     {
         return $this->hasMany(StockMovementItem::class);
     }
+
+    public function getStockPercentageAttribute()
+    {
+        return $this->minimum_stock > 0
+            ? min(($this->stock / $this->minimum_stock) *100, 100)
+            : 100;
+    }
+
+    public function getLowStockAttribute()
+    {
+        return $this->minimum_stock > 0
+            && $this->stock <= $this->minimum_stock;
+    }
 }
