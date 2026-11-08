@@ -36,7 +36,7 @@ class EnsureUserIsActive
             return redirect()
                 ->route('login')
                 ->withErrors([
-                    'email' => 'Sua conta está inativa. Entre em contato com o administrador.',
+                    'email' => __('auth.inactive'),
                 ]);
         }
 
