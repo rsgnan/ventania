@@ -46,13 +46,14 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => __('auth.failed'),
             ]);
         }
 
         // 2. Só após confirmar a senha correta, verifica se o usuário foi desativado
         if (! Auth::user()->is_active) {
             Auth::logout();
+            RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
                 'email' => __('auth.inactive'),
