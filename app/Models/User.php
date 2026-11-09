@@ -5,15 +5,17 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\UserRole;
+use App\Models\Concerns\Auditable;
 use DomainException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use Auditable, HasFactory, Notifiable;
 
     /**
      * Atributos que podem ser preenchidos em massa ( User::create() / $user->update() ).
@@ -71,5 +73,14 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === UserRole::Admin;
+    }
+
+    /**
+     * Retorna apenas o registro de login mais recente do usuário usando o índice composto de audit_logs.
+     */
+    public function latestLogin(): HasOne
+    {
+        return $this->hasOne(AuditLog::class)
+            ->ofMany(['id' => 'max'], fn($query) => $query->where('action', 'login'));
     }
 }
