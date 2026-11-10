@@ -2,7 +2,13 @@
 import InputError from '@/components/InputError.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -24,7 +30,17 @@ import {
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem, type SharedData, type User } from '@/types';
 import { Head, router, useForm, usePage } from '@inertiajs/vue3';
-import { Pencil, Plus, Search, ShieldCheck, UserCheck, Users, UserX } from 'lucide-vue-next';
+import {
+    Pencil,
+    Plus,
+    Search,
+    ShieldCheck,
+    TrendingDown,
+    TrendingUp,
+    UserCheck,
+    Users,
+    UserX,
+} from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 
 interface UserRow extends User {
@@ -156,6 +172,11 @@ const formatDate = (dateString?: string) => {
         timeStyle: 'short',
     }).format(new Date(dateString));
 };
+
+const getPercentage = (value: number) => {
+    if (!props.stats.total) return '0%';
+    return `${((value / props.stats.total) * 100).toFixed(1)}%`;
+};
 </script>
 
 <template>
@@ -179,44 +200,100 @@ const formatDate = (dateString?: string) => {
 
             <!-- Cards Superiores de KPIs -->
             <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
-                    <CardHeader class="flex flex-row items-center justify-between pb-2">
-                        <CardTitle class="text-sm font-medium">Total de Usuários</CardTitle>
-                        <Users class="h-4 w-4 text-muted-foreground" />
+                <Card class="flex flex-col justify-between">
+                    <CardHeader class="pb-2">
+                        <div class="flex items-center justify-between">
+                            <CardDescription>Total de Usuários</CardDescription>
+                            <Badge variant="outline" class="flex items-center gap-1 rounded-lg text-xs font-medium">
+                                <Users class="h-3 w-3" />
+                                100%
+                            </Badge>
+                        </div>
+                        <CardTitle class="text-3xl font-semibold tabular-nums">
+                            {{ stats.total }}
+                        </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <div class="text-2xl font-bold">{{ stats.total }}</div>
-                    </CardContent>
+                    <CardFooter class="flex-col items-start gap-1 text-sm">
+                        <div class="flex items-center gap-1.5 font-medium">
+                            Base histórica preservada
+                            <TrendingUp class="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <div class="text-xs text-muted-foreground">
+                            Todos os operadores cadastrados no ERP
+                        </div>
+                    </CardFooter>
                 </Card>
 
-                <Card>
-                    <CardHeader class="flex flex-row items-center justify-between pb-2">
-                        <CardTitle class="text-sm font-medium">Usuários Ativos</CardTitle>
-                        <UserCheck class="h-4 w-4 text-emerald-500" />
+                <Card class="flex flex-col justify-between">
+                    <CardHeader class="pb-2">
+                        <div class="flex items-center justify-between">
+                            <CardDescription>Usuários Ativos</CardDescription>
+                            <Badge variant="outline" class="flex items-center gap-1 rounded-lg text-xs font-medium">
+                                <TrendingUp class="h-3 w-3 text-emerald-500" />
+                                {{ getPercentage(stats.active) }}
+                            </Badge>
+                        </div>
+                        <CardTitle class="text-3xl font-semibold tabular-nums">
+                            {{ stats.active }}
+                        </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <div class="text-2xl font-bold">{{ stats.active }}</div>
-                    </CardContent>
+                    <CardFooter class="flex-col items-start gap-1 text-sm">
+                        <div class="flex items-center gap-1.5 font-medium">
+                            Operadores habilitados
+                            <UserCheck class="h-4 w-4 text-emerald-500" />
+                        </div>
+                        <div class="text-xs text-muted-foreground">
+                            Contas com permissão de login imediato
+                        </div>
+                    </CardFooter>
                 </Card>
 
-                <Card>
-                    <CardHeader class="flex flex-row items-center justify-between pb-2">
-                        <CardTitle class="text-sm font-medium">Usuários Inativos</CardTitle>
-                        <UserX class="h-4 w-4 text-destructive" />
+                <Card class="flex flex-col justify-between">
+                    <CardHeader class="pb-2">
+                        <div class="flex items-center justify-between">
+                            <CardDescription>Usuários Inativos</CardDescription>
+                            <Badge variant="outline" class="flex items-center gap-1 rounded-lg text-xs font-medium">
+                                <TrendingDown class="h-3 w-3 text-destructive" />
+                                {{ getPercentage(stats.inactive) }}
+                            </Badge>
+                        </div>
+                        <CardTitle class="text-3xl font-semibold tabular-nums">
+                            {{ stats.inactive }}
+                        </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <div class="text-2xl font-bold">{{ stats.inactive }}</div>
-                    </CardContent>
+                    <CardFooter class="flex-col items-start gap-1 text-sm">
+                        <div class="flex items-center gap-1.5 font-medium">
+                            Acessos revogados
+                            <UserX class="h-4 w-4 text-destructive" />
+                        </div>
+                        <div class="text-xs text-muted-foreground">
+                            Mantidos intactos para trilha de auditoria
+                        </div>
+                    </CardFooter>
                 </Card>
 
-                <Card>
-                    <CardHeader class="flex flex-row items-center justify-between pb-2">
-                        <CardTitle class="text-sm font-medium">Administradores</CardTitle>
-                        <ShieldCheck class="h-4 w-4 text-primary" />
+                <Card class="flex flex-col justify-between">
+                    <CardHeader class="pb-2">
+                        <div class="flex items-center justify-between">
+                            <CardDescription>Administradores</CardDescription>
+                            <Badge variant="outline" class="flex items-center gap-1 rounded-lg text-xs font-medium">
+                                <ShieldCheck class="h-3 w-3 text-primary" />
+                                {{ getPercentage(stats.admins) }}
+                            </Badge>
+                        </div>
+                        <CardTitle class="text-3xl font-semibold tabular-nums">
+                            {{ stats.admins }}
+                        </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <div class="text-2xl font-bold">{{ stats.admins }}</div>
-                    </CardContent>
+                    <CardFooter class="flex-col items-start gap-1 text-sm">
+                        <div class="flex items-center gap-1.5 font-medium">
+                            Gestão e governança
+                            <ShieldCheck class="h-4 w-4 text-primary" />
+                        </div>
+                        <div class="text-xs text-muted-foreground">
+                            Acesso total aos módulos e configurações
+                        </div>
+                    </CardFooter>
                 </Card>
             </div>
 
