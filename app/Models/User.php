@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Enums\UserRole;
-use App\Models\Concerns\Auditable;
 use DomainException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Enums\UserRole;
+use App\Models\Concerns\Auditable;
 
 class User extends Authenticatable
 {
@@ -61,9 +61,7 @@ class User extends Authenticatable
     protected static function booted(): void
     {
         static::deleting(function (self $user): void {
-            throw new DomainException(
-                "Operação proibida: o usuário [{$user->email}] não pode ser excluído. Utilize a inativação (is_active = false)."
-            );
+            throw new DomainException(__('users.cannot_delete', ['email' => $user->email]));
         });
     }
 

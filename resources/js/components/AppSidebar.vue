@@ -3,29 +3,37 @@ import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-vue-next';
+import { type NavItem, type SharedData } from '@/types';
+import { computed } from 'vue';
+import { Link, usePage } from '@inertiajs/vue3';
+import { BookOpen, Folder, LayoutGrid, Users } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
-const mainNavItems: NavItem[] = [
+const page = usePage<SharedData>();
+
+// Monta os itens do menu principal exibindo "Usuários" apenas para perfil 'admin'
+const mainNavItems = computed<NavItem[]>(() => [
     {
         title: 'Dashboard',
         href: '/dashboard',
         icon: LayoutGrid,
     },
-];
+    ...(page.props.auth.user.role === 'admin'
+        ? [
+              {
+                  title: 'Usuários',
+                  href: '/users',
+                  icon: Users,
+              },
+          ]
+        : []),
+]);
 
 const footerNavItems: NavItem[] = [
     {
         title: 'Github Repo',
-        href: 'https://github.com/laravel/vue-starter-kit',
+        href: 'https://github.com/rsgnan/ventania',
         icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits',
-        icon: BookOpen,
     },
 ];
 </script>
