@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Enums\UserRole;
+use App\Models\Category;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -55,6 +57,14 @@ class DatabaseSeeder extends Seeder
 
             // Cria 2 operadores inativos aleatórios para testar filtros na listagem
             User::factory(2)->inactive()->create();
+        }
+
+        // 5. Categorias fixas do catálogo Ventania (Idempotente via slug único)
+        foreach (['Vestuários', 'Pedras', 'Guias', 'Ervas', 'Sabonetes', 'Perfumes', 'Incensos', 'Acessórios', 'Amigurumi'] as $name) {
+            Category::firstOrCreate(
+                ['slug' => Str::slug($name)],
+                ['name' => $name],
+            );
         }
     }
 }

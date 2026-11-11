@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -12,6 +13,10 @@ Route::get('dashboard', function () {
 })->middleware(['auth'])->name('dashboard');
 
 Route::resource('users', UserController::class)
+    ->only(['index', 'store', 'update'])
+    ->middleware(['auth']);
+
+Route::resource('products', ProductController::class)
     ->only(['index', 'store', 'update'])
     ->middleware(['auth']);
 
