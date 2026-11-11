@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserRole;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -53,53 +52,22 @@ class UserController extends Controller
     }
 
     /**
-     * Cadastra um novo usuário no ERP (acionado pelo painel lateral <Sheet>).
+     * Cadastra um novo usuário no ERP (autorizado e validado via StoreUserRequest).
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreUserRequest $request): RedirectResponse
     {
-        Gate::authorize('create', User::class);
-
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', Password::defaults()],
-            'role' => ['required', Rule::enum(UserRole::class)],
-            'is_active' => ['required', 'boolean'],
-        ]);
-
-        User::create($validated);
+        User::create($request->validated());
 
         return back();
     }
 
+
     /**
-     * Atualiza um usuário existente garantindo que o Admin logado não bloqueie a si mesmo.
+     * Atualiza um usuário existente (autorizado e protegido contra auto-bloqueio via UpdateUserRequest).
      */
-    public function update(Request $request, User $user): RedirectResponse
+    public function update(UpdateUserRequest $request, User $user): RedirectResponse
     {
-        Gate::authorize('update', $user);
-
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'password' => ['nullable', 'string', Password::defaults()],
-            'role' => ['required', Rule::enum(UserRole::class)],
-            'is_active' => ['required', 'boolean'],
-        ]);
-
-        // Trava de autoproteção: impede que o administrador logado desative a si mesmo ou remova seu próprio cargo de Admin
-        if ($request->user()->is($user) && (! $validated['is_active'] || $validated['role'] !== UserRole::Admin->value)) {
-            throw ValidationException::withMessages([
-                'role' => __('users.self_lockout'),
-            ]);
-        }
-
-        // Na edição, se o campo de senha vier em branco, mantém a senha atual intacta
-        if (empty($validated['password'])) {
-            unset($validated['password']);
-        }
-
-        $user->update($validated);
+        $user->update(array_filter($request->validated(), fn($value) => $value !== null));
 
         return back();
     }

@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ProductType;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -70,9 +71,9 @@ class ProductController extends Controller
     /**
      * Cadastra um Produto Simples (com estoque inicial 0) ou um Kit com sua composição.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreProductRequest $request): RedirectResponse
     {
-        $validated = $this->validateProduct($request);
+        $validated = $request->validated();
 
         DB::transaction(function () use ($validated) {
             $product = Product::create([
@@ -95,9 +96,9 @@ class ProductController extends Controller
     /**
      * Atualiza dados cadastrais, status e composição (sem permitir edição direta de estoque).
      */
-    public function update(Request $request, Product $product): RedirectResponse
+    public function update(UpdateProductRequest $request, Product $product): RedirectResponse
     {
-        $validated = $this->validateProduct($request, $product);
+        $validated = $request->validated();
 
         DB::transaction(function () use ($product, $validated) {
             $product->update([
@@ -117,29 +118,6 @@ class ProductController extends Controller
         });
 
         return back();
-    }
-
-    /**
-     * Centraliza as regras de validação de criação e edição de produtos e kits.
-     */
-    private function validateProduct(Request $request, ?Product $product = null): array
-    {
-        return $request->validate([
-            'category_id' => ['required', 'integer', 'exists:categories,id'],
-            'name' => ['required', 'string', 'max:255'],
-            'sku' => ['nullable', 'string', 'max:50', Rule::unique('products', 'sku')->ignore($product?->id)],
-            'type' => ['required', Rule::enum(ProductType::class)],
-            'price' => ['required', 'numeric', 'min:0'],
-            'is_active' => ['required', 'boolean'],
-            'components' => ['required_if:type,kit', 'nullable', 'array', 'min:1'],
-            'components.*.product_id' => [
-                'required_if:type,kit',
-                'integer',
-                'distinct',
-                Rule::exists('products', 'id')->where('type', ProductType::Simple->value),
-            ],
-            'components.*.quantity' => ['required_if:type,kit', 'integer', 'min:1'],
-        ]);
     }
 
     /**
