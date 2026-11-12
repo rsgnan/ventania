@@ -125,7 +125,6 @@ class ProductController extends Controller
                 'category_id' => $validated['category_id'],
                 'name' => $validated['name'],
                 'sku' => $validated['sku'] ?: $product->sku,
-                'type' => $validated['type'],
                 'price' => $validated['price'],
                 'min_stock' => $validated['min_stock'],
                 'description' => $validated['description'] ?? null,

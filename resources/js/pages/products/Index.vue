@@ -662,6 +662,7 @@ const formatCurrency = (value: number | string) => {
                                 type="button"
                                 :variant="form.type === 'simple' ? 'default' : 'outline'"
                                 class="w-full"
+                                :disabled="!!editingProduct"
                                 @click="selectProductType('simple')"
                             >
                                 <Package class="mr-2 h-4 w-4" />
@@ -671,6 +672,7 @@ const formatCurrency = (value: number | string) => {
                                 type="button"
                                 :variant="form.type === 'kit' ? 'default' : 'outline'"
                                 class="w-full"
+                                :disabled="!!editingProduct"
                                 @click="selectProductType('kit')"
                             >
                                 <Layers class="mr-2 h-4 w-4" />

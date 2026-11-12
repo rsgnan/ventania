@@ -63,6 +63,13 @@ class Product extends Model
         static::deleting(function (self $product): void {
             throw new DomainException(__('products.cannot_delete', ['name' => $product->name]));
         });
+
+        // Trava de domínio: proibido alterar a natureza (Simples <-> Kit) de um produto após criado
+        static::updating(function (self $product): void {
+            if ($product->isDirty('type')) {
+                throw new DomainException(__('products.cannot_change_type'));
+            }
+        });
     }
 
     /**
@@ -124,7 +131,7 @@ class Product extends Model
         return Attribute::make(
             get: function (): int {
                 if ($this->type !== ProductType::Kit) {
-                    return $this->stock_quantity;
+                    return (int) ($this->stock_quantity ?? 0);
                 }
 
                 $components = $this->relationLoaded('components')
@@ -136,7 +143,7 @@ class Product extends Model
                 }
 
                 return (int) $components->map(
-                    fn(self $component) => intdiv(max(0, $component->stock_quantity), max(1, (int) $component->pivot->quantity))
+                    fn(self $component) => intdiv(max(0, (int) $component->stock_quantity), max(1, (int) $component->pivot->quantity))
                 )->min();
             }
         );
@@ -144,12 +151,11 @@ class Product extends Model
 
     /**
      * Indica se o Produto Físico (Simple) está com saldo abaixo ou igual ao estoque mínimo.
-     * Kits possuem estoque virtual e não geram alerta de estoque baixo próprio.
      */
     protected function isLowStock(): Attribute
     {
         return Attribute::make(
-            get: fn(): bool => $this->type === ProductType::Simple && $this->stock_quantity <= $this->min_stock,
+            get: fn(): bool => $this->type === ProductType::Simple && ($this->stock_quantity ?? 0) <= ($this->min_stock ?? 0),
         );
     }
 
