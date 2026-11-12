@@ -29,6 +29,15 @@ return new class extends Migration
             // Todo produto simples nasce com estoque 0 (só muda via Movimentação). Kits calculam dinamicamente.
             $table->integer('stock_quantity')->default(0);
 
+            // Limite mínimo de estoque para alertas de reposição
+            $table->unsignedInteger('min_stock')->default(5);
+
+            // Descrição detalhada do produto (opcional)
+            $table->text('description')->nullable();
+
+            // Caminho ou URL da imagem principal do produto armazenada no storage
+            $table->string('image_path')->nullable();
+
             // Proibido deletar produtos: controle apenas via ativação/inativação
             $table->boolean('is_active')->default(true);
 

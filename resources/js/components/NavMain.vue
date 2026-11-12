@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type SharedData } from '@/types';
+import {
+    SidebarGroup,
+    SidebarGroupLabel,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+} from '@/components/ui/sidebar';
+// Importamos NavItem do arquivo central de tipos para evitar divergência entre 'url' e 'href'
+import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import type { Component } from 'vue';
-
-interface NavItem {
-    title: string;
-    url: string;
-    icon: Component;
-}
 
 defineProps<{
     items: NavItem[];
@@ -19,11 +19,12 @@ const page = usePage<SharedData>();
 
 <template>
     <SidebarGroup class="px-2 py-0">
-        <SidebarGroupLabel>Platform</SidebarGroupLabel>
+        <SidebarGroupLabel>Plataforma</SidebarGroupLabel>
         <SidebarMenu>
             <SidebarMenuItem v-for="item in items" :key="item.title">
-                <SidebarMenuButton as-child :is-active="item.url === page.url">
-                    <Link :href="item.url">
+                <!-- startsWith mantém o menu ativo mesmo em sub-rotas ou paginação (ex: /products?page=2) -->
+                <SidebarMenuButton as-child :is-active="page.url.startsWith(item.href)">
+                    <Link :href="item.href">
                         <component :is="item.icon" />
                         <span>{{ item.title }}</span>
                     </Link>

@@ -22,16 +22,21 @@ class Product extends Model
         'type',
         'price',
         'stock_quantity',
+        'min_stock',
+        'description',
+        'image_path',
         'is_active',
     ];
 
     /**
-     * Inclui automaticamente o estoque calculado (available_stock) na serialização JSON para o Vue.
+     * Inclui automaticamente o estoque calculado, o alerta de estoque baixo e a URL da foto no JSON enviado ao Vue.
      *
      * @var list<string>
      */
     protected $appends = [
         'available_stock',
+        'is_low_stock',
+        'image_url',
     ];
 
     protected function casts(): array
@@ -40,6 +45,7 @@ class Product extends Model
             'type' => ProductType::class,
             'price' => 'decimal:2',
             'stock_quantity' => 'integer',
+            'min_stock' => 'integer',
             'is_active' => 'boolean',
         ];
     }
@@ -133,6 +139,27 @@ class Product extends Model
                     fn(self $component) => intdiv(max(0, $component->stock_quantity), max(1, (int) $component->pivot->quantity))
                 )->min();
             }
+        );
+    }
+
+    /**
+     * Indica se o Produto Físico (Simple) está com saldo abaixo ou igual ao estoque mínimo.
+     * Kits possuem estoque virtual e não geram alerta de estoque baixo próprio.
+     */
+    protected function isLowStock(): Attribute
+    {
+        return Attribute::make(
+            get: fn(): bool => $this->type === ProductType::Simple && $this->stock_quantity <= $this->min_stock,
+        );
+    }
+
+    /**
+     * Retorna a URL pública da imagem do produto através do link simbólico public/storage.
+     */
+    protected function imageUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn(): ?string => $this->image_path ? asset('storage/' . $this->image_path) : null,
         );
     }
 }

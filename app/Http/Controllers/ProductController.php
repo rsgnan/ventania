@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -30,13 +31,18 @@ class ProductController extends Controller
                 });
             })
             ->when($request->integer('category_id'), fn(Builder $query, int $categoryId) => $query->where('category_id', $categoryId))
-            ->when($request->string('type')->value(), fn(Builder $query, string $type) => $query->where('type', $type))
+            ->when($request->string('tab')->value(), function (Builder $query, string $tab) {
+                match ($tab) {
+                    'simple' => $query->where('type', ProductType::Simple),
+                    'kit' => $query->where('type', ProductType::Kit),
+                    'low_stock' => $query->where('type', ProductType::Simple)->whereColumn('stock_quantity', '<=', 'min_stock'),
+                    default => null,
+                };
+            })
             ->when($request->string('status')->value(), function (Builder $query, string $status) {
                 match ($status) {
                     'active' => $query->where('is_active', true),
                     'inactive' => $query->where('is_active', false),
-                    'in_stock' => $query->where('type', ProductType::Simple)->where('stock_quantity', '>', 0),
-                    'out_of_stock' => $query->where('type', ProductType::Simple)->where('stock_quantity', '<=', 0),
                     default => null,
                 };
             })
@@ -46,7 +52,7 @@ class ProductController extends Controller
 
         return Inertia::render('products/Index', [
             'products' => $products,
-            'filters' => $request->only(['search', 'category_id', 'type', 'status']),
+            'filters' => $request->only(['search', 'category_id', 'tab', 'status']),
             'categories' => Category::orderBy('name')->get(['id', 'name']),
             'simpleProducts' => Product::where('type', ProductType::Simple)
                 ->where('is_active', true)
@@ -58,8 +64,9 @@ class ProductController extends Controller
             ],
             'stats' => [
                 'total' => Product::count(),
+                'simple' => Product::where('type', ProductType::Simple)->count(),
                 'kits' => Product::where('type', ProductType::Kit)->count(),
-                'active' => Product::where('is_active', true)->count(),
+                'low_stock' => Product::where('type', ProductType::Simple)->whereColumn('stock_quantity', '<=', 'min_stock')->count(),
                 'physical_units' => (int) Product::where('type', ProductType::Simple)->sum('stock_quantity'),
                 'stock_value' => (float) Product::where('type', ProductType::Simple)
                     ->selectRaw('COALESCE(SUM(price * stock_quantity), 0) as total')
@@ -69,19 +76,22 @@ class ProductController extends Controller
     }
 
     /**
-     * Cadastra um Produto Simples (com estoque inicial 0) ou um Kit com sua composição.
+     * Cadastra um Produto Simples (com estoque inicial 0) ou um Kit com sua composição e imagem opcional.
      */
     public function store(StoreProductRequest $request): RedirectResponse
     {
         $validated = $request->validated();
 
-        DB::transaction(function () use ($validated) {
+        DB::transaction(function () use ($request, $validated) {
             $product = Product::create([
                 'category_id' => $validated['category_id'],
                 'name' => $validated['name'],
                 'sku' => $validated['sku'] ?? null,
                 'type' => $validated['type'],
                 'price' => $validated['price'],
+                'min_stock' => $validated['min_stock'],
+                'description' => $validated['description'] ?? null,
+                'image_path' => $request->file('image')?->store('products', 'public'),
                 'is_active' => $validated['is_active'],
             ]);
 
@@ -94,19 +104,32 @@ class ProductController extends Controller
     }
 
     /**
-     * Atualiza dados cadastrais, status e composição (sem permitir edição direta de estoque).
+     * Atualiza dados cadastrais, foto, estoque mínimo e composição do Kit.
      */
     public function update(UpdateProductRequest $request, Product $product): RedirectResponse
     {
         $validated = $request->validated();
 
-        DB::transaction(function () use ($product, $validated) {
+        DB::transaction(function () use ($request, $product, $validated) {
+            $imagePath = $product->image_path;
+
+            if ($request->hasFile('image')) {
+                if ($product->image_path) {
+                    Storage::disk('public')->delete($product->image_path);
+                }
+
+                $imagePath = $request->file('image')->store('products', 'public');
+            }
+
             $product->update([
                 'category_id' => $validated['category_id'],
                 'name' => $validated['name'],
                 'sku' => $validated['sku'] ?: $product->sku,
                 'type' => $validated['type'],
                 'price' => $validated['price'],
+                'min_stock' => $validated['min_stock'],
+                'description' => $validated['description'] ?? null,
+                'image_path' => $imagePath,
                 'is_active' => $validated['is_active'],
             ]);
 

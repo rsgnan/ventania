@@ -55,6 +55,8 @@ interface Props {
         data: UserRow[];
         current_page: number;
         last_page: number;
+        from: number | null;
+        to: number | null;
         total: number;
         prev_page_url: string | null;
         next_page_url: string | null;
@@ -81,20 +83,17 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Usuários', href: '/users' },
 ];
 
-// Estado dos filtros da listagem
+// Estado dos filtros (Busca + Aba Pill de Status: Todos, Ativos, Desativados)
 const search = ref(props.filters.search ?? '');
-const roleFilter = ref(props.filters.role ?? '');
-const statusFilter = ref(props.filters.status ?? '');
+const statusTab = ref(props.filters.status ?? '');
 
-// Dispara a filtragem no backend com debounce para evitar excesso de requisições ao digitar
 let searchTimeout: ReturnType<typeof setTimeout>;
 const applyFilters = () => {
     router.get(
         '/users',
         {
             search: search.value || undefined,
-            role: roleFilter.value || undefined,
-            status: statusFilter.value || undefined,
+            status: statusTab.value || undefined,
         },
         {
             preserveState: true,
@@ -109,7 +108,7 @@ watch(search, () => {
     searchTimeout = setTimeout(applyFilters, 300);
 });
 
-watch([roleFilter, statusFilter], applyFilters);
+watch(statusTab, applyFilters);
 
 // Controle do painel lateral (<Sheet>) de criação e edição
 const isSheetOpen = ref(false);
@@ -123,7 +122,6 @@ const form = useForm({
     is_active: true,
 });
 
-// Verifica se o administrador logado está editando a própria conta
 const isEditingSelf = computed(() => editingUser.value?.id === page.props.auth.user.id);
 
 const openCreateSheet = () => {
@@ -183,28 +181,22 @@ const getPercentage = (value: number) => {
     <Head title="Gestão de Usuários" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex flex-1 flex-col gap-6 p-6">
+        <div class="flex min-w-0 flex-1 flex-col gap-4 p-4 sm:gap-6 sm:p-6">
             <!-- Cabeçalho da Página -->
-            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h1 class="text-2xl font-bold tracking-tight">Usuários</h1>
-                    <p class="text-sm text-muted-foreground">
-                        Gerencie os operadores e administradores do ERP Ventania.
-                    </p>
-                </div>
-                <Button @click="openCreateSheet">
-                    <Plus class="mr-2 h-4 w-4" />
-                    Novo Usuário
-                </Button>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight sm:text-2xl">Usuários</h1>
+                <p class="text-sm text-muted-foreground">
+                    Gerencie os operadores e administradores do ERP Ventania.
+                </p>
             </div>
 
-            <!-- Cards Superiores de KPIs -->
-            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <!-- Cards Superiores de KPIs (Padrão Shadcn Dashboard) -->
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <Card class="flex flex-col justify-between">
                     <CardHeader class="pb-2">
-                        <div class="flex items-center justify-between">
-                            <CardDescription>Total de Usuários</CardDescription>
-                            <Badge variant="outline" class="flex items-center gap-1 rounded-lg text-xs font-medium">
+                        <div class="flex items-center justify-between gap-2">
+                            <CardDescription class="truncate">Total de Usuários</CardDescription>
+                            <Badge variant="outline" class="flex shrink-0 items-center gap-1 rounded-lg text-xs font-medium">
                                 <Users class="h-3 w-3" />
                                 100%
                             </Badge>
@@ -216,7 +208,7 @@ const getPercentage = (value: number) => {
                     <CardFooter class="flex-col items-start gap-1 text-sm">
                         <div class="flex items-center gap-1.5 font-medium">
                             Base histórica preservada
-                            <TrendingUp class="h-4 w-4 text-muted-foreground" />
+                            <TrendingUp class="h-4 w-4 shrink-0 text-muted-foreground" />
                         </div>
                         <div class="text-xs text-muted-foreground">
                             Todos os operadores cadastrados no ERP
@@ -226,9 +218,9 @@ const getPercentage = (value: number) => {
 
                 <Card class="flex flex-col justify-between">
                     <CardHeader class="pb-2">
-                        <div class="flex items-center justify-between">
-                            <CardDescription>Usuários Ativos</CardDescription>
-                            <Badge variant="outline" class="flex items-center gap-1 rounded-lg text-xs font-medium">
+                        <div class="flex items-center justify-between gap-2">
+                            <CardDescription class="truncate">Usuários Ativos</CardDescription>
+                            <Badge variant="outline" class="flex shrink-0 items-center gap-1 rounded-lg text-xs font-medium">
                                 <TrendingUp class="h-3 w-3 text-emerald-500" />
                                 {{ getPercentage(stats.active) }}
                             </Badge>
@@ -240,7 +232,7 @@ const getPercentage = (value: number) => {
                     <CardFooter class="flex-col items-start gap-1 text-sm">
                         <div class="flex items-center gap-1.5 font-medium">
                             Operadores habilitados
-                            <UserCheck class="h-4 w-4 text-emerald-500" />
+                            <UserCheck class="h-4 w-4 shrink-0 text-emerald-500" />
                         </div>
                         <div class="text-xs text-muted-foreground">
                             Contas com permissão de login imediato
@@ -250,9 +242,9 @@ const getPercentage = (value: number) => {
 
                 <Card class="flex flex-col justify-between">
                     <CardHeader class="pb-2">
-                        <div class="flex items-center justify-between">
-                            <CardDescription>Usuários Inativos</CardDescription>
-                            <Badge variant="outline" class="flex items-center gap-1 rounded-lg text-xs font-medium">
+                        <div class="flex items-center justify-between gap-2">
+                            <CardDescription class="truncate">Usuários Inativos</CardDescription>
+                            <Badge variant="outline" class="flex shrink-0 items-center gap-1 rounded-lg text-xs font-medium">
                                 <TrendingDown class="h-3 w-3 text-destructive" />
                                 {{ getPercentage(stats.inactive) }}
                             </Badge>
@@ -264,7 +256,7 @@ const getPercentage = (value: number) => {
                     <CardFooter class="flex-col items-start gap-1 text-sm">
                         <div class="flex items-center gap-1.5 font-medium">
                             Acessos revogados
-                            <UserX class="h-4 w-4 text-destructive" />
+                            <UserX class="h-4 w-4 shrink-0 text-destructive" />
                         </div>
                         <div class="text-xs text-muted-foreground">
                             Mantidos intactos para trilha de auditoria
@@ -274,9 +266,9 @@ const getPercentage = (value: number) => {
 
                 <Card class="flex flex-col justify-between">
                     <CardHeader class="pb-2">
-                        <div class="flex items-center justify-between">
-                            <CardDescription>Administradores</CardDescription>
-                            <Badge variant="outline" class="flex items-center gap-1 rounded-lg text-xs font-medium">
+                        <div class="flex items-center justify-between gap-2">
+                            <CardDescription class="truncate">Administradores</CardDescription>
+                            <Badge variant="outline" class="flex shrink-0 items-center gap-1 rounded-lg text-xs font-medium">
                                 <ShieldCheck class="h-3 w-3 text-primary" />
                                 {{ getPercentage(stats.admins) }}
                             </Badge>
@@ -288,7 +280,7 @@ const getPercentage = (value: number) => {
                     <CardFooter class="flex-col items-start gap-1 text-sm">
                         <div class="flex items-center gap-1.5 font-medium">
                             Gestão e governança
-                            <ShieldCheck class="h-4 w-4 text-primary" />
+                            <ShieldCheck class="h-4 w-4 shrink-0 text-primary" />
                         </div>
                         <div class="text-xs text-muted-foreground">
                             Acesso total aos módulos e configurações
@@ -297,87 +289,158 @@ const getPercentage = (value: number) => {
                 </Card>
             </div>
 
-            <!-- Barra de Filtros -->
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <div class="relative flex-1">
-                    <Search class="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        v-model="search"
-                        placeholder="Buscar por nome ou e-mail..."
-                        class="pl-9"
-                    />
+            <!-- Barra de Ferramentas: Pills (Esquerda) + Busca e Botão Novo Usuário (Direita) -->
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div class="inline-flex w-fit flex-wrap items-center gap-1 rounded-lg bg-muted/70 p-1">
+                    <button
+                        type="button"
+                        class="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all"
+                        :class="
+                            statusTab === ''
+                                ? 'bg-background text-foreground shadow-sm'
+                                : 'text-muted-foreground hover:text-foreground'
+                        "
+                        @click="statusTab = ''"
+                    >
+                        Todos
+                        <span class="rounded-full bg-muted-foreground/15 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums">
+                            {{ stats.total }}
+                        </span>
+                    </button>
+
+                    <button
+                        type="button"
+                        class="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all"
+                        :class="
+                            statusTab === 'active'
+                                ? 'bg-background text-foreground shadow-sm'
+                                : 'text-muted-foreground hover:text-foreground'
+                        "
+                        @click="statusTab = 'active'"
+                    >
+                        Ativos
+                        <span class="rounded-full bg-muted-foreground/15 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums">
+                            {{ stats.active }}
+                        </span>
+                    </button>
+
+                    <button
+                        type="button"
+                        class="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all"
+                        :class="
+                            statusTab === 'inactive'
+                                ? 'bg-background text-foreground shadow-sm'
+                                : 'text-muted-foreground hover:text-foreground'
+                        "
+                        @click="statusTab = 'inactive'"
+                    >
+                        Desativados
+                        <span class="rounded-full bg-muted-foreground/15 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums">
+                            {{ stats.inactive }}
+                        </span>
+                    </button>
                 </div>
 
-                <select
-                    v-model="roleFilter"
-                    class="h-9 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                >
-                    <option value="">Todos os perfis</option>
-                    <option v-for="role in roles" :key="role.value" :value="role.value">
-                        {{ role.label }}
-                    </option>
-                </select>
+                <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+                    <div class="relative w-full sm:w-64">
+                        <Search class="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            v-model="search"
+                            placeholder="Buscar por nome ou e-mail..."
+                            class="h-9 pl-9"
+                        />
+                    </div>
 
-                <select
-                    v-model="statusFilter"
-                    class="h-9 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                >
-                    <option value="">Todos os status</option>
-                    <option value="active">Apenas Ativos</option>
-                    <option value="inactive">Apenas Inativos</option>
-                </select>
+                    <Button class="h-9 w-full sm:w-auto" @click="openCreateSheet">
+                        <Plus class="mr-1.5 h-4 w-4" />
+                        Novo Usuário
+                    </Button>
+                </div>
             </div>
 
-            <!-- Tabela de Usuários -->
-            <div class="rounded-md border bg-card">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Nome</TableHead>
-                            <TableHead>E-mail</TableHead>
-                            <TableHead>Perfil</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Último Acesso</TableHead>
-                            <TableHead class="text-right">Ações</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        <TableRow v-for="user in users.data" :key="user.id">
-                            <TableCell class="font-medium">{{ user.name }}</TableCell>
-                            <TableCell>{{ user.email }}</TableCell>
-                            <TableCell>
-                                <Badge :variant="user.role === 'admin' ? 'default' : 'secondary'">
-                                    {{ user.role === 'admin' ? 'Administrador' : 'Usuário' }}
-                                </Badge>
-                            </TableCell>
-                            <TableCell>
-                                <Badge :variant="user.is_active ? 'outline' : 'destructive'">
-                                    {{ user.is_active ? 'Ativo' : 'Inativo' }}
-                                </Badge>
-                            </TableCell>
-                            <TableCell class="text-muted-foreground">
-                                {{ formatDate(user.latest_login?.created_at) }}
-                            </TableCell>
-                            <TableCell class="text-right">
-                                <Button variant="ghost" size="sm" @click="openEditSheet(user)">
-                                    <Pencil class="mr-1 h-4 w-4" />
-                                    Editar
-                                </Button>
-                            </TableCell>
-                        </TableRow>
+            <!-- Tabela de Usuários com Scroll Horizontal Isolado no Mobile -->
+            <div class="w-full overflow-hidden rounded-md border bg-card">
+                <div class="w-full overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead class="w-14 whitespace-nowrap">ID</TableHead>
+                                <TableHead class="whitespace-nowrap">Nome</TableHead>
+                                <TableHead class="whitespace-nowrap">E-mail</TableHead>
+                                <TableHead class="whitespace-nowrap">Cargo</TableHead>
+                                <TableHead class="whitespace-nowrap">Status de Acesso</TableHead>
+                                <TableHead class="whitespace-nowrap">Último Acesso</TableHead>
+                                <TableHead class="whitespace-nowrap">Data de Cadastro</TableHead>
+                                <TableHead class="whitespace-nowrap text-right">Ações</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow v-for="user in users.data" :key="user.id">
+                                <TableCell class="whitespace-nowrap font-mono text-xs text-muted-foreground">
+                                    #{{ user.id }}
+                                </TableCell>
+                                <TableCell class="whitespace-nowrap font-medium">
+                                    <div class="flex items-center gap-2">
+                                        <span>{{ user.name }}</span>
+                                        <span
+                                            v-if="user.id === page.props.auth.user.id"
+                                            class="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground"
+                                        >
+                                            Você
+                                        </span>
+                                    </div>
+                                </TableCell>
+                                <TableCell class="whitespace-nowrap text-muted-foreground">
+                                    {{ user.email }}
+                                </TableCell>
+                                <TableCell class="whitespace-nowrap">
+                                    <Badge :variant="user.role === 'admin' ? 'default' : 'secondary'">
+                                        {{ user.role === 'admin' ? 'Administrador' : 'Usuário Comum' }}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell class="whitespace-nowrap">
+                                    <Badge
+                                        :variant="user.is_active ? 'outline' : 'destructive'"
+                                        class="inline-flex items-center gap-1.5"
+                                    >
+                                        <span
+                                            class="h-1.5 w-1.5 rounded-full"
+                                            :class="user.is_active ? 'bg-emerald-500' : 'bg-current'"
+                                        />
+                                        {{ user.is_active ? 'Ativo' : 'Desativado' }}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell class="whitespace-nowrap text-xs text-muted-foreground tabular-nums">
+                                    {{ formatDate(user.latest_login?.created_at) }}
+                                </TableCell>
+                                <TableCell class="whitespace-nowrap text-xs text-muted-foreground tabular-nums">
+                                    {{ formatDate(user.created_at) }}
+                                </TableCell>
+                                <TableCell class="whitespace-nowrap text-right">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        class="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                        @click="openEditSheet(user)"
+                                    >
+                                        <Pencil class="h-4 w-4" />
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
 
-                        <TableRow v-if="users.data.length === 0">
-                            <TableCell colspan="6" class="h-24 text-center text-muted-foreground">
-                                Nenhum usuário encontrado com os filtros informados.
-                            </TableCell>
-                        </TableRow>
-                    </TableBody>
-                </Table>
+                            <TableRow v-if="users.data.length === 0">
+                                <TableCell colspan="8" class="h-24 text-center text-muted-foreground">
+                                    Nenhum usuário encontrado com os filtros informados.
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </div>
 
                 <!-- Rodapé de Paginação -->
-                <div class="flex items-center justify-between border-t px-4 py-3 text-sm text-muted-foreground">
+                <div class="flex flex-col items-center justify-between gap-2 border-t px-4 py-3 text-sm text-muted-foreground sm:flex-row">
                     <div>
-                        Página {{ users.current_page }} de {{ users.last_page }} ({{ users.total }} registros)
+                        Mostrando página {{ users.current_page }} de {{ users.last_page }} ({{ users.total }} usuários)
                     </div>
                     <div class="flex gap-2">
                         <Button
@@ -403,7 +466,7 @@ const getPercentage = (value: number) => {
 
         <!-- Painel Lateral (<Sheet>) de Criação / Edição -->
         <Sheet v-model:open="isSheetOpen">
-            <SheetContent class="sm:max-w-md">
+            <SheetContent class="overflow-y-auto sm:max-w-md">
                 <SheetHeader>
                     <SheetTitle>
                         {{ editingUser ? 'Editar Usuário' : 'Novo Usuário' }}
@@ -451,7 +514,7 @@ const getPercentage = (value: number) => {
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="role">Perfil de Acesso</Label>
+                        <Label for="role">Cargo</Label>
                         <select
                             id="role"
                             v-model="form.role"

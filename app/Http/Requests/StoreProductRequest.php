@@ -8,17 +8,12 @@ use Illuminate\Validation\Rule;
 
 class StoreProductRequest extends FormRequest
 {
-    /**
-     * Determina se o usuário logado tem permissão para realizar esta requisição.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
     /**
-     * Regras de validação para criação (e base para atualização) de Produtos e Kits.
-     *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
@@ -29,6 +24,9 @@ class StoreProductRequest extends FormRequest
             'sku' => ['nullable', 'string', 'max:50', Rule::unique('products', 'sku')->ignore($this->route('product'))],
             'type' => ['required', Rule::enum(ProductType::class)],
             'price' => ['required', 'numeric', 'min:0'],
+            'min_stock' => ['required', 'integer', 'min:0'],
+            'description' => ['nullable', 'string', 'max:2000'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'is_active' => ['required', 'boolean'],
             'components' => ['required_if:type,kit', 'nullable', 'array', 'min:1'],
             'components.*.product_id' => [
