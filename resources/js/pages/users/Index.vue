@@ -37,6 +37,7 @@ import {
     ShieldCheck,
     TrendingDown,
     TrendingUp,
+    User as UserIcon,
     UserCheck,
     Users,
     UserX,
@@ -79,7 +80,6 @@ const props = defineProps<Props>();
 const page = usePage<SharedData>();
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
     { title: 'Usuários', href: '/users' },
 ];
 
@@ -119,7 +119,7 @@ const form = useForm({
     email: '',
     password: '',
     role: 'user' as 'admin' | 'user',
-    is_active: true,
+    is_active: true as boolean,
 });
 
 const isEditingSelf = computed(() => editingUser.value?.id === page.props.auth.user.id);
@@ -352,7 +352,7 @@ const getPercentage = (value: number) => {
                     </div>
 
                     <Button class="h-9 w-full sm:w-auto" @click="openCreateSheet">
-                        <Plus class="mr-1.5 h-4 w-4" />
+                        <Plus class="h-4 w-4" />
                         Novo Usuário
                     </Button>
                 </div>
@@ -464,93 +464,123 @@ const getPercentage = (value: number) => {
             </div>
         </div>
 
-        <!-- Painel Lateral (<Sheet>) de Criação / Edição -->
+        <!-- Painel Lateral (<Sheet>) Compacto Padronizado -->
         <Sheet v-model:open="isSheetOpen">
-            <SheetContent class="overflow-y-auto sm:max-w-md">
-                <SheetHeader>
-                    <SheetTitle>
-                        {{ editingUser ? 'Editar Usuário' : 'Novo Usuário' }}
+            <SheetContent class="flex h-full flex-col p-0 sm:max-w-md">
+                <SheetHeader class="border-b px-5 py-3.5">
+                    <SheetTitle class="text-base">
+                        {{ editingUser ? `Editar usuário #${editingUser.id}` : 'Novo usuário' }}
                     </SheetTitle>
-                    <SheetDescription>
-                        {{
-                            editingUser
-                                ? 'Atualize os dados cadastrais, nível de acesso ou status do operador.'
-                                : 'Preencha os dados abaixo para cadastrar um novo operador no ERP.'
-                        }}
+                    <SheetDescription class="text-sm">
+                        Configure as credenciais, o cargo e o status de acesso ao ERP.
                     </SheetDescription>
                 </SheetHeader>
 
-                <form class="mt-6 flex flex-col gap-4" @submit.prevent="submitForm">
-                    <div class="grid gap-2">
-                        <Label for="name">Nome completo</Label>
-                        <Input id="name" v-model="form.name" required placeholder="Ex: João Silva" />
-                        <InputError :message="form.errors.name" />
+                <form class="flex min-h-0 flex-1 flex-col" autocomplete="off" @submit.prevent="submitForm">
+                    <!-- Corpo rolável compacto (gap-3 e px-5 py-4) -->
+                    <div class="flex flex-1 flex-col gap-3 overflow-y-auto px-5 py-4">
+                        <!-- 1. Cargo / Permissão em Botões no Topo -->
+                        <div class="grid gap-1.5">
+                            <Label>Cargo / Permissão</Label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <Button
+                                    type="button"
+                                    :variant="form.role === 'user' ? 'default' : 'outline'"
+                                    class="w-full"
+                                    :disabled="isEditingSelf"
+                                    @click="form.role = 'user'"
+                                >
+                                    <UserIcon class="h-4 w-4" />
+                                    Usuário Comum
+                                </Button>
+                                <Button
+                                    type="button"
+                                    :variant="form.role === 'admin' ? 'default' : 'outline'"
+                                    class="w-full"
+                                    :disabled="isEditingSelf"
+                                    @click="form.role = 'admin'"
+                                >
+                                    <ShieldCheck class="h-4 w-4" />
+                                    Administrador
+                                </Button>
+                            </div>
+                            <InputError :message="form.errors.role" />
+                        </div>
+
+                        <!-- 2. Nome completo -->
+                        <div class="grid gap-1.5">
+                            <Label for="name">Nome completo</Label>
+                            <Input
+                                id="name"
+                                v-model="form.name"
+                                required
+                                placeholder="Ex: João Silva"
+                            />
+                            <InputError :message="form.errors.name" />
+                        </div>
+
+                        <!-- 3. E-mail -->
+                        <div class="grid gap-1.5">
+                            <Label for="email">Endereço de e-mail</Label>
+                            <Input
+                                id="email"
+                                v-model="form.email"
+                                type="email"
+                                required
+                                autocomplete="off"
+                                placeholder="ex: joao@ventania.com"
+                            />
+                            <InputError :message="form.errors.email" />
+                        </div>
+
+                        <!-- 4. Senha -->
+                        <div class="grid gap-1.5">
+                            <Label for="password">
+                                {{ editingUser ? 'Nova senha (deixe em branco para manter)' : 'Senha de acesso' }}
+                            </Label>
+                            <Input
+                                id="password"
+                                v-model="form.password"
+                                type="password"
+                                autocomplete="new-password"
+                                :required="!editingUser"
+                                placeholder="Mínimo de 8 caracteres"
+                            />
+                            <InputError :message="form.errors.password" />
+                        </div>
+
+                        <!-- 5. Checkbox de Conta Ativa -->
+                        <div class="flex items-center gap-2 pt-0.5">
+                            <input
+                                id="is_active"
+                                v-model="form.is_active"
+                                type="checkbox"
+                                :disabled="isEditingSelf"
+                                class="h-4 w-4 rounded border-input text-primary focus:ring-primary disabled:opacity-50"
+                            />
+                            <Label for="is_active" class="cursor-pointer text-xs">
+                                Conta ativa (permite login e operação no sistema)
+                            </Label>
+                        </div>
+
+                        <p v-if="isEditingSelf" class="text-xs text-muted-foreground">
+                            Por segurança, você não pode remover seu próprio cargo de administrador ou inativar a própria conta.
+                        </p>
                     </div>
 
-                    <div class="grid gap-2">
-                        <Label for="email">E-mail</Label>
-                        <Input
-                            id="email"
-                            v-model="form.email"
-                            type="email"
-                            required
-                            placeholder="nome@ventania.com"
-                        />
-                        <InputError :message="form.errors.email" />
-                    </div>
-
-                    <div class="grid gap-2">
-                        <Label for="password">
-                            {{ editingUser ? 'Nova senha (deixe em branco para manter)' : 'Senha inicial' }}
-                        </Label>
-                        <Input
-                            id="password"
-                            v-model="form.password"
-                            type="password"
-                            :required="!editingUser"
-                            placeholder="Mínimo de 8 caracteres"
-                        />
-                        <InputError :message="form.errors.password" />
-                    </div>
-
-                    <div class="grid gap-2">
-                        <Label for="role">Cargo</Label>
-                        <select
-                            id="role"
-                            v-model="form.role"
-                            :disabled="isEditingSelf"
-                            class="h-9 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
-                        >
-                            <option v-for="role in roles" :key="role.value" :value="role.value">
-                                {{ role.label }}
-                            </option>
-                        </select>
-                        <InputError :message="form.errors.role" />
-                    </div>
-
-                    <div class="flex items-center gap-2 pt-2">
-                        <input
-                            id="is_active"
-                            v-model="form.is_active"
-                            type="checkbox"
-                            :disabled="isEditingSelf"
-                            class="h-4 w-4 rounded border-input text-primary focus:ring-primary disabled:opacity-50"
-                        />
-                        <Label for="is_active" class="cursor-pointer">
-                            Conta ativa (permite login e operação no sistema)
-                        </Label>
-                    </div>
-
-                    <p v-if="isEditingSelf" class="text-xs text-muted-foreground">
-                        Por segurança, você não pode remover seu próprio cargo de administrador ou inativar a própria conta.
-                    </p>
-
-                    <SheetFooter class="mt-4">
+                    <!-- Rodapé fixo compacto -->
+                    <SheetFooter class="border-t bg-background px-5 py-3.5">
                         <Button type="button" variant="outline" @click="isSheetOpen = false">
                             Cancelar
                         </Button>
                         <Button type="submit" :disabled="form.processing">
-                            {{ form.processing ? 'Salvando...' : 'Salvar' }}
+                            {{
+                                form.processing
+                                    ? 'Salvando...'
+                                    : editingUser
+                                      ? 'Salvar alterações'
+                                      : 'Cadastrar usuário'
+                            }}
                         </Button>
                     </SheetFooter>
                 </form>

@@ -41,7 +41,7 @@ import {
     TrendingDown,
     TrendingUp,
 } from 'lucide-vue-next';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 interface SimpleProductOption {
     id: number;
@@ -102,7 +102,6 @@ interface Props {
 const props = defineProps<Props>();
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
     { title: 'Movimentações', href: '/stock-movements' },
 ];
 
@@ -133,7 +132,7 @@ watch(search, () => {
 
 watch(activeTab, applyFilters);
 
-// Controle do painel lateral (<Sheet>) de Nova Movimentação
+// Controle do painel lateral (<Sheet>) de Movimentação em Lote
 const isSheetOpen = ref(false);
 
 const form = useForm({
@@ -141,6 +140,18 @@ const form = useForm({
     notes: '',
     items: [] as Array<{ product_id: number | string; quantity: number }>,
 });
+
+// Sugestões rápidas de motivo com 1 clique de acordo com o tipo da operação
+const notePresets = computed(() =>
+    form.type === 'in'
+        ? ['Compra de fornecedor', 'Ajuste de inventário', 'Devolução de cliente']
+        : ['Ajuste de inventário', 'Perda ou avaria', 'Uso interno'],
+);
+
+// Soma total de unidades físicas sendo movimentadas no lote atual
+const totalBatchUnits = computed(() =>
+    form.items.reduce((sum, item) => sum + Math.max(0, Number(item.quantity || 0)), 0),
+);
 
 const isProductSelected = (productId: number, currentIndex: number): boolean => {
     return form.items.some(
@@ -368,7 +379,7 @@ const formatDate = (dateString: string) => {
                     </div>
 
                     <Button class="h-9 w-full sm:w-auto" @click="openCreateSheet">
-                        <Plus class="mr-1.5 h-4 w-4" />
+                        <Plus class="h-4 w-4" />
                         Nova Movimentação
                     </Button>
                 </div>
@@ -480,123 +491,151 @@ const formatDate = (dateString: string) => {
             </div>
         </div>
 
-        <!-- Painel Lateral (<Sheet>) de Nova Movimentação -->
+        <!-- Painel Lateral (<Sheet>) Compacto Padronizado -->
         <Sheet v-model:open="isSheetOpen">
-            <SheetContent class="overflow-y-auto sm:max-w-lg">
-                <SheetHeader>
-                    <SheetTitle>Nova Movimentação de Estoque</SheetTitle>
-                    <SheetDescription>
-                        Registre entradas de fornecedor ou baixas manuais com 1 ou mais produtos físicos (PRO).
+            <SheetContent class="flex h-full flex-col p-0 sm:max-w-md">
+                <SheetHeader class="border-b px-5 py-3.5">
+                    <SheetTitle class="text-base">Registrar Movimentação em Lote</SheetTitle>
+                    <SheetDescription class="text-sm">
+                        Adicione um ou mais produtos físicos (PRO) e confira o volume total antes de confirmar.
                     </SheetDescription>
                 </SheetHeader>
 
-                <form class="mt-6 flex flex-col gap-4" @submit.prevent="submitForm">
-                    <!-- Tipo de Movimentação (Entrada vs Saída) -->
-                    <div class="grid gap-2">
-                        <Label>Tipo de operação</Label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <Button
-                                type="button"
-                                :variant="form.type === 'in' ? 'default' : 'outline'"
-                                class="w-full"
-                                @click="form.type = 'in'"
-                            >
-                                <ArrowDownLeft class="mr-2 h-4 w-4 text-emerald-500" />
-                                Entrada (+ Estoque)
-                            </Button>
-                            <Button
-                                type="button"
-                                :variant="form.type === 'out' ? 'default' : 'outline'"
-                                class="w-full"
-                                @click="form.type = 'out'"
-                            >
-                                <ArrowUpRight class="mr-2 h-4 w-4 text-destructive" />
-                                Saída (- Baixa)
-                            </Button>
-                        </div>
-                        <InputError :message="form.errors.type" />
-                    </div>
-
-                    <!-- Motivo / Observação -->
-                    <div class="grid gap-2">
-                        <Label for="notes">Motivo / Observação</Label>
-                        <Input
-                            id="notes"
-                            v-model="form.notes"
-                            :placeholder="
-                                form.type === 'in'
-                                    ? 'ex: Compra Fornecedor NF #105, Reposição de prateleira'
-                                    : 'ex: Ajuste de inventário, Perda/Avaria'
-                            "
-                        />
-                        <InputError :message="form.errors.notes" />
-                    </div>
-
-                    <!-- Lista de Itens da Movimentação -->
-                    <div class="flex flex-col gap-3 rounded-lg border bg-muted/30 p-3.5">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <div class="text-sm font-medium">Itens da Movimentação</div>
-                                <div class="text-xs text-muted-foreground">
-                                    Selecione os produtos físicos (PRO) e as quantidades.
-                                </div>
-                            </div>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                :disabled="form.items.length >= simpleProducts.length"
-                                @click="addItemRow"
-                            >
-                                <Plus class="mr-1 h-3.5 w-3.5" />
-                                Adicionar item
-                            </Button>
-                        </div>
-
-                        <div
-                            v-for="(item, index) in form.items"
-                            :key="index"
-                            class="flex items-center gap-2"
-                        >
-                            <select
-                                v-model="item.product_id"
-                                required
-                                class="h-9 min-w-0 flex-1 truncate rounded-md border border-input bg-background px-2.5 text-xs ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                            >
-                                <option
-                                    v-for="simple in simpleProducts"
-                                    :key="simple.id"
-                                    :value="simple.id"
-                                    :disabled="isProductSelected(simple.id, index)"
+                <form class="flex min-h-0 flex-1 flex-col" autocomplete="off" @submit.prevent="submitForm">
+                    <!-- Corpo rolável compacto (gap-3 e px-5 py-4) -->
+                    <div class="flex flex-1 flex-col gap-3 overflow-y-auto px-5 py-4">
+                        <!-- 1. Tipo de Operação -->
+                        <div class="grid gap-1.5">
+                            <Label>Tipo de operação</Label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <Button
+                                    type="button"
+                                    :variant="form.type === 'in' ? 'default' : 'outline'"
+                                    class="w-full"
+                                    @click="form.type = 'in'"
                                 >
-                                    {{ simple.sku }} — {{ simple.name }} (Saldo: {{ simple.stock_quantity }} un.)
-                                </option>
-                            </select>
-
-                            <Input
-                                v-model.number="item.quantity"
-                                type="number"
-                                min="1"
-                                required
-                                class="h-9 w-20 shrink-0 text-center tabular-nums"
-                            />
-
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                class="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
-                                :disabled="form.items.length <= 1"
-                                @click="removeItemRow(index)"
-                            >
-                                <Trash2 class="h-4 w-4" />
-                            </Button>
+                                    <ArrowDownLeft class="h-4 w-4" />
+                                    Entrada (+ Estoque)
+                                </Button>
+                                <Button
+                                    type="button"
+                                    :variant="form.type === 'out' ? 'default' : 'outline'"
+                                    class="w-full"
+                                    @click="form.type = 'out'"
+                                >
+                                    <ArrowUpRight class="h-4 w-4" />
+                                    Saída (- Estoque)
+                                </Button>
+                            </div>
+                            <InputError :message="form.errors.type" />
                         </div>
 
-                        <InputError :message="form.errors.items" />
+                        <!-- 2. Identificação da Nota Fiscal / Motivo + Sugestões com 1 Clique -->
+                        <div class="grid gap-1.5">
+                            <Label for="notes">Identificação da Nota Fiscal / Motivo</Label>
+                            <Input
+                                id="notes"
+                                v-model="form.notes"
+                                :placeholder="
+                                    form.type === 'in'
+                                        ? 'ex: Entrada NF 4510 - Fornecedor'
+                                        : 'ex: Ajuste de inventário, Perda ou avaria'
+                                "
+                            />
+                            <div class="flex flex-wrap gap-1.5 pt-0.5">
+                                <button
+                                    v-for="preset in notePresets"
+                                    :key="preset"
+                                    type="button"
+                                    class="rounded-md border bg-muted/40 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                                    @click="form.notes = preset"
+                                >
+                                    {{ preset }}
+                                </button>
+                            </div>
+                            <InputError :message="form.errors.notes" />
+                        </div>
+
+                        <!-- 3. Quadro de Itens da Movimentação e Totalizador de Unidades -->
+                        <div class="flex flex-col gap-2.5 rounded-lg border bg-muted/30 p-3">
+                            <div class="flex items-center justify-between gap-2">
+                                <div>
+                                    <div class="text-sm font-medium">
+                                        Itens da Movimentação ({{ form.items.length }})
+                                    </div>
+                                    <div class="text-xs text-muted-foreground">
+                                        Produtos físicos e quantidade movimentada.
+                                    </div>
+                                </div>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    :disabled="form.items.length >= simpleProducts.length"
+                                    @click="addItemRow"
+                                >
+                                    <Plus class="h-3.5 w-3.5" />
+                                    Adicionar produto
+                                </Button>
+                            </div>
+
+                            <!-- Lista de Produtos do Lote (Em linha única compacta) -->
+                            <div
+                                v-for="(item, index) in form.items"
+                                :key="index"
+                                class="flex items-center gap-2"
+                            >
+                                <select
+                                    v-model="item.product_id"
+                                    required
+                                    class="h-9 min-w-0 flex-1 truncate rounded-md border border-input bg-background px-2.5 text-xs ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                                >
+                                    <option
+                                        v-for="simple in simpleProducts"
+                                        :key="simple.id"
+                                        :value="simple.id"
+                                        :disabled="isProductSelected(simple.id, index)"
+                                    >
+                                        {{ simple.sku }} — {{ simple.name }} (Saldo: {{ simple.stock_quantity }} un.)
+                                    </option>
+                                </select>
+
+                                <Input
+                                    v-model.number="item.quantity"
+                                    type="number"
+                                    min="1"
+                                    required
+                                    class="w-16 shrink-0 text-center tabular-nums"
+                                />
+
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    class="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
+                                    :disabled="form.items.length <= 1"
+                                    @click="removeItemRow(index)"
+                                >
+                                    <Trash2 class="h-4 w-4" />
+                                </Button>
+                            </div>
+
+                            <InputError :message="form.errors.items" />
+
+                            <!-- Resumo de Conferência do Lote (Total de Peças e SKUs) -->
+                            <div class="flex items-center justify-between border-t pt-2 text-xs">
+                                <span class="text-muted-foreground">
+                                    Total de peças no lote ({{ form.items.length }} {{ form.items.length === 1 ? 'SKU' : 'SKUs' }}):
+                                </span>
+                                <span class="text-sm font-semibold tabular-nums">
+                                    {{ totalBatchUnits }} {{ totalBatchUnits === 1 ? 'unidade' : 'unidades' }}
+                                </span>
+                            </div>
+                        </div>
                     </div>
 
-                    <SheetFooter class="mt-4">
+                    <!-- Rodapé fixo compacto -->
+                    <SheetFooter class="border-t bg-background px-5 py-3.5">
                         <Button type="button" variant="outline" @click="isSheetOpen = false">
                             Cancelar
                         </Button>
@@ -605,8 +644,8 @@ const formatDate = (dateString: string) => {
                                 form.processing
                                     ? 'Processando...'
                                     : form.type === 'in'
-                                      ? 'Confirmar Entrada'
-                                      : 'Confirmar Saída'
+                                      ? 'Confirmar Entrada do Lote'
+                                      : 'Confirmar Saída do Lote'
                             }}
                         </Button>
                     </SheetFooter>
