@@ -528,7 +528,7 @@ const formatCurrency = (value: number | string) => {
                                 <TableHead class="whitespace-nowrap">Preço</TableHead>
                                 <TableHead class="whitespace-nowrap">Disponível</TableHead>
                                 <TableHead class="whitespace-nowrap">Status</TableHead>
-                                <TableHead class="whitespace-nowrap text-right">Ações</TableHead>
+                                <TableHead class="whitespace-nowrap w-16 text-center">Ações</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -625,7 +625,7 @@ const formatCurrency = (value: number | string) => {
                                         {{ product.is_active ? 'Ativo' : 'Inativo' }}
                                     </Badge>
                                 </TableCell>
-                                <TableCell class="whitespace-nowrap text-right">
+                                <TableCell class="whitespace-nowrap w-16 text-center">
                                     <Button
                                         variant="ghost"
                                         size="icon"

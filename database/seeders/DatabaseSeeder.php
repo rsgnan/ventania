@@ -4,11 +4,18 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\PaymentMethod;
+use App\Enums\SaleStatus;
+use App\Enums\StockMovementType;
 use App\Enums\ProductType;
 use App\Enums\UserRole;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Sale;
+use App\Models\StockMovement;
 use App\Models\User;
+use App\Services\SaleService;
+use App\Services\StockMovementService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -116,5 +123,57 @@ class DatabaseSeeder extends Seeder
             $incenso->id => ['quantity' => 2],
             $sabonete->id => ['quantity' => 1],
         ]);
+
+        // 7. Movimentação inicial de estoque e vendas de exemplo (Idempotente)
+        if (StockMovement::count() === 0) {
+            $admin = User::where('email', 'admin@ventania.com')->first();
+
+            app(StockMovementService::class)->record(
+                userId: $admin->id,
+                type: StockMovementType::In,
+                items: [
+                    ['product_id' => $incenso->id, 'quantity' => 30],
+                    ['product_id' => $sabonete->id, 'quantity' => 15],
+                ],
+                notes: 'Compra de fornecedor - Lote Inicial NF #001',
+            );
+
+            $saleService = app(SaleService::class);
+
+            // Venda #1: Concluída (baixa automática no estoque)
+            $completedSale = $saleService->create($admin->id, [
+                'customer_name' => 'Maria Clara Oliveira',
+                'payment_method' => PaymentMethod::Pix->value,
+                'discount' => 2.50,
+                'notes' => 'Cliente recorrente da loja física',
+                'items' => [
+                    ['product_id' => $incenso->id, 'quantity' => 1],
+                    ['product_id' => $kit->id, 'quantity' => 1],
+                ],
+            ]);
+
+            $saleService->update($completedSale, [
+                'customer_name' => 'Maria Clara Oliveira',
+                'status' => SaleStatus::Completed->value,
+                'payment_method' => PaymentMethod::Pix->value,
+                'discount' => 2.50,
+                'notes' => 'Cliente recorrente da loja física',
+                'items' => [
+                    ['product_id' => $incenso->id, 'quantity' => 1],
+                    ['product_id' => $kit->id, 'quantity' => 1],
+                ],
+            ], $admin->id);
+
+            // Venda #2: Pendente (em aberto para testar edição no painel)
+            $saleService->create($admin->id, [
+                'customer_name' => 'Consumidor Final',
+                'payment_method' => PaymentMethod::CreditCard->value,
+                'discount' => 0,
+                'notes' => 'Aguardando confirmação no balcão',
+                'items' => [
+                    ['product_id' => $sabonete->id, 'quantity' => 2],
+                ],
+            ]);
+        }
     }
 }

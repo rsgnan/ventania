@@ -371,7 +371,7 @@ const getPercentage = (value: number) => {
                                 <TableHead class="whitespace-nowrap">Status de Acesso</TableHead>
                                 <TableHead class="whitespace-nowrap">Último Acesso</TableHead>
                                 <TableHead class="whitespace-nowrap">Data de Cadastro</TableHead>
-                                <TableHead class="whitespace-nowrap text-right">Ações</TableHead>
+                                <TableHead class="whitespace-nowrap w-16 text-center">Ações</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -416,7 +416,7 @@ const getPercentage = (value: number) => {
                                 <TableCell class="whitespace-nowrap text-xs text-muted-foreground tabular-nums">
                                     {{ formatDate(user.created_at) }}
                                 </TableCell>
-                                <TableCell class="whitespace-nowrap text-right">
+                                <TableCell class="whitespace-nowrap w-16 text-center">
                                     <Button
                                         variant="ghost"
                                         size="icon"

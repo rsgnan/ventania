@@ -15,10 +15,11 @@ import { type NavItem, type SharedData } from '@/types';
 import { computed } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import { 
-    ArrowDownUp, 
+    ArrowUpDown, 
     FolderGit2, 
     LayoutGrid, 
-    Package, 
+    Package,
+    ShoppingBag,
     Users
 } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
@@ -29,20 +30,25 @@ const page = usePage<SharedData>();
 const mainNavItems = computed<NavItem[]>(() => {
     const items: NavItem[] = [
         {
-            title: 'Dashboard',
-            href: '/dashboard',
-            icon: LayoutGrid,
-        },
-        {
-            title: 'Produtos',
-            href: '/products',
-            icon: Package,
-        },
-        {
-            title: 'Movimentações',
-            href: '/stock-movements',
-            icon: ArrowDownUp,
-        },
+        title: 'Dashboard',
+        href: '/dashboard',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Vendas',
+        href: '/sales',
+        icon: ShoppingBag,
+    },
+    {
+        title: 'Produtos',
+        href: '/products',
+        icon: Package,
+    },
+    {
+        title: 'Movimentações',
+        href: '/stock-movements',
+        icon: ArrowUpDown,
+    },
     ];
 
     if (page.props.auth.user?.role === 'admin') {

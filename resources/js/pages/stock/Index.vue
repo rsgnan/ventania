@@ -418,9 +418,10 @@ const formatDate = (dateString: string) => {
                                     </Badge>
                                 </TableCell>
                                 <TableCell>
-                                    <div class="flex flex-wrap gap-1.5">
+                                    <!-- Exibe no máximo 2 itens + badge (+N itens) para manter a linha compacta -->
+                                    <div class="flex flex-wrap items-center gap-1.5">
                                         <span
-                                            v-for="item in mov.items"
+                                            v-for="item in mov.items.slice(0, 2)"
                                             :key="item.id"
                                             class="inline-flex items-center gap-1.5 rounded border bg-muted/40 px-2 py-0.5 text-xs"
                                         >
@@ -437,11 +438,25 @@ const formatDate = (dateString: string) => {
                                             <span class="font-mono text-muted-foreground">
                                                 {{ item.product?.sku }}
                                             </span>
-                                            <span class="font-medium">{{ item.product?.name }}</span>
+                                            <span class="max-w-[140px] truncate font-medium">{{ item.product?.name }}</span>
                                             <span class="rounded bg-background px-1.5 py-0.2 font-mono text-[10px] text-muted-foreground tabular-nums">
                                                 {{ item.previous_stock }} → {{ item.new_stock }} un.
                                             </span>
                                         </span>
+
+                                        <Badge
+                                            v-if="mov.items.length > 2"
+                                            variant="secondary"
+                                            :title="
+                                                mov.items
+                                                    .slice(2)
+                                                    .map((i) => `${mov.type === 'in' ? '+' : '-'}${i.quantity}x ${i.product?.sku} (${i.product?.name})`)
+                                                    .join(', ')
+                                            "
+                                            class="text-[10px] tabular-nums"
+                                        >
+                                            +{{ mov.items.length - 2 }} {{ mov.items.length - 2 === 1 ? 'item' : 'itens' }}
+                                        </Badge>
                                     </div>
                                 </TableCell>
                                 <TableCell class="whitespace-nowrap text-sm text-muted-foreground">
