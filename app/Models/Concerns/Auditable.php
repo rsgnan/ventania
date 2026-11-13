@@ -9,7 +9,7 @@ use Illuminate\Support\Arr;
 trait Auditable
 {
     /**
-     * Convenção do Eloquent: boot{NomeDaTrait} roda automaticamente nos Models que usam a Trait.
+     * Registra os eventos de auditoria no boot do Model (convenção boot{Trait}).
      */
     public static function bootAuditable(): void
     {

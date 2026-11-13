@@ -190,7 +190,7 @@ const getPercentage = (value: number) => {
                 </p>
             </div>
 
-            <!-- Cards Superiores de KPIs (Padrão Shadcn Dashboard) -->
+            <!-- Cards Superiores de KPIs -->
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <Card class="flex flex-col justify-between">
                     <CardHeader class="pb-2">
@@ -358,7 +358,7 @@ const getPercentage = (value: number) => {
                 </div>
             </div>
 
-            <!-- Tabela de Usuários com Scroll Horizontal Isolado no Mobile -->
+            <!-- Tabela de Usuários com Scroll Horizontal Isolado -->
             <div class="w-full overflow-hidden rounded-md border bg-card">
                 <div class="w-full overflow-x-auto">
                     <Table>

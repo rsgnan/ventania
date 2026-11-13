@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types=1); // Força checagem estrita de tipos no PHP 8.3+ (evita conversões implícitas silenciosas)
+declare(strict_types=1);
 
 namespace App\Enums;
 
 /**
- * Define os níveis de acesso (Roles) permitidos no Ventania.
+ * Define os níveis de acesso (Roles) permitidos no sistema.
  */
 enum UserRole: string
 {
@@ -24,7 +24,7 @@ enum UserRole: string
     }
 
     /**
-     * Método auxiliar para retornar todas as opções formatadas para componentes de <Select> no Frontend.
+     * Método auxiliar para retornar todas as opções formatadas para componentes do Frontend.
      *
      * @return array<int, array{value: string, label: string}>
      */

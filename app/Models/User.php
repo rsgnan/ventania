@@ -48,14 +48,13 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'password' => 'hashed', // Garante hash Bcrypt/Argon2 automático ao atribuir uma senha em texto puro
-            'role' => UserRole::class, // Converte 'admin'/'user' do banco diretamente para o Enum UserRole
-            'is_active' => 'boolean', // Garante tipo booleano estrito (true/false) no PHP e no Vue
+            'password' => 'hashed',
+            'role' => UserRole::class,
+            'is_active' => 'boolean',
         ];
     }
 
     /**
-     * Registra gatilhos no ciclo de vida do Model (Model Events).
      * Blindagem arquitetural: impede que qualquer parte do sistema execute $user->delete().
      */
     protected static function booted(): void

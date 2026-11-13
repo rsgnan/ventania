@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class AuditLog extends Model
 {
-    /**
-     * Desativa a coluna updated_at, pois logs de auditoria nunca sofrem update.
-     */
     public const UPDATED_AT = null;
 
     protected $fillable = [
@@ -29,7 +26,7 @@ class AuditLog extends Model
     protected function casts(): array
     {
         return [
-            'old_values' => 'array', // Converte automaticamente entre array PHP e JSONB do Postgres
+            'old_values' => 'array',
             'new_values' => 'array',
             'created_at' => 'datetime',
         ];

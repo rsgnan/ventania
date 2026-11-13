@@ -15,8 +15,6 @@ class StoreStockMovementRequest extends FormRequest
     }
 
     /**
-     * Valida o cabeçalho (tipo e observação) e a lista de itens físicos movimentados.
-     *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array

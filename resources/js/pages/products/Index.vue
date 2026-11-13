@@ -311,7 +311,7 @@ const formatCurrency = (value: number | string) => {
                 </p>
             </div>
 
-            <!-- Cards Superiores de KPIs (Padrão Shadcn Dashboard) -->
+            <!-- Cards Superiores de KPIs -->
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <Card class="flex flex-col justify-between">
                     <CardHeader class="pb-2">

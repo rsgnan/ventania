@@ -13,9 +13,6 @@ class StockMovement extends Model
 {
     use Auditable;
 
-    /**
-     * Movimentações de estoque possuem apenas created_at (são fatos históricos imutáveis).
-     */
     public const UPDATED_AT = null;
 
     protected $fillable = [
