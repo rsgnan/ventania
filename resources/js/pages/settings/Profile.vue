@@ -22,7 +22,7 @@ defineProps<Props>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Profile settings',
+        title: 'Configurações de Perfil',
         href: '/settings/profile',
     },
 ];
@@ -44,68 +44,61 @@ const submit = () => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head title="Profile settings" />
+        <Head title="Configurações de Perfil" />
 
         <SettingsLayout>
             <div class="flex flex-col space-y-6">
-                <HeadingSmall title="Profile information" description="Update your name and email address" />
+                <HeadingSmall
+                    title="Informações do perfil"
+                    description="Atualize o seu nome e endereço de e-mail"
+                />
 
-                <form @submit.prevent="submit" class="space-y-6">
-                    <div class="grid gap-2">
-                        <Label for="name">Name</Label>
-                        <Input id="name" class="mt-1 block w-full" v-model="form.name" required autocomplete="name" placeholder="Full name" />
+                <form class="space-y-6" @submit.prevent="submit">
+                    <div class="grid gap-1.5">
+                        <Label for="name">Nome completo</Label>
+                        <Input
+                            id="name"
+                            v-model="form.name"
+                            class="mt-1 block w-full"
+                            required
+                            autocomplete="name"
+                            placeholder="Seu nome completo"
+                        />
                         <InputError class="mt-2" :message="form.errors.name" />
                     </div>
 
-                    <div class="grid gap-2">
-                        <Label for="email">Email address</Label>
+                    <div class="grid gap-1.5">
+                        <Label for="email">Endereço de e-mail</Label>
                         <Input
                             id="email"
+                            v-model="form.email"
                             type="email"
                             class="mt-1 block w-full"
-                            v-model="form.email"
                             required
                             autocomplete="username"
-                            placeholder="Email address"
+                            placeholder="Seu e-mail"
                         />
                         <InputError class="mt-2" :message="form.errors.email" />
                     </div>
 
-                    <div v-if="mustVerifyEmail && !user.email_verified_at">
-                        <p class="mt-2 text-sm text-neutral-800">
-                            Your email address is unverified.
-                            <Link
-                                :href="route('verification.send')"
-                                method="post"
-                                as="button"
-                                class="focus:outline-hidden rounded-md text-sm text-neutral-600 underline hover:text-neutral-900 focus:ring-2 focus:ring-offset-2"
-                            >
-                                Click here to re-send the verification email.
-                            </Link>
-                        </p>
-
-                        <div v-if="status === 'verification-link-sent'" class="mt-2 text-sm font-medium text-green-600">
-                            A new verification link has been sent to your email address.
-                        </div>
-                    </div>
-
                     <div class="flex items-center gap-4">
-                        <Button :disabled="form.processing">Save</Button>
+                        <Button :disabled="form.processing">
+                            {{ form.processing ? 'Salvando...' : 'Salvar alterações' }}
+                        </Button>
 
-                        <TransitionRoot
-                            :show="form.recentlySuccessful"
-                            enter="transition ease-in-out"
-                            enter-from="opacity-0"
-                            leave="transition ease-in-out"
-                            leave-to="opacity-0"
+                        <Transition
+                            enter-active-class="transition ease-in-out"
+                            enter-from-class="opacity-0"
+                            leave-active-class="transition ease-in-out"
+                            leave-to-class="opacity-0"
                         >
-                            <p class="text-sm text-neutral-600">Saved.</p>
-                        </TransitionRoot>
+                            <p v-show="form.recentlySuccessful" class="text-sm text-emerald-600">
+                                Salvo com sucesso.
+                            </p>
+                        </Transition>
                     </div>
                 </form>
             </div>
-
-            <DeleteUser />
         </SettingsLayout>
     </AppLayout>
 </template>

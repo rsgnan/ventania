@@ -8,21 +8,24 @@ import { type BreadcrumbItem } from '@/types';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 
-const breadcrumbItems: BreadcrumbItem[] = [
+const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Appearance settings',
+        title: 'Configurações de Aparência',
         href: '/settings/appearance',
     },
 ];
 </script>
 
 <template>
-    <AppLayout :breadcrumbs="breadcrumbItems">
-        <Head title="Appearance settings" />
+    <AppLayout :breadcrumbs="breadcrumbs">
+        <Head title="Configurações de Aparência" />
 
         <SettingsLayout>
             <div class="space-y-6">
-                <HeadingSmall title="Appearance settings" description="Update your account's appearance settings" />
+                <HeadingSmall
+                    title="Aparência do sistema"
+                    description="Personalize o tema visual do ERP neste dispositivo"
+                />
                 <AppearanceTabs />
             </div>
         </SettingsLayout>

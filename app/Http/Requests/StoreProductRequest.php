@@ -28,14 +28,15 @@ class StoreProductRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:2000'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'is_active' => ['required', 'boolean'],
-            'components' => ['required_if:type,kit', 'nullable', 'array', 'min:1'],
+            'components' => ['exclude_unless:type,kit', 'required', 'array', 'min:1'],
             'components.*.product_id' => [
-                'required_if:type,kit',
+                'exclude_unless:type,kit',
+                'required',
                 'integer',
                 'distinct',
                 Rule::exists('products', 'id')->where('type', ProductType::Simple->value),
             ],
-            'components.*.quantity' => ['required_if:type,kit', 'integer', 'min:1'],
+            'components.*.quantity' => ['exclude_unless:type,kit', 'required', 'integer', 'min:1'],
         ];
     }
 }

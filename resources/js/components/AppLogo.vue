@@ -10,10 +10,10 @@ defineProps<Props>();
 
 <template>
     <div class="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-        <Warehouse class="size-4" />
+        <Warehouse class="size-4 text-white dark:text-black" />
     </div>
     <div class="ml-1 grid flex-1 text-left text-sm leading-tight">
         <span class="truncate font-semibold">Ventania</span>
-        <span class="text-muted-foreground truncate text-xs">ERP & Hub</span>
+        <span class="truncate text-xs text-muted-foreground">ERP &amp; Hub</span>
     </div>
 </template>

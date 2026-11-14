@@ -7,15 +7,15 @@ import { Link } from '@inertiajs/vue3';
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Profile',
+        title: 'Perfil',
         href: '/settings/profile',
     },
     {
-        title: 'Password',
+        title: 'Senha',
         href: '/settings/password',
     },
     {
-        title: 'Appearance',
+        title: 'Aparência',
         href: '/settings/appearance',
     },
 ];
@@ -25,7 +25,7 @@ const currentPath = window.location.pathname;
 
 <template>
     <div class="px-4 py-6">
-        <Heading title="Settings" description="Manage your profile and account settings" />
+        <Heading title="Configurações" description="Gerencie os dados do seu perfil, senha e aparência do sistema" />
 
         <div class="flex flex-col space-y-8 md:space-y-0 lg:flex-row lg:space-x-12 lg:space-y-0">
             <aside class="w-full max-w-xl lg:w-48">
@@ -34,7 +34,10 @@ const currentPath = window.location.pathname;
                         v-for="item in sidebarNavItems"
                         :key="item.href"
                         variant="ghost"
-                        :class="['w-full justify-start', { 'bg-muted': currentPath === item.href }]"
+                        :class="[
+                            'w-full justify-start',
+                            { 'bg-muted': currentPath === item.href },
+                        ]"
                         as-child
                     >
                         <Link :href="item.href">
