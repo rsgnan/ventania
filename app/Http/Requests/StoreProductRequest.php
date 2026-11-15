@@ -20,7 +20,7 @@ class StoreProductRequest extends FormRequest
     {
         return [
             'category_id' => ['required', 'integer', 'exists:categories,id'],
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->ignore($this->route('product'))],
             'sku' => ['nullable', 'string', 'max:50', Rule::unique('products', 'sku')->ignore($this->route('product'))],
             'type' => ['required', Rule::enum(ProductType::class)],
             'price' => ['required', 'numeric', 'min:0'],

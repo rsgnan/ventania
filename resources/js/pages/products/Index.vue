@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import InputError from '@/components/InputError.vue';
+import ProductCombobox from '@/components/ProductCombobox.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -172,13 +173,6 @@ const form = useForm({
     components: [] as Array<{ product_id: number | string; quantity: number }>,
 });
 
-// Verifica se um produto simples já foi selecionado em outra linha da composição do Kit
-const isComponentSelected = (productId: number, currentIndex: number): boolean => {
-    return form.components.some(
-        (item, idx) => idx !== currentIndex && Number(item.product_id) === productId,
-    );
-};
-
 // Adiciona uma nova linha no Kit escolhendo automaticamente o primeiro produto simples ainda não usado
 const addComponentRow = () => {
     const nextAvailable = props.simpleProducts.find(
@@ -194,6 +188,7 @@ const addComponentRow = () => {
 };
 
 const removeComponentRow = (index: number) => {
+    if (form.components.length <= 1) return;
     form.components.splice(index, 1);
 };
 
@@ -296,6 +291,16 @@ const formatCurrency = (value: number | string) => {
         currency: 'BRL',
     }).format(Number(value || 0));
 };
+
+// Opções formatadas para o ProductCombobox na composição do Kit
+const comboboxSimpleProducts = computed(() =>
+    props.simpleProducts.map((p) => ({
+        id: p.id,
+        name: p.name,
+        sku: p.sku,
+        meta: formatCurrency(p.price),
+    })),
+);
 </script>
 
 <template>
@@ -311,7 +316,7 @@ const formatCurrency = (value: number | string) => {
                 </p>
             </div>
 
-            <!-- Cards Superiores de KPIs -->
+            <!-- Cards Superiores de KPIs (Padrão Shadcn Dashboard) -->
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <Card class="flex flex-col justify-between">
                     <CardHeader class="pb-2">
@@ -528,7 +533,7 @@ const formatCurrency = (value: number | string) => {
                                 <TableHead class="whitespace-nowrap">Preço</TableHead>
                                 <TableHead class="whitespace-nowrap">Disponível</TableHead>
                                 <TableHead class="whitespace-nowrap">Status</TableHead>
-                                <TableHead class="whitespace-nowrap w-16 text-center">Ações</TableHead>
+                                <TableHead class="w-16 whitespace-nowrap text-center">Ações</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -625,7 +630,7 @@ const formatCurrency = (value: number | string) => {
                                         {{ product.is_active ? 'Ativo' : 'Inativo' }}
                                     </Badge>
                                 </TableCell>
-                                <TableCell class="whitespace-nowrap w-16 text-center">
+                                <TableCell class="w-16 whitespace-nowrap text-center">
                                     <Button
                                         variant="ghost"
                                         size="icon"
@@ -695,7 +700,7 @@ const formatCurrency = (value: number | string) => {
                                 <Button
                                     type="button"
                                     :variant="form.type === 'simple' ? 'default' : 'outline'"
-                                    class="w-full"
+                                    class="w-full px-2.5 text-xs sm:text-sm"
                                     :disabled="!!editingProduct"
                                     @click="selectProductType('simple')"
                                 >
@@ -705,7 +710,7 @@ const formatCurrency = (value: number | string) => {
                                 <Button
                                     type="button"
                                     :variant="form.type === 'kit' ? 'default' : 'outline'"
-                                    class="w-full"
+                                    class="w-full px-2.5 text-xs sm:text-sm"
                                     :disabled="!!editingProduct"
                                     @click="selectProductType('kit')"
                                 >
@@ -797,20 +802,11 @@ const formatCurrency = (value: number | string) => {
                                 :key="index"
                                 class="flex items-center gap-2"
                             >
-                                <select
+                                <ProductCombobox
                                     v-model="comp.product_id"
-                                    required
-                                    class="h-9 min-w-0 flex-1 truncate rounded-md border border-input bg-background px-2.5 text-xs ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                                >
-                                    <option
-                                        v-for="simple in simpleProducts"
-                                        :key="simple.id"
-                                        :value="simple.id"
-                                        :disabled="isComponentSelected(simple.id, index)"
-                                    >
-                                        {{ simple.sku }} — {{ simple.name }} ({{ formatCurrency(simple.price) }})
-                                    </option>
-                                </select>
+                                    :options="comboboxSimpleProducts"
+                                    :disabled-ids="form.components.map((c) => c.product_id)"
+                                />
 
                                 <Input
                                     v-model.number="comp.quantity"
@@ -824,8 +820,17 @@ const formatCurrency = (value: number | string) => {
                                     type="button"
                                     variant="ghost"
                                     size="icon"
-                                    class="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
-                                    :disabled="form.components.length <= 1"
+                                    class="h-9 w-9 shrink-0"
+                                    :title="
+                                        form.components.length <= 1
+                                            ? 'O Kit precisa conter pelo menos 1 produto.'
+                                            : 'Remover item do Kit'
+                                    "
+                                    :class="
+                                        form.components.length <= 1
+                                            ? 'cursor-not-allowed opacity-40 hover:bg-transparent hover:text-muted-foreground'
+                                            : 'text-muted-foreground hover:text-destructive'
+                                    "
                                     @click="removeComponentRow(index)"
                                 >
                                     <Trash2 class="h-4 w-4" />

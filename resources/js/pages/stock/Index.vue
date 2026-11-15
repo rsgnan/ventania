@@ -41,6 +41,7 @@ import {
     TrendingDown,
     TrendingUp,
 } from 'lucide-vue-next';
+import ProductCombobox from '@/components/ProductCombobox.vue';
 import { computed, ref, watch } from 'vue';
 
 interface SimpleProductOption {
@@ -153,12 +154,6 @@ const totalBatchUnits = computed(() =>
     form.items.reduce((sum, item) => sum + Math.max(0, Number(item.quantity || 0)), 0),
 );
 
-const isProductSelected = (productId: number, currentIndex: number): boolean => {
-    return form.items.some(
-        (item, idx) => idx !== currentIndex && Number(item.product_id) === productId,
-    );
-};
-
 const addItemRow = () => {
     const nextAvailable = props.simpleProducts.find(
         (p) => !form.items.some((item) => Number(item.product_id) === p.id),
@@ -202,6 +197,16 @@ const formatDate = (dateString: string) => {
         timeStyle: 'short',
     }).format(new Date(dateString));
 };
+
+// Formata os produtos físicos para o ProductCombobox exibindo o saldo atual na etiqueta lateral
+const comboboxProducts = computed(() =>
+    props.simpleProducts.map((p) => ({
+        id: p.id,
+        name: p.name,
+        sku: p.sku,
+        meta: `Saldo: ${p.stock_quantity} un.`,
+    })),
+);
 </script>
 
 <template>
@@ -600,20 +605,11 @@ const formatDate = (dateString: string) => {
                                 :key="index"
                                 class="flex items-center gap-2"
                             >
-                                <select
+                               <ProductCombobox
                                     v-model="item.product_id"
-                                    required
-                                    class="h-9 min-w-0 flex-1 truncate rounded-md border border-input bg-background px-2.5 text-xs ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                                >
-                                    <option
-                                        v-for="simple in simpleProducts"
-                                        :key="simple.id"
-                                        :value="simple.id"
-                                        :disabled="isProductSelected(simple.id, index)"
-                                    >
-                                        {{ simple.sku }} — {{ simple.name }} (Saldo: {{ simple.stock_quantity }} un.)
-                                    </option>
-                                </select>
+                                    :options="comboboxProducts"
+                                    :disabled-ids="form.items.map((i) => i.product_id)"
+                                />
 
                                 <Input
                                     v-model.number="item.quantity"

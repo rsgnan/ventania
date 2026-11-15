@@ -19,7 +19,7 @@ return new class extends Migration
                 ->constrained('categories')
                 ->restrictOnDelete();
 
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('sku', 50)->nullable()->unique();
             $table->string('type', 20)->default(ProductType::Simple->value);
 
