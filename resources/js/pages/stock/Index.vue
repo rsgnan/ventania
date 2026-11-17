@@ -168,6 +168,7 @@ const addItemRow = () => {
 };
 
 const removeItemRow = (index: number) => {
+    if (form.items.length <= 1) return;
     form.items.splice(index, 1);
 };
 
@@ -620,15 +621,24 @@ const comboboxProducts = computed(() =>
                                 />
 
                                 <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    class="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
-                                    :disabled="form.items.length <= 1"
-                                    @click="removeItemRow(index)"
-                                >
-                                    <Trash2 class="h-4 w-4" />
-                                </Button>
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  class="h-9 w-9 shrink-0"
+                                  :title="
+                                      form.items.length <= 1
+                                          ? 'A movimentação precisa conter pelo menos 1 produto.'
+                                          : 'Remover produto do lote'
+                                  "
+                                  :class="
+                                      form.items.length <= 1
+                                          ? 'cursor-not-allowed opacity-40 hover:bg-transparent hover:text-muted-foreground'
+                                          : 'text-muted-foreground hover:text-destructive'
+                                  "
+                                  @click="removeItemRow(index)"
+                              >
+                                  <Trash2 class="h-4 w-4" />
+                              </Button>
                             </div>
 
                             <InputError :message="form.errors.items" />

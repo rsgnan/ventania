@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import InputError from '@/components/InputError.vue';
+import ProductCombobox from '@/components/ProductCombobox.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -40,7 +41,6 @@ import {
     Pencil,
     Plus,
     Search,
-    ShoppingBag,
     Trash2,
     TrendingUp,
 } from 'lucide-vue-next';
@@ -180,12 +180,6 @@ const form = useForm({
 
 const customerPresets = ['Consumidor Final', 'Cliente Balcão'];
 
-const isProductSelected = (productId: number, currentIndex: number): boolean => {
-    return form.items.some(
-        (item, idx) => idx !== currentIndex && Number(item.product_id) === productId,
-    );
-};
-
 const getProductById = (productId: number | string): CatalogProductOption | undefined => {
     return props.catalogProducts.find((p) => p.id === Number(productId));
 };
@@ -204,6 +198,7 @@ const addItemRow = () => {
 };
 
 const removeItemRow = (index: number) => {
+    if (form.items.length <= 1) return;
     form.items.splice(index, 1);
 };
 
@@ -288,6 +283,16 @@ const formatCurrency = (value: number | string) => {
         currency: 'BRL',
     }).format(Number(value || 0));
 };
+
+// Opções formatadas para o ProductCombobox exibindo Preço e Estoque Disponível
+const comboboxCatalogProducts = computed(() =>
+    props.catalogProducts.map((p) => ({
+        id: p.id,
+        name: p.name,
+        sku: p.sku,
+        meta: `${formatCurrency(p.price)} | Disp: ${p.available_stock}`,
+    })),
+);
 
 const formatDate = (dateString: string) => {
     return new Intl.DateTimeFormat('pt-BR', {
@@ -564,6 +569,12 @@ const getPercentage = (value: number) => {
                                         <Badge
                                             v-if="sale.items.length > 2"
                                             variant="secondary"
+                                            :title="
+                                                sale.items
+                                                    .slice(2)
+                                                    .map((i) => `${i.quantity}x ${i.product?.sku} (${i.product?.name})`)
+                                                    .join(', ')
+                                            "
                                             class="text-[10px] tabular-nums"
                                         >
                                             +{{ sale.items.length - 2 }} {{ sale.items.length - 2 === 1 ? 'item' : 'itens' }}
@@ -680,7 +691,7 @@ const getPercentage = (value: number) => {
             </div>
         </div>
 
-        <!-- Painel Lateral (<Sheet>) Compacto Padronizado (Criação / Edição Pendente / Visualização Imutável) -->
+        <!-- Painel Lateral (<Sheet>) Compacto Padronizado -->
         <Sheet v-model:open="isSheetOpen">
             <SheetContent class="flex h-full flex-col p-0 sm:max-w-md">
                 <SheetHeader class="border-b px-5 py-3.5">
@@ -715,7 +726,7 @@ const getPercentage = (value: number) => {
                                     type="button"
                                     size="sm"
                                     :variant="form.status === 'pending' ? 'default' : 'outline'"
-                                    class="w-full"
+                                    class="w-full px-2 text-xs"
                                     :disabled="isReadOnly"
                                     @click="form.status = 'pending'"
                                 >
@@ -726,7 +737,7 @@ const getPercentage = (value: number) => {
                                     type="button"
                                     size="sm"
                                     :variant="form.status === 'completed' ? 'default' : 'outline'"
-                                    class="w-full"
+                                    class="w-full px-2 text-xs"
                                     :disabled="isReadOnly"
                                     @click="form.status = 'completed'"
                                 >
@@ -737,7 +748,7 @@ const getPercentage = (value: number) => {
                                     type="button"
                                     size="sm"
                                     :variant="form.status === 'cancelled' ? 'destructive' : 'outline'"
-                                    class="w-full"
+                                    class="w-full px-2 text-xs"
                                     :disabled="isReadOnly"
                                     @click="form.status = 'cancelled'"
                                 >
@@ -782,7 +793,7 @@ const getPercentage = (value: number) => {
                                     type="button"
                                     size="sm"
                                     :variant="form.payment_method === method.value ? 'default' : 'outline'"
-                                    class="w-full"
+                                    class="w-full px-2.5 text-xs sm:text-sm"
                                     :disabled="isReadOnly"
                                     @click="form.payment_method = method.value as any"
                                 >
@@ -825,20 +836,11 @@ const getPercentage = (value: number) => {
                                     class="flex flex-col gap-1"
                                 >
                                     <div class="flex items-center gap-2">
-                                        <select
+                                        <ProductCombobox
                                             v-model="item.product_id"
-                                            required
-                                            class="h-9 min-w-0 flex-1 truncate rounded-md border border-input bg-background px-2.5 text-xs ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                                        >
-                                            <option
-                                                v-for="prod in catalogProducts"
-                                                :key="prod.id"
-                                                :value="prod.id"
-                                                :disabled="isProductSelected(prod.id, index)"
-                                            >
-                                                {{ prod.sku }} — {{ prod.name }} ({{ formatCurrency(prod.price) }} | Disp: {{ prod.available_stock }})
-                                            </option>
-                                        </select>
+                                            :options="comboboxCatalogProducts"
+                                            :disabled-ids="form.items.map((i) => i.product_id)"
+                                        />
 
                                         <Input
                                             v-model.number="item.quantity"
@@ -852,8 +854,17 @@ const getPercentage = (value: number) => {
                                             type="button"
                                             variant="ghost"
                                             size="icon"
-                                            class="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive"
-                                            :disabled="form.items.length <= 1"
+                                            class="h-9 w-9 shrink-0"
+                                            :title="
+                                                form.items.length <= 1
+                                                    ? 'A venda precisa conter pelo menos 1 item.'
+                                                    : 'Remover item da venda'
+                                            "
+                                            :class="
+                                                form.items.length <= 1
+                                                    ? 'cursor-not-allowed opacity-40 hover:bg-transparent hover:text-muted-foreground'
+                                                    : 'text-muted-foreground hover:text-destructive'
+                                            "
                                             @click="removeItemRow(index)"
                                         >
                                             <Trash2 class="h-4 w-4" />
